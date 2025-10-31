@@ -15,7 +15,7 @@ public class GameManager {
         this.players = new ArrayList<>();
         this.board = new Board();
         this.currentPlayerIndex = 0;
-        this.turnCounter = 0;
+        this.turnCounter = 1;
         this.gameOver = false;
     }
 
@@ -203,8 +203,6 @@ public class GameManager {
             return false;
         }
 
-        turnCounter++;
-
         Player currentPlayer = players.get(currentPlayerIndex);
 
         int novaPosicao = currentPlayer.getPosicao() + nrSpaces;
@@ -215,6 +213,8 @@ public class GameManager {
         }
 
         currentPlayer.setPosicao(novaPosicao);
+
+        turnCounter++;
 
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
 
