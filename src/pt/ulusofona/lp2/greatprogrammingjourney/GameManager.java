@@ -15,7 +15,7 @@ public class GameManager {
         this.players = new ArrayList<>();
         this.board = new Board();
         this.currentPlayerIndex = 0;
-        this.turnCounter = 1;
+        this.turnCounter = 0;
         this.gameOver = false;
     }
 
@@ -33,7 +33,7 @@ public class GameManager {
         }
 
         players.clear();
-        turnCounter = 0;
+        turnCounter = 1;
         gameOver = false;
         currentPlayerIndex = 0;
 
