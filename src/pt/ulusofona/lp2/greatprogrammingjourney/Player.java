@@ -12,36 +12,33 @@ public class Player {
     public Player(String id, String nome, String linguagens, String cor) {
         this.id = id;
         this.nome = nome;
-        // CORREÇÃO: Garantir espaço após ponto e vírgula e ordem alfabética
+
         this.linguagens = formatarLinguagens(linguagens);
         this.cor = cor;
-        this.posicao = 1; // Todos começam na posição 1
+        this.posicao = 1;
     }
 
-    /**
-     * Formata as linguagens: ordem alfabética + espaço após ponto e vírgula
-     */
+
     private String formatarLinguagens(String linguagens) {
         if (linguagens == null || linguagens.trim().isEmpty()) {
             return "";
         }
 
-        // Separar por ponto e vírgula, remover espaços extras
+
         String[] langs = linguagens.split(";");
 
-        // Limpar espaços em branco de cada linguagem
+
         for (int i = 0; i < langs.length; i++) {
             langs[i] = langs[i].trim();
         }
 
-        // Ordenar alfabeticamente
         Arrays.sort(langs);
 
-        // Juntar com "; " (ponto e vírgula + espaço)
+
         return String.join("; ", langs);
     }
 
-    // Getters
+
     public String getId() {
         return id;
     }
@@ -62,7 +59,7 @@ public class Player {
         return posicao;
     }
 
-    // Setters
+
     public void setId(String id) {
         this.id = id;
     }
