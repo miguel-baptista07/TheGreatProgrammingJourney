@@ -147,7 +147,7 @@ public class GameManager {
         for (Player p : players) {
             try {
                 if (Integer.parseInt(p.getId()) == id) {
-                    if (p.getPosicao() >= board.getTamanhoTabuleiro()) {
+                    if (p.getPosicao() > board.getTamanhoTabuleiro()) {
                         estado = "Fora do Jogo";
                     }
                     break;
