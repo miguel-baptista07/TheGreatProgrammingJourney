@@ -286,7 +286,7 @@ public class GameManager {
 
     public JPanel getAuthorsPanel() {
         JPanel panel = new JPanel();
-        panel.add(new JLabel("Desenvolvido por: [Teu Nome Aqui]"));
+        panel.add(new JLabel("Desenvolvido por: Miguel Baptista e Gonçao Almeida"));
         return panel;
     }
 
