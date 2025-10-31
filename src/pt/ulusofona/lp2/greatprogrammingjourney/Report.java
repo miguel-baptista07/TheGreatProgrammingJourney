@@ -35,7 +35,8 @@ public class Report {
             }
         }
 
-        results.add("VENCEDOR " + vencedor);
+        results.add("VENCEDOR");
+        results.add(vencedor);
         results.add("");
 
         ArrayList<Player> restantes = new ArrayList<>();
@@ -45,6 +46,7 @@ public class Report {
             }
         }
 
+        // Ordenar por posição decrescente
         restantes.sort(Comparator.comparingInt(Player::getPosicao).reversed());
 
         StringBuilder restantesStr = new StringBuilder("RESTANTES ");
