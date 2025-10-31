@@ -49,16 +49,10 @@ public class Report {
         // Ordenar por posição decrescente
         restantes.sort(Comparator.comparingInt(Player::getPosicao).reversed());
 
-        StringBuilder restantesStr = new StringBuilder("RESTANTES ");
-        for (int i = 0; i < restantes.size(); i++) {
-            Player p = restantes.get(i);
-            restantesStr.append(p.getNome()).append(" ").append(p.getPosicao());
-            if (i < restantes.size() - 1) {
-                restantesStr.append(", ");
-            }
+        results.add("RESTANTES");
+        for (Player p : restantes) {
+            results.add(p.getNome() + " " + p.getPosicao());
         }
-
-        results.add(restantesStr.toString());
 
         return results;
     }
