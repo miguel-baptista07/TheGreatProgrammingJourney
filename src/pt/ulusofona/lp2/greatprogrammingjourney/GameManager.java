@@ -214,13 +214,13 @@ public class GameManager {
 
         currentPlayer.setPosicao(novaPosicao);
 
-        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-
-        turnCounter++;
-
         if (novaPosicao >= board.getTamanhoTabuleiro()) {
             gameOver = true;
         }
+
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+
+        turnCounter++;
 
         return true;
     }
