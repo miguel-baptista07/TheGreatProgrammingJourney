@@ -20,7 +20,6 @@ public class GameManager {
     }
 
     public boolean createInitialBoard(String[][] playerInfo, int worldSize) {
-        // Validações
         if (playerInfo == null || worldSize < 2) {
             return false;
         }
@@ -33,17 +32,14 @@ public class GameManager {
             return false;
         }
 
-        // Limpar dados anteriores
         players.clear();
         turnCounter = 0;
         gameOver = false;
         currentPlayerIndex = 0;
 
-        // Criar jogadores
         for (int i = 0; i < playerInfo.length; i++) {
             String[] info = playerInfo[i];
 
-            // Validar dados do jogador
             if (info == null || info.length != 4) {
                 return false;
             }
@@ -53,33 +49,28 @@ public class GameManager {
             String linguagens = info[2];
             String cor = info[3];
 
-            // Validar ID único e positivo
             if (id == null || id.isEmpty()) {
                 return false;
             }
 
             for (Player p : players) {
                 if (p.getId().equals(id)) {
-                    return false; // ID duplicado
+                    return false;
                 }
             }
 
-            // Validar nome
             if (nome == null || nome.isEmpty()) {
                 return false;
             }
 
-            // Validar cor
             if (cor == null || !isValidColor(cor)) {
                 return false;
             }
 
-            // Criar jogador
             Player player = new Player(id, nome, linguagens, cor);
             players.add(player);
         }
 
-        // Ordenar jogadores por ID (menor primeiro)
         players.sort((p1, p2) -> {
             try {
                 int id1 = Integer.parseInt(p1.getId());
@@ -90,7 +81,6 @@ public class GameManager {
             }
         });
 
-        // Inicializar tabuleiro
         board.setTamanhoTabuleiro(worldSize);
 
         return true;
@@ -108,32 +98,24 @@ public class GameManager {
             return null;
         }
 
-        // Última casa = meta
         if (nrSquare == board.getTamanhoTabuleiro()) {
             return "glory.png";
         }
 
-        // Outras casas podem ter imagens específicas ou null
-        // Por exemplo, casas tecnológicas (comentado se não tiveres tech.png)
-        // if (nrSquare % 10 == 0) {
-        //     return "tech.png";
-        // }
-
-        return null; // Sem imagem específica
+        return null;
     }
 
     public String[] getProgrammerInfo(int id) {
         for (Player player : players) {
             try {
                 if (Integer.parseInt(player.getId()) == id) {
-                    // CORREÇÃO: Cor com primeira letra maiúscula, resto minúscula
                     String corFormatada = player.getCor().substring(0, 1).toUpperCase() +
                             player.getCor().substring(1).toLowerCase();
                     return new String[] {
                             player.getId(),
                             player.getNome(),
                             player.getLinguagens(),
-                            corFormatada,  // Mudado de toUpperCase() para formato correto
+                            corFormatada,
                             String.valueOf(player.getPosicao())
                     };
                 }
@@ -160,10 +142,8 @@ public class GameManager {
             return null;
         }
 
-        // Formato: "<ID> | <Nome> | <Posição> | <Linguagens> | <Estado>"
         String estado = "Em Jogo";
 
-        // Verificar se chegou à meta
         for (Player p : players) {
             try {
                 if (Integer.parseInt(p.getId()) == id) {
@@ -173,7 +153,6 @@ public class GameManager {
                     break;
                 }
             } catch (NumberFormatException e) {
-                // Log do erro ou tratamento apropriado
                 System.err.println("Erro ao converter ID: " + p.getId());
             }
         }
@@ -198,7 +177,6 @@ public class GameManager {
             return new String[] {""};
         }
 
-        // Retornar IDs separados por vírgula
         String ids = String.join(",", playersInPosition);
         return new String[] {ids};
     }
@@ -221,34 +199,27 @@ public class GameManager {
             return false;
         }
 
-        // Validar número de casas (1-6)
         if (nrSpaces < 1 || nrSpaces > 6) {
             return false;
         }
 
         Player currentPlayer = players.get(currentPlayerIndex);
 
-        // Calcular nova posição
         int novaPosicao = currentPlayer.getPosicao() + nrSpaces;
 
-        // Recuo automático se ultrapassar o tabuleiro
         if (novaPosicao > board.getTamanhoTabuleiro()) {
             int excesso = novaPosicao - board.getTamanhoTabuleiro();
             novaPosicao = board.getTamanhoTabuleiro() - excesso;
         }
 
-        // Atualizar posição
         currentPlayer.setPosicao(novaPosicao);
 
-        // Incrementar contador de turnos
         turnCounter++;
 
-        // Verificar se o jogo acabou
         if (novaPosicao >= board.getTamanhoTabuleiro()) {
             gameOver = true;
         }
 
-        // Avançar para próximo jogador (circular)
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
 
         return true;
@@ -259,7 +230,6 @@ public class GameManager {
             return true;
         }
 
-        // Verificar se pelo menos um jogador chegou à meta
         for (Player player : players) {
             if (player.getPosicao() >= board.getTamanhoTabuleiro()) {
                 gameOver = true;
@@ -278,7 +248,6 @@ public class GameManager {
         results.add("NR. DE TURNOS " + turnCounter);
         results.add("");
 
-        // Encontrar vencedor
         String vencedor = "Nenhum";
         int maxPosicao = 0;
 
@@ -292,7 +261,6 @@ public class GameManager {
         results.add("VENCEDOR " + vencedor);
         results.add("");
 
-        // Restantes jogadores ordenados por proximidade à meta
         ArrayList<Player> restantes = new ArrayList<>();
         for (Player p : players) {
             if (p.getPosicao() < board.getTamanhoTabuleiro()) {
@@ -324,17 +292,13 @@ public class GameManager {
 
     public HashMap<String, String> customizeBoard() {
         HashMap<String, String> customization = new HashMap<>();
-        // Retornar vazio para usar defaults
-        // Podes personalizar aqui se quiseres
         return customization;
     }
 
-    // Getter para testes
     public ArrayList<Player> getPlayers() {
         return players;
     }
 
     public int getTurnCounter() {
         return turnCounter;
-    }
-}
+    }}
