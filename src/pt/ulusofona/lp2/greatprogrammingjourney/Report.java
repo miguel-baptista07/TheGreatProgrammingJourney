@@ -20,7 +20,9 @@ public class Report {
 
         results.add("THE GREAT PROGRAMMING JOURNEY");
         results.add("");
-        results.add("NR. DE TURNOS " + nrTurnos);
+        results.add("NR. DE TURNOS");
+        results.add(String.valueOf(nrTurnos));
+
         results.add("");
 
         String vencedor = "Nenhum";
