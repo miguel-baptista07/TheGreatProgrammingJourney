@@ -96,9 +96,11 @@ public class GameManager {
             return null;
         }
 
+
         if (nrSquare == board.getTamanhoTabuleiro()) {
             return "glory.png";
         }
+
 
         return null;
     }
@@ -284,7 +286,7 @@ public class GameManager {
 
     public JPanel getAuthorsPanel() {
         JPanel panel = new JPanel();
-        panel.add(new JLabel("Desenvolvido por: [Teu Nome Aqui]"));
+        panel.add(new JLabel("Desenvolvido por: Miguel Baptista e Gonçalo Almeida"));
         return panel;
     }
 
