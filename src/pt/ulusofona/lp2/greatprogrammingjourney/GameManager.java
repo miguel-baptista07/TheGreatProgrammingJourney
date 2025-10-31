@@ -214,9 +214,9 @@ public class GameManager {
 
         currentPlayer.setPosicao(novaPosicao);
 
-        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-
         turnCounter++;
+
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
 
         if (novaPosicao >= board.getTamanhoTabuleiro()) {
             gameOver = true;
