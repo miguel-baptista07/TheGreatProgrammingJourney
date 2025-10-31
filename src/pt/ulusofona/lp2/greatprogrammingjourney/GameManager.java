@@ -203,6 +203,8 @@ public class GameManager {
             return false;
         }
 
+        turnCounter++;
+
         Player currentPlayer = players.get(currentPlayerIndex);
 
         int novaPosicao = currentPlayer.getPosicao() + nrSpaces;
@@ -213,8 +215,6 @@ public class GameManager {
         }
 
         currentPlayer.setPosicao(novaPosicao);
-
-        turnCounter++;
 
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
 
