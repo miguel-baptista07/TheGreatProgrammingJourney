@@ -24,16 +24,12 @@ public class Player {
             return "";
         }
 
-
         String[] langs = linguagens.split(";");
-
 
         for (int i = 0; i < langs.length; i++) {
             langs[i] = langs[i].trim();
         }
-
         Arrays.sort(langs);
-
 
         return String.join("; ", langs);
     }

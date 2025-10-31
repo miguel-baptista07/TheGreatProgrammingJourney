@@ -241,47 +241,8 @@ public class GameManager {
     }
 
     public ArrayList<String> getGameResults() {
-        ArrayList<String> results = new ArrayList<>();
-
-        results.add("THE GREAT PROGRAMMING JOURNEY");
-        results.add("");
-        results.add("NR. DE TURNOS: " + turnCounter);
-        results.add("");
-
-        String vencedor = "Nenhum";
-        int maxPosicao = 0;
-
-        for (Player player : players) {
-            if (player.getPosicao() > maxPosicao) {
-                maxPosicao = player.getPosicao();
-                vencedor = player.getNome() + " " + player.getPosicao();
-            }
-        }
-
-        results.add("VENCEDOR " + vencedor);
-        results.add("");
-
-        ArrayList<Player> restantes = new ArrayList<>();
-        for (Player p : players) {
-            if (p.getPosicao() < board.getTamanhoTabuleiro()) {
-                restantes.add(p);
-            }
-        }
-
-        restantes.sort((p1, p2) -> Integer.compare(p2.getPosicao(), p1.getPosicao()));
-
-        StringBuilder restantesStr = new StringBuilder("RESTANTES ");
-        for (int i = 0; i < restantes.size(); i++) {
-            Player p = restantes.get(i);
-            restantesStr.append(p.getNome()).append(" ").append(p.getPosicao());
-            if (i < restantes.size() - 1) {
-                restantesStr.append(", ");
-            }
-        }
-
-        results.add(restantesStr.toString());
-
-        return results;
+        Report report = new Report(turnCounter, players, board.getTamanhoTabuleiro());
+        return report.generateReport();
     }
 
     public JPanel getAuthorsPanel() {
