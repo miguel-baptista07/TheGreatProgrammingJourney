@@ -31,7 +31,7 @@ public class Report {
         for (Player player : players) {
             if (player.getPosicao() > maxPosicao) {
                 maxPosicao = player.getPosicao();
-                vencedor = player.getNome() + " " + player.getPosicao();
+                vencedor = player.getNome();
             }
         }
 
