@@ -245,7 +245,7 @@ public class GameManager {
 
         results.add("THE GREAT PROGRAMMING JOURNEY");
         results.add("");
-        results.add("NR. DE TURNOS " + turnCounter);
+        results.add("NR. DE TURNOS: " + turnCounter);
         results.add("");
 
         String vencedor = "Nenhum";
