@@ -9,14 +9,14 @@ public class GameManager {
     private Board board;
     private int currentPlayerIndex;
     private int turnCounter;
-    private boolean gameOver;
+    private GameStatus gameStatus;
 
     public GameManager() {
         this.players = new ArrayList<>();
         this.board = new Board();
         this.currentPlayerIndex = 0;
         this.turnCounter = 0;
-        this.gameOver = false;
+        this.gameStatus = null;
     }
 
     public boolean createInitialBoard(String[][] playerInfo, int worldSize) {
@@ -34,7 +34,6 @@ public class GameManager {
 
         players.clear();
         turnCounter = 1;
-        gameOver = false;
         currentPlayerIndex = 0;
 
         for (int i = 0; i < playerInfo.length; i++) {
@@ -82,6 +81,7 @@ public class GameManager {
         });
 
         board.setTamanhoTabuleiro(worldSize);
+        gameStatus = new GameStatus(worldSize);
 
         return true;
     }
@@ -195,7 +195,7 @@ public class GameManager {
     }
 
     public boolean moveCurrentPlayer(int nrSpaces) {
-        if (gameOver) {
+        if (gameStatus.isGameOver()) {
             return false;
         }
 
@@ -218,26 +218,13 @@ public class GameManager {
 
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
 
-        if (novaPosicao >= board.getTamanhoTabuleiro()) {
-            gameOver = true;
-        }
+        gameStatus.checkGameOver(players);
 
         return true;
     }
 
     public boolean gameIsOver() {
-        if (gameOver) {
-            return true;
-        }
-
-        for (Player player : players) {
-            if (player.getPosicao() >= board.getTamanhoTabuleiro()) {
-                gameOver = true;
-                return true;
-            }
-        }
-
-        return false;
+        return gameStatus.checkGameOver(players);
     }
 
     public ArrayList<String> getGameResults() {
