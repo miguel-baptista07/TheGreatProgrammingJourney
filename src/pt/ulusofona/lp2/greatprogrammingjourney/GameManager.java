@@ -10,6 +10,7 @@ public class GameManager {
     private int currentPlayerIndex;
     private int turnCounter;
     private GameStatus gameStatus;
+    private Report report;
 
     public GameManager() {
         this.players = new ArrayList<>();
@@ -17,6 +18,7 @@ public class GameManager {
         this.currentPlayerIndex = 0;
         this.turnCounter = 0;
         this.gameStatus = null;
+        this.report = new Report(turnCounter, players, board.getTamanhoTabuleiro());
     }
 
     public boolean createInitialBoard(String[][] playerInfo, int worldSize) {
@@ -81,7 +83,7 @@ public class GameManager {
         });
 
         board.setTamanhoTabuleiro(worldSize);
-        gameStatus = new GameStatus(worldSize);
+        gameStatus = new GameStatus(worldSize, players);
 
         return true;
     }
@@ -228,7 +230,6 @@ public class GameManager {
     }
 
     public ArrayList<String> getGameResults() {
-        Report report = new Report(turnCounter, players, board.getTamanhoTabuleiro());
         return report.generateReport();
     }
 

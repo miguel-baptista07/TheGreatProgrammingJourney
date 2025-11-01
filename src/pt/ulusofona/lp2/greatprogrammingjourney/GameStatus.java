@@ -5,10 +5,12 @@ import java.util.List;
 public class GameStatus {
     private boolean gameOver;
     private final int boardSize;
+    private final List<Player> players;
 
-    public GameStatus(int boardSize) {
+    public GameStatus(int boardSize, List<Player> players) {
         this.gameOver = false;
         this.boardSize = boardSize;
+        this.players = players;
     }
 
     public boolean isGameOver() {
