@@ -46,7 +46,7 @@ public class Report {
             }
         }
 
-        // Ordenar por posição decrescente
+
         restantes.sort(Comparator.comparingInt(Player::getPosicao).reversed());
 
         results.add("RESTANTES");
