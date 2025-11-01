@@ -28,24 +28,28 @@ public class Report {
         String vencedor = "Nenhum";
         int maxPosicao = 0;
 
+
         for (Player player : players) {
-            if (player.getPosicao() > maxPosicao) {
+            if (player.getPosicao() >= boardSize && player.getPosicao() > maxPosicao) {
                 maxPosicao = player.getPosicao();
                 vencedor = player.getNome();
             }
         }
+
+
 
         results.add("VENCEDOR");
         results.add(vencedor);
         results.add("");
 
         ArrayList<Player> restantes = new ArrayList<>();
+
+
         for (Player p : players) {
-            if (p.getPosicao() < boardSize) {
+            if (p.getPosicao() != boardSize) {
                 restantes.add(p);
             }
         }
-
 
         restantes.sort(Comparator.comparingInt(Player::getPosicao).reversed());
 

@@ -33,7 +33,7 @@ public class GameManager {
         }
 
         players.clear();
-        turnCounter = 1;
+        turnCounter = 0; // CORRIGIDO: Inicializar em 0 em vez de 1
         gameOver = false;
         currentPlayerIndex = 0;
 
@@ -153,7 +153,8 @@ public class GameManager {
                     break;
                 }
             } catch (NumberFormatException e) {
-                System.err.println("Erro ao converter ID: " + p.getId());
+                // CORRIGIDO: Removido System.err.println
+                // Tratamento silencioso do erro
             }
         }
 
@@ -218,7 +219,8 @@ public class GameManager {
 
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
 
-        if (novaPosicao >= board.getTamanhoTabuleiro()) {
+        // CORRIGIDO: Usar == em vez de >= para verificar vitória
+        if (novaPosicao == board.getTamanhoTabuleiro()) {
             gameOver = true;
         }
 
@@ -231,7 +233,8 @@ public class GameManager {
         }
 
         for (Player player : players) {
-            if (player.getPosicao() >= board.getTamanhoTabuleiro()) {
+            // CORRIGIDO: Usar == em vez de >= para consistência
+            if (player.getPosicao() == board.getTamanhoTabuleiro()) {
                 gameOver = true;
                 return true;
             }
