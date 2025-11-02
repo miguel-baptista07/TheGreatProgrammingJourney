@@ -12,10 +12,12 @@ public class Player {
     public Player(String id, String nome, String linguagens, String cor) {
         this.id = id;
         this.nome = nome;
+
         this.linguagens = formatarLinguagens(linguagens);
         this.cor = cor;
         this.posicao = 1;
     }
+
 
     private String formatarLinguagens(String linguagens) {
         if (linguagens == null || linguagens.trim().isEmpty()) {
@@ -31,6 +33,7 @@ public class Player {
 
         return String.join("; ", langs);
     }
+
 
     public String getId() {
         return id;
@@ -51,6 +54,7 @@ public class Player {
     public int getPosicao() {
         return posicao;
     }
+
 
     public void setId(String id) {
         this.id = id;

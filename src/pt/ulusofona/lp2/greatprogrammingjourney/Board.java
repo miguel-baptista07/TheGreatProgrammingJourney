@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 public class Board {
     private int tamanhoTabuleiro;
-
     private ArrayList<Integer> posicoesJogadores;
 
     public Board() {
