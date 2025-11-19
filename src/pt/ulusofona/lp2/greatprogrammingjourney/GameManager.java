@@ -114,15 +114,14 @@ public class GameManager {
                 return new String[]{
                         p.getId(),
                         p.getNome(),
-                        p.getCor(),
                         p.linguagensAsString(),
+                        p.getCor(),
                         String.valueOf(p.getPosicao())
                 };
             }
         }
         return null;
     }
-
 
     private String estadoToString(Player p) {
         if (p.getEstado() == PlayerState.EM_JOGO) {
