@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestGameManagerMove {
+public class GameManagerMoveTest {
 
     private GameManager gm;
     private final int WORLD_SIZE = 20;
