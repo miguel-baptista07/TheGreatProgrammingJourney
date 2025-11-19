@@ -116,12 +116,13 @@ public class GameManager {
                         p.getNome(),
                         p.getCor(),
                         p.linguagensAsString(),
-                        estadoToString(p)
+                        String.valueOf(p.getPosicao())
                 };
             }
         }
         return null;
     }
+
 
     private String estadoToString(Player p) {
         if (p.getEstado() == PlayerState.EM_JOGO) {
