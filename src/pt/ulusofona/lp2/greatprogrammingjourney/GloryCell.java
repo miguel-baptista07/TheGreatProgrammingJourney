@@ -13,6 +13,6 @@ public class GloryCell extends Cell {
 
     @Override
     public String react(Player p, GameManager gm) {
-        return "Nada aconteceu"; // a vitória é tratada por GameStatus
+        return null;
     }
 }

@@ -13,6 +13,6 @@ public class NormalCell extends Cell {
 
     @Override
     public String react(Player p, GameManager gm) {
-        return "Nada aconteceu";
+        return null;
     }
 }

@@ -196,7 +196,7 @@ public class GameManager {
 
 	        if (c.getId() == 0 || c.getId() == 1 || c.getId() == 2 || c.getId() == 3 || c.getId() == 9) {
 	            if (p.hasAnyToolForAbyss(0, 1, 2)) {
-	                lastReactionMessage = null; // Se tiver a ferramenta, a reação é nula
+	                lastReactionMessage = null;
 	                return true;
 	            }
 	        }
@@ -311,7 +311,7 @@ public class GameManager {
         }
 
         if (ids.isEmpty()) {
-            return new String[]{""};
+            return null;
         }
 
         return new String[]{String.join(",", ids)};
