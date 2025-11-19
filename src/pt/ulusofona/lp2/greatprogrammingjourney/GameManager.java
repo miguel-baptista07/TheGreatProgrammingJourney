@@ -25,87 +25,116 @@ public class GameManager {
     }
 
     public boolean createInitialBoard(String[][] playerInfo, int worldSize, String[][] abyssesAndTools) {
-        try {
-            players.clear();
-            vivos.clear();
-            currentPlayerIndex = 0;
-            turnCounter = 0;
+        players.clear();
+        vivos.clear();
+        currentPlayerIndex = 0;
+        turnCounter = 0;
+        lastReactionMessage = null;
 
-            if (playerInfo == null || playerInfo.length < 2 || playerInfo.length > 4) {
-                return false;
-            }
-            if (worldSize < playerInfo.length * 2) {
-                return false;
-            }
-
-            for (String[] p : playerInfo) {
-                if (p == null || p.length != 4) {
-                    return false;
-                }
-                Player pl = new Player(p[0], p[1], p[2], p[3]);
-                players.add(pl);
-                vivos.add(pl);
-            }
-
-            players.sort((a, b) -> a.getId().compareTo(b.getId()));
-
-            board = new Board(worldSize);
-
-            for (int i = 1; i <= worldSize; i++) {
-                if (i == worldSize) {
-                    board.setCell(i, CellFactory.glory(i));
-                } else {
-                    board.setCell(i, CellFactory.normal(i));
-                }
-            }
-
-            if (abyssesAndTools != null) {
-                for (String[] a : abyssesAndTools) {
-                    if (a.length != 3) {
-                        return false;
-                    }
-                    int tipo = Integer.parseInt(a[0]);
-                    int id = Integer.parseInt(a[1]);
-                    int pos = Integer.parseInt(a[2]);
-
-                    if (pos < 1 || pos > worldSize) {
-                        return false;
-                    }
-
-                    if (tipo == 0 && (id < 0 || id > 9)) {
-                        return false;
-                    }
-                    if (tipo == 1 && (id < 0 || id > 5)) {
-                        return false;
-                    }
-
-                    Cell c;
-                    if (tipo == 0) {
-                        c = AbyssFactory.create(id, pos);
-                    } else {
-                        c = ToolFactory.create(id, pos);
-                    }
-
-                    if (c == null) {
-                        return false;
-                    }
-
-                    board.setCell(pos, c);
-                }
-            }
-
-            return true;
-
-        } catch (Exception e) {
+        if (playerInfo == null || playerInfo.length < 2 || playerInfo.length > 4) {
             return false;
         }
+        if (worldSize < playerInfo.length * 2) {
+            return false;
+        }
+
+        // Validar e criar jogadores
+        for (String[] p : playerInfo) {
+            if (p == null || p.length != 4) {
+                return false;
+            }
+            // garantir que os campos existem (evita IndexOutOfBounds)
+            for (int i = 0; i < 4; i++) {
+                if (p[i] == null) {
+                    return false;
+                }
+            }
+            Player pl = new Player(p[0], p[1], p[2], p[3]);
+            players.add(pl);
+            vivos.add(pl);
+        }
+
+        players.sort((a, b) -> a.getId().compareTo(b.getId()));
+
+        board = new Board(worldSize);
+
+        for (int i = 1; i <= worldSize; i++) {
+            if (i == worldSize) {
+                board.setCell(i, CellFactory.glory(i));
+            } else {
+                board.setCell(i, CellFactory.normal(i));
+            }
+        }
+
+        if (abyssesAndTools != null) {
+            for (String[] a : abyssesAndTools) {
+                if (a == null || a.length != 3) {
+                    return false;
+                }
+
+                int tipo, id, pos;
+                try {
+                    tipo = Integer.parseInt(a[0]);
+                    id = Integer.parseInt(a[1]);
+                    pos = Integer.parseInt(a[2]);
+                } catch (NumberFormatException e) {
+                    return false;
+                }
+
+                if (pos < 1 || pos > worldSize) {
+                    return false;
+                }
+
+                if (tipo != 0 && tipo != 1) {
+                    return false;
+                }
+
+                if (tipo == 0 && (id < 0 || id > 9)) {
+                    return false;
+                }
+                if (tipo == 1 && (id < 0 || id > 5)) {
+                    return false;
+                }
+
+                Cell c;
+                if (tipo == 0) {
+                    c = AbyssFactory.create(id, pos);
+                } else {
+                    c = ToolFactory.create(id, pos);
+                }
+
+                if (c == null) {
+                    return false;
+                }
+
+                board.setCell(pos, c);
+            }
+        }
+        return true;
     }
 
     public String getImagePng(int nrSquare) {
-        if (nrSquare < 1 || nrSquare > board.getTamanho()) {
+        if (board == null || nrSquare < 1 || nrSquare > board.getTamanho()) {
             return null;
         }
-        return board.getCell(nrSquare).getImagePng();
+        Cell cell = board.getCell(nrSquare);
+        return cell == null ? null : cell.getImagePng();
+    }
+
+    public boolean gameIsOver() {
+        if (board == null) {
+            return true;
+        }
+        GameStatus gs = new GameStatus();
+        return gs.checkGameOver(vivos, board.getTamanho());
+    }
+
+    public ArrayList<String> getGameResults() {
+        if (board == null) {
+            return new ArrayList<>();
+        }
+        Report r = new Report(turnCounter, vivos, board.getTamanho());
+        return r.generateReport();
     }
 
     public String[] getProgrammerInfo(int id) {
@@ -210,24 +239,30 @@ public class GameManager {
         String result = lastReactionMessage;
         lastReactionMessage = null;
 
-        if (result != null && result.equals("O jogador caiu num abismo")) {
-            // O jogador caiu num abismo, mas não foi eliminado.
-            // A mensagem "O jogador caiu num abismo" é interna.
-            // O visualizador espera null se não houver mensagem para mostrar.
+        if (result == null) {
             return null;
         }
 
-        if (result != null && result.equals("O jogador foi eliminado")) {
+        if ("Nada aconteceu".equals(result) || result.trim().isEmpty()) {
+            turnCounter++;
+            if (!vivos.isEmpty()) {
+                currentPlayerIndex = (currentPlayerIndex + 1) % vivos.size();
+            }
+            return null;
+        }
+
+        if (result.equals("O jogador caiu num abismo")) {
+            return null;
+        }
+
+        if (result.equals("O jogador foi eliminado")) {
             Player morto = vivos.get(currentPlayerIndex);
             vivos.remove(morto);
-            // O estado do jogador deve ser alterado para DERROTADO na classe Player
-            // pelo método react() na Cell.
-            // O jogador permanece na lista 'players' para efeitos de getProgrammerInfo.
 
             if (!vivos.isEmpty()) {
                 currentPlayerIndex %= vivos.size();
             }
-            // O teste espera null, então retornamos null.
+
             return null;
         }
 
@@ -238,16 +273,6 @@ public class GameManager {
         }
 
         return result;
-    }
-
-    public boolean gameIsOver() {
-        GameStatus gs = new GameStatus();
-        return gs.checkGameOver(vivos, board.getTamanho());
-    }
-
-    public ArrayList<String> getGameResults() {
-        Report r = new Report(turnCounter, vivos, board.getTamanho());
-        return r.generateReport();
     }
 
     public JPanel getAuthorsPanel() {
