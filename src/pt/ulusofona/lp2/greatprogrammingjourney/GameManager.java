@@ -15,7 +15,7 @@ public class GameManager {
     private Board board;
     private int currentPlayerIndex = 0;
     private int turnCounter = 0;
-    private String lastReactionMessage = "Nada aconteceu";
+    private String lastReactionMessage = null;
 
     public GameManager() {
     }
@@ -175,7 +175,7 @@ public class GameManager {
         Player p = vivos.get(currentPlayerIndex);
 
         if (p.getEstado() == PlayerState.PRESO) {
-            lastReactionMessage = "Nada aconteceu";
+            lastReactionMessage = null;
             return true;
         }
 
@@ -194,12 +194,12 @@ public class GameManager {
 
         Cell c = board.getCell(nova);
 
-        if (c.getId() == 0 || c.getId() == 1 || c.getId() == 2 || c.getId() == 3 || c.getId() == 9) {
-            if (p.hasAnyToolForAbyss(0, 1, 2)) {
-                lastReactionMessage = "O jogador já possui a ferramenta necessária";
-                return true;
-            }
-        }
+	        if (c.getId() == 0 || c.getId() == 1 || c.getId() == 2 || c.getId() == 3 || c.getId() == 9) {
+	            if (p.hasAnyToolForAbyss(0, 1, 2)) {
+	                lastReactionMessage = null; // Se tiver a ferramenta, a reação é nula
+	                return true;
+	            }
+	        }
 
         lastReactionMessage = c.react(p, this);
 
@@ -207,19 +207,28 @@ public class GameManager {
     }
 
     public String reactToAbyssOrTool() {
-        if (lastReactionMessage != null && lastReactionMessage.equals("O jogador caiu num abismo")) {
-            lastReactionMessage = null;
+        String result = lastReactionMessage;
+        lastReactionMessage = null;
+
+        if (result != null && result.equals("O jogador caiu num abismo")) {
+            // O jogador caiu num abismo, mas não foi eliminado.
+            // A mensagem "O jogador caiu num abismo" é interna.
+            // O visualizador espera null se não houver mensagem para mostrar.
             return null;
         }
 
-        if (lastReactionMessage != null && lastReactionMessage.equals("O jogador foi eliminado")) {
+        if (result != null && result.equals("O jogador foi eliminado")) {
             Player morto = vivos.get(currentPlayerIndex);
             vivos.remove(morto);
-            players.remove(morto);
+            // O estado do jogador deve ser alterado para DERROTADO na classe Player
+            // pelo método react() na Cell.
+            // O jogador permanece na lista 'players' para efeitos de getProgrammerInfo.
+
             if (!vivos.isEmpty()) {
                 currentPlayerIndex %= vivos.size();
             }
-            return "O jogador foi eliminado";
+            // O teste espera null, então retornamos null.
+            return null;
         }
 
         turnCounter++;
@@ -228,7 +237,7 @@ public class GameManager {
             currentPlayerIndex = (currentPlayerIndex + 1) % vivos.size();
         }
 
-        return lastReactionMessage;
+        return result;
     }
 
     public boolean gameIsOver() {

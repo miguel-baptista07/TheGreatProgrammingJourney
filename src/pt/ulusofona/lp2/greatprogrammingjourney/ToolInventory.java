@@ -17,7 +17,9 @@ public class ToolInventory {
 
     public boolean hasAnyOf(int... ids) {
         for (int id : ids) {
-            if (tools.contains(id)) return true;
+            if (tools.contains(id)) {
+                return true;
+            }
         }
         return false;
     }
@@ -27,7 +29,9 @@ public class ToolInventory {
     }
 
     public String toStringList() {
-        if (tools.isEmpty()) return "No tools";
+        if (tools.isEmpty()) {
+            return "No tools";
+        }
         StringBuilder sb = new StringBuilder();
         for (int id : tools) {
             sb.append(id).append(",");
