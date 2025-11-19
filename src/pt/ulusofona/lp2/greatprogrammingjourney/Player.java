@@ -1,101 +1,115 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class Player {
 
-    private final String id;
-    private final String nome;
-    private final List<String> linguagensOrdenadas;
-    private final String cor;
-
+    private String id;
+    private String nome;
+    private String linguagens;
+    private String cor;
     private int posicao = 1;
     private PlayerState estado = PlayerState.EM_JOGO;
-
-    private final PlayerHistory history = new PlayerHistory();
-    private final ToolInventory inventory = new ToolInventory();
+    private final ArrayList<Integer> tools = new ArrayList<>();
 
     public Player(String id, String nome, String linguagens, String cor) {
         this.id = id;
         this.nome = nome;
         this.cor = cor;
-        List<String> langs = Arrays.asList(linguagens.split(";"));
-        langs.replaceAll(String::trim);
-        langs.sort(String::compareToIgnoreCase);
-        this.linguagensOrdenadas = langs;
-
-        history.record(posicao);
+        this.linguagens = formatarLinguagens(linguagens);
     }
 
-    public String getId() { return id; }
-    public String getNome() { return nome; }
-    public String getCor() { return cor; }
-    public int getPosicao() { return posicao; }
-    public PlayerState getEstado() { return estado; }
-
-    public String getFirstLanguage() {
-        return linguagensOrdenadas.isEmpty() ? "" : linguagensOrdenadas.get(0);
+    private String formatarLinguagens(String linguagens) {
+        if (linguagens == null || linguagens.trim().isEmpty()) {
+            return "";
+        }
+        String[] langs = linguagens.split(";");
+        for (int i = 0; i < langs.length; i++) {
+            langs[i] = langs[i].trim();
+        }
+        Arrays.sort(langs);
+        return String.join("; ", langs);
     }
 
-    public void addTool(int toolId) {
-        inventory.addTool(toolId);
+    public String getId() {
+        return id;
     }
 
-    public boolean hasTool(int toolId) {
-        return inventory.hasTool(toolId);
+    public String getNome() {
+        return nome;
     }
 
-    public boolean hasAnyToolForAbyss(int... ids) {
-        return inventory.hasAnyOf(ids);
+    public String getCor() {
+        return cor;
     }
 
-    public void consumeTool(int id) {
-        inventory.removeTool(id);
+    public int getPosicao() {
+        return posicao;
     }
 
-    public String toolsAsString() {
-        return inventory.toStringList();
+    public PlayerState getEstado() {
+        return estado;
     }
 
-    public void setPosicao(int novaPosicao) {
-        this.posicao = Math.max(1, novaPosicao);
-        history.record(this.posicao);
-    }
-
-    public int posAnterior() {
-        return history.beforeLast();
-    }
-
-    public int posDuasAntes() {
-        return history.twoBefore();
+    public void setPosicao(int pos) {
+        this.posicao = pos;
     }
 
     public void eliminar() {
-        this.estado = PlayerState.DERROTADO;
+        estado = PlayerState.DERROTADO;
     }
 
     public void prender() {
-        this.estado = PlayerState.PRESO;
+        estado = PlayerState.PRESO;
     }
 
-    public void libertar() {
-        this.estado = PlayerState.EM_JOGO;
+    public int posAnterior() {
+        return Math.max(1, posicao - 1);
+    }
+
+    public int posDuasAntes() {
+        return Math.max(1, posicao - 2);
+    }
+
+    public void addTool(int id) {
+        tools.add(id);
+    }
+
+    public boolean hasTool(int id) {
+        return tools.contains(id);
+    }
+
+    public boolean hasAnyToolForAbyss(int... ids) {
+        for (int t : tools) {
+            for (int x : ids) {
+                if (t == x) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public String toolsAsString() {
+        if (tools.isEmpty()) {
+            return "No tools";
+        }
+        ArrayList<String> nomes = new ArrayList<>();
+        for (int t : tools) {
+            nomes.add(ToolFactory.getToolName(t));
+        }
+        return String.join(", ", nomes);
     }
 
     public String linguagensAsString() {
-        return String.join("; ", linguagensOrdenadas);
+        return linguagens;
     }
 
     public String toInfoString() {
-        return id + " | " + nome + " | " + posicao + " | " + toolsAsString() + " | " + linguagensAsString() + " | " + estadoString();
-    }
-
-    private String estadoString() {
-        return switch (estado) {
-            case EM_JOGO -> "Em Jogo";
-            case PRESO -> "Preso";
-            case DERROTADO -> "Derrotado";
-        };
+        return id + " | " + nome + " | " + posicao + " | " +
+                toolsAsString() + " | " + linguagens + " | " +
+                (estado == PlayerState.EM_JOGO ? "Em Jogo" :
+                        estado == PlayerState.PRESO ? "Preso" : "Derrotado");
     }
 }

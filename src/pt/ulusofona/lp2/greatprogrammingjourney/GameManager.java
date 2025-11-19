@@ -72,6 +72,13 @@ public class GameManager {
                         return false;
                     }
 
+                    if (tipo == 0 && (id < 0 || id > 9)) {
+                        return false;
+                    }
+                    if (tipo == 1 && (id < 0 || id > 5)) {
+                        return false;
+                    }
+
                     Cell c;
                     if (tipo == 0) {
                         c = AbyssFactory.create(id, pos);
@@ -107,8 +114,7 @@ public class GameManager {
                 return new String[]{
                         p.getId(),
                         p.getNome(),
-                        String.valueOf(p.getPosicao()),
-                        p.toolsAsString(),
+                        p.getCor(),
                         p.linguagensAsString(),
                         estadoToString(p)
                 };
@@ -130,7 +136,12 @@ public class GameManager {
     public String getProgrammerInfoAsStr(int id) {
         for (Player p : players) {
             if (p.getId().equals(String.valueOf(id))) {
-                return p.toInfoString();
+                return p.getId() + " | " +
+                        p.getNome() + " | " +
+                        p.getPosicao() + " | " +
+                        p.toolsAsString() + " | " +
+                        p.linguagensAsString() + " | " +
+                        estadoToString(p);
             }
         }
         return null;
@@ -196,20 +207,24 @@ public class GameManager {
     }
 
     public String reactToAbyssOrTool() {
-        turnCounter++;
+        if (lastReactionMessage != null && lastReactionMessage.equals("O jogador caiu num abismo")) {
+            lastReactionMessage = null;
+            return null;
+        }
 
-        if (lastReactionMessage.equals("O jogador foi eliminado")) {
+        if (lastReactionMessage != null && lastReactionMessage.equals("O jogador foi eliminado")) {
             Player morto = vivos.get(currentPlayerIndex);
             vivos.remove(morto);
             players.remove(morto);
-
-            if (vivos.isEmpty()) {
-                return lastReactionMessage;
+            if (!vivos.isEmpty()) {
+                currentPlayerIndex %= vivos.size();
             }
+            return "O jogador foi eliminado";
         }
 
+        turnCounter++;
+
         if (!vivos.isEmpty()) {
-            currentPlayerIndex %= vivos.size();
             currentPlayerIndex = (currentPlayerIndex + 1) % vivos.size();
         }
 

@@ -13,4 +13,16 @@ public class ToolFactory {
             default -> null;
         };
     }
+
+    public static String getToolName(int id) {
+        return switch (id) {
+            case 0 -> "IDE";
+            case 1 -> "Programação Funcional";
+            case 2 -> "Testes unitários";
+            case 3 -> "Tratamento de Excepções";
+            case 4 -> "Herança";
+            case 5 -> "Depuração";
+            default -> "Desconhecida";
+        };
+    }
 }
