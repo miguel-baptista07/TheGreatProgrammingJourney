@@ -17,7 +17,8 @@ public class GameManager {
     private int turnCounter = 0;
     private String lastReactionMessage = "Nada aconteceu";
 
-    public GameManager() {}
+    public GameManager() {
+    }
 
     public boolean createInitialBoard(String[][] playerInfo, int worldSize) {
         return createInitialBoard(playerInfo, worldSize, null);
@@ -30,11 +31,17 @@ public class GameManager {
             currentPlayerIndex = 0;
             turnCounter = 0;
 
-            if (playerInfo == null || playerInfo.length < 2 || playerInfo.length > 4) return false;
-            if (worldSize < playerInfo.length * 2) return false;
+            if (playerInfo == null || playerInfo.length < 2 || playerInfo.length > 4) {
+                return false;
+            }
+            if (worldSize < playerInfo.length * 2) {
+                return false;
+            }
 
             for (String[] p : playerInfo) {
-                if (p == null || p.length != 4) return false;
+                if (p == null || p.length != 4) {
+                    return false;
+                }
                 Player pl = new Player(p[0], p[1], p[2], p[3]);
                 players.add(pl);
                 vivos.add(pl);
@@ -45,23 +52,37 @@ public class GameManager {
             board = new Board(worldSize);
 
             for (int i = 1; i <= worldSize; i++) {
-                if (i == worldSize) board.setCell(i, CellFactory.glory(i));
-                else board.setCell(i, CellFactory.normal(i));
+                if (i == worldSize) {
+                    board.setCell(i, CellFactory.glory(i));
+                } else {
+                    board.setCell(i, CellFactory.normal(i));
+                }
             }
 
             if (abyssesAndTools != null) {
                 for (String[] a : abyssesAndTools) {
-                    if (a.length != 3) return false;
+                    if (a.length != 3) {
+                        return false;
+                    }
                     int tipo = Integer.parseInt(a[0]);
                     int id = Integer.parseInt(a[1]);
                     int pos = Integer.parseInt(a[2]);
-                    if (pos < 1 || pos > worldSize) return false;
 
-                    Cell c = (tipo == 0)
-                            ? AbyssFactory.create(id, pos)
-                            : ToolFactory.create(id, pos);
+                    if (pos < 1 || pos > worldSize) {
+                        return false;
+                    }
 
-                    if (c == null) return false;
+                    Cell c;
+                    if (tipo == 0) {
+                        c = AbyssFactory.create(id, pos);
+                    } else {
+                        c = ToolFactory.create(id, pos);
+                    }
+
+                    if (c == null) {
+                        return false;
+                    }
+
                     board.setCell(pos, c);
                 }
             }
@@ -74,7 +95,9 @@ public class GameManager {
     }
 
     public String getImagePng(int nrSquare) {
-        if (nrSquare < 1 || nrSquare > board.getTamanho()) return null;
+        if (nrSquare < 1 || nrSquare > board.getTamanho()) {
+            return null;
+        }
         return board.getCell(nrSquare).getImagePng();
     }
 
@@ -95,11 +118,13 @@ public class GameManager {
     }
 
     private String estadoToString(Player p) {
-        return switch (p.getEstado()) {
-            case EM_JOGO -> "Em Jogo";
-            case PRESO -> "Preso";
-            case DERROTADO -> "Derrotado";
-        };
+        if (p.getEstado() == PlayerState.EM_JOGO) {
+            return "Em Jogo";
+        } else if (p.getEstado() == PlayerState.PRESO) {
+            return "Preso";
+        } else {
+            return "Derrotado";
+        }
     }
 
     public String getProgrammerInfoAsStr(int id) {
@@ -115,7 +140,9 @@ public class GameManager {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (Player p : vivos) {
-            if (!first) sb.append(" | ");
+            if (!first) {
+                sb.append(" | ");
+            }
             first = false;
             sb.append(p.getNome()).append(" : ").append(p.toolsAsString());
         }
@@ -123,12 +150,16 @@ public class GameManager {
     }
 
     public int getCurrentPlayerID() {
-        if (vivos.isEmpty()) return -1;
+        if (vivos.isEmpty()) {
+            return -1;
+        }
         return Integer.parseInt(vivos.get(currentPlayerIndex).getId());
     }
 
     public boolean moveCurrentPlayer(int nrSpaces) {
-        if (vivos.isEmpty()) return false;
+        if (vivos.isEmpty()) {
+            return false;
+        }
 
         Player p = vivos.get(currentPlayerIndex);
 
@@ -137,7 +168,9 @@ public class GameManager {
             return true;
         }
 
-        if (!LanguageRules.isMoveAllowed(p, nrSpaces)) return false;
+        if (!LanguageRules.isMoveAllowed(p, nrSpaces)) {
+            return false;
+        }
 
         int nova = p.getPosicao() + nrSpaces;
 
@@ -158,6 +191,7 @@ public class GameManager {
         }
 
         lastReactionMessage = c.react(p, this);
+
         return true;
     }
 
@@ -168,7 +202,10 @@ public class GameManager {
             Player morto = vivos.get(currentPlayerIndex);
             vivos.remove(morto);
             players.remove(morto);
-            if (vivos.isEmpty()) return lastReactionMessage;
+
+            if (vivos.isEmpty()) {
+                return lastReactionMessage;
+            }
         }
 
         if (!vivos.isEmpty()) {
@@ -230,8 +267,29 @@ public class GameManager {
     public List<Player> getAlivePlayersAt(int pos) {
         List<Player> r = new ArrayList<>();
         for (Player p : vivos) {
-            if (p.getPosicao() == pos && p.getEstado() == PlayerState.EM_JOGO) r.add(p);
+            if (p.getPosicao() == pos && p.getEstado() == PlayerState.EM_JOGO) {
+                r.add(p);
+            }
         }
         return r;
+    }
+
+    public String[] getSlotInfo(int position) {
+        if (board == null || position < 1 || position > board.getTamanho()) {
+            return null;
+        }
+
+        ArrayList<String> ids = new ArrayList<>();
+        for (Player p : players) {
+            if (p.getPosicao() == position && p.getEstado() != PlayerState.DERROTADO) {
+                ids.add(p.getId());
+            }
+        }
+
+        if (ids.isEmpty()) {
+            return new String[]{""};
+        }
+
+        return new String[]{String.join(",", ids)};
     }
 }
