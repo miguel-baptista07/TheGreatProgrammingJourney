@@ -1,59 +1,48 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class Report {
+
     private final int nrTurnos;
-    private final List<Player> players;
+    private final List<Player> vivos;
     private final int boardSize;
 
-    public Report(int nrTurnos, List<Player> players, int boardSize) {
+    public Report(int nrTurnos, List<Player> vivos, int boardSize) {
         this.nrTurnos = nrTurnos;
-        this.players = players;
+        this.vivos = vivos;
         this.boardSize = boardSize;
     }
 
     public ArrayList<String> generateReport() {
-        ArrayList<String> results = new ArrayList<>();
+        ArrayList<String> r = new ArrayList<>();
 
-        results.add("THE GREAT PROGRAMMING JOURNEY");
-        results.add("");
-        results.add("NR. DE TURNOS");
-        results.add(String.valueOf(nrTurnos));
+        r.add("THE GREAT PROGRAMMING JOURNEY");
+        r.add("");
+        r.add("NR. DE TURNOS");
+        r.add(String.valueOf(nrTurnos));
+        r.add("");
 
-        results.add("");
-
-        String vencedor = "Nenhum";
-        int maxPosicao = 0;
-
-        for (Player player : players) {
-            if (player.getPosicao() > maxPosicao) {
-                maxPosicao = player.getPosicao();
-                vencedor = player.getNome();
+        Player vencedor = null;
+        for (Player p : vivos) {
+            if (p.getPosicao() >= boardSize) {
+                vencedor = p;
+                break;
             }
         }
 
-        results.add("VENCEDOR");
-        results.add(vencedor);
-        results.add("");
+        r.add("VENCEDOR");
+        r.add(vencedor == null ? "Nenhum" : vencedor.getNome());
+        r.add("");
 
-        ArrayList<Player> restantes = new ArrayList<>();
-        for (Player p : players) {
-            if (p.getPosicao() < boardSize) {
-                restantes.add(p);
+        r.add("RESTANTES");
+        for (Player p : vivos) {
+            if (p != vencedor) {
+                r.add(p.getNome() + " " + p.getPosicao());
             }
         }
 
-
-        restantes.sort(Comparator.comparingInt(Player::getPosicao).reversed());
-
-        results.add("RESTANTES");
-        for (Player p : restantes) {
-            results.add(p.getNome() + " " + p.getPosicao());
-        }
-
-        return results;
+        return r;
     }
 }

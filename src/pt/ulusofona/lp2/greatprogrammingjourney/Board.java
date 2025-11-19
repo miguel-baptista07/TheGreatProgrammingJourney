@@ -1,37 +1,24 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-import java.util.ArrayList;
-
 public class Board {
-    private int tamanhoTabuleiro;
-    private ArrayList<Integer> posicoesJogadores;
 
-    public Board() {
-        this.tamanhoTabuleiro = 0;
-        this.posicoesJogadores = new ArrayList<>();
+    private final int tamanho;
+    private final Cell[] cells;
+
+    public Board(int tamanho) {
+        this.tamanho = tamanho;
+        this.cells = new Cell[tamanho + 1];
     }
 
-    public int getTamanhoTabuleiro() {
-        return tamanhoTabuleiro;
+    public int getTamanho() {
+        return tamanho;
     }
 
-    public void setTamanhoTabuleiro(int tamanhoTabuleiro) {
-        this.tamanhoTabuleiro = tamanhoTabuleiro;
+    public void setCell(int pos, Cell c) {
+        cells[pos] = c;
     }
 
-    public ArrayList<Integer> getPosicoesJogadores() {
-        return posicoesJogadores;
-    }
-
-    public void setPosicoesJogadores(ArrayList<Integer> posicoesJogadores) {
-        this.posicoesJogadores = posicoesJogadores;
-    }
-
-    public void adicionarPosicaoJogador(int posicao) {
-        this.posicoesJogadores.add(posicao);
-    }
-
-    public void limparPosicoesJogadores() {
-        this.posicoesJogadores.clear();
+    public Cell getCell(int pos) {
+        return cells[pos];
     }
 }

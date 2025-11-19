@@ -1,89 +1,101 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class Player {
-    private String id;
-    private String nome;
-    private String linguagens;
-    private String cor;
-    private int posicao;
+
+    private final String id;
+    private final String nome;
+    private final List<String> linguagensOrdenadas;
+    private final String cor;
+
+    private int posicao = 1;
+    private PlayerState estado = PlayerState.EM_JOGO;
+
+    private final PlayerHistory history = new PlayerHistory();
+    private final ToolInventory inventory = new ToolInventory();
 
     public Player(String id, String nome, String linguagens, String cor) {
         this.id = id;
         this.nome = nome;
-
-        this.linguagens = formatarLinguagens(linguagens);
         this.cor = cor;
-        this.posicao = 1;
+        List<String> langs = Arrays.asList(linguagens.split(";"));
+        langs.replaceAll(String::trim);
+        langs.sort(String::compareToIgnoreCase);
+        this.linguagensOrdenadas = langs;
+
+        history.record(posicao);
     }
 
+    public String getId() { return id; }
+    public String getNome() { return nome; }
+    public String getCor() { return cor; }
+    public int getPosicao() { return posicao; }
+    public PlayerState getEstado() { return estado; }
 
-    private String formatarLinguagens(String linguagens) {
-        if (linguagens == null || linguagens.trim().isEmpty()) {
-            return "";
-        }
-
-        String[] langs = linguagens.split(";");
-
-        for (int i = 0; i < langs.length; i++) {
-            langs[i] = langs[i].trim();
-        }
-        Arrays.sort(langs);
-
-        return String.join("; ", langs);
+    public String getFirstLanguage() {
+        return linguagensOrdenadas.isEmpty() ? "" : linguagensOrdenadas.get(0);
     }
 
-
-    public String getId() {
-        return id;
+    public void addTool(int toolId) {
+        inventory.addTool(toolId);
     }
 
-    public String getNome() {
-        return nome;
+    public boolean hasTool(int toolId) {
+        return inventory.hasTool(toolId);
     }
 
-    public String getLinguagens() {
-        return linguagens;
+    public boolean hasAnyToolForAbyss(int... ids) {
+        return inventory.hasAnyOf(ids);
     }
 
-    public String getCor() {
-        return cor;
+    public void consumeTool(int id) {
+        inventory.removeTool(id);
     }
 
-    public int getPosicao() {
-        return posicao;
+    public String toolsAsString() {
+        return inventory.toStringList();
     }
 
-
-    public void setId(String id) {
-        this.id = id;
+    public void setPosicao(int novaPosicao) {
+        this.posicao = Math.max(1, novaPosicao);
+        history.record(this.posicao);
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public int posAnterior() {
+        return history.beforeLast();
     }
 
-    public void setLinguagens(String linguagens) {
-        this.linguagens = formatarLinguagens(linguagens);
+    public int posDuasAntes() {
+        return history.twoBefore();
     }
 
-    public void setCor(String cor) {
-        this.cor = cor;
+    public void eliminar() {
+        this.estado = PlayerState.DERROTADO;
     }
 
-    public void setPosicao(int posicao) {
-        this.posicao = posicao;
+    public void prender() {
+        this.estado = PlayerState.PRESO;
     }
 
-    @Override
-    public String toString() {
-        return "Player{" +
-                "id='" + id + '\'' +
-                ", nome='" + nome + '\'' +
-                ", linguagens='" + linguagens + '\'' +
-                ", cor='" + cor + '\'' +
-                ", posicao=" + posicao +
-                '}';
+    public void libertar() {
+        this.estado = PlayerState.EM_JOGO;
+    }
+
+    public String linguagensAsString() {
+        return String.join("; ", linguagensOrdenadas);
+    }
+
+    public String toInfoString() {
+        return id + " | " + nome + " | " + posicao + " | " + toolsAsString() + " | " + linguagensAsString() + " | " + estadoString();
+    }
+
+    private String estadoString() {
+        return switch (estado) {
+            case EM_JOGO -> "Em Jogo";
+            case PRESO -> "Preso";
+            case DERROTADO -> "Derrotado";
+        };
     }
 }
