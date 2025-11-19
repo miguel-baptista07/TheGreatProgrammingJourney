@@ -106,6 +106,16 @@ public class Player {
         return linguagens;
     }
 
+    public String getFirstLanguage() {
+        if (linguagens == null || linguagens.isEmpty()) {
+            return "";
+        }
+        if (!linguagens.contains(";")) {
+            return linguagens;
+        }
+        return linguagens.split(";")[0].trim();
+    }
+
     public String toInfoString() {
         return id + " | " + nome + " | " + posicao + " | " +
                 toolsAsString() + " | " + linguagens + " | " +
