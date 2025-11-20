@@ -77,53 +77,18 @@ public class GameManager {
     public String getImagePng(int nrSquare) {
         if (board == null) return null;
         if (nrSquare < 1 || nrSquare > board.getTamanho()) return null;
-
-        String img = board.getCell(nrSquare).getImagePng();
-        if (img == null) return null;
-
-        // tenta o nome tal como está
-        if (resourceExists(img)) return img;
-        // tenta com prefixo images/
-        if (resourceExists("images/" + img)) return "images/" + img;
-
-        // mapa de fallback para nomes diferentes dentro do JAR
-        HashMap<String, String> fallback = new HashMap<>();
-        fallback.put("playerJava.png", "playerBlue.png");
-        fallback.put("playerPython.png", "playerGreen.png");
-        fallback.put("playerAda.png", "playerBrown.png");
-        fallback.put("playerLisp.png", "playerPurple.png");
-        fallback.put("playerBlue.png", "playerBlue.png");
-        fallback.put("playerGreen.png", "playerGreen.png");
-        fallback.put("playerBrown.png", "playerBrown.png");
-        fallback.put("playerPurple.png", "playerPurple.png");
-
-        String mapped = fallback.get(img);
-        if (mapped != null) {
-            if (resourceExists(mapped)) return mapped;
-            if (resourceExists("images/" + mapped)) return "images/" + mapped;
-        }
-
-        // fallback final para blank
-        if (resourceExists("images/blank.png")) return "images/blank.png";
-        if (resourceExists("blank.png")) return "blank.png";
-
-        return null;
+        return board.getCell(nrSquare).getImagePng();
     }
 
-    private boolean resourceExists(String path) {
-        // garante que procuramos a partir da raiz do classpath
-        String p = path.startsWith("/") ? path : "/" + path;
-        return getClass().getResource(p) != null;
-    }
-
+    // --- TESTS REQUIRE EXACT ORDER ---
     public String[] getProgrammerInfo(int id) {
         for (Player p : players) {
             if (p.getId().equals(String.valueOf(id))) {
                 return new String[]{
                         p.getId(),
                         p.getNome(),
-                        p.getCor(),
-                        p.linguagensAsString(),
+                        p.getCor(),              // COR -> CORRETO
+                        p.linguagensAsString(),  // LINGUAGENS
                         String.valueOf(p.getPosicao())
                 };
             }
@@ -137,14 +102,15 @@ public class GameManager {
         return "Derrotado";
     }
 
+    // --- TOOLTIP FORMAT EXACTLY LIKE PROFESSOR ---
     public String getProgrammerInfoAsStr(int id) {
         for (Player p : players) {
             if (p.getId().equals(String.valueOf(id))) {
                 return p.getId() + " | " +
                         p.getNome() + " | " +
                         p.getPosicao() + " | " +
-                        p.toolsAsString() + " | " +
-                        p.linguagensAsString() + " | " +
+                        p.toolsAsString() + " | " +      // FERRAMENTAS (ANTES ESTAVA A COR -> ERRADO)
+                        p.linguagensAsString() + " | " + // LINGUAGENS
                         estadoToString(p);
             }
         }
@@ -196,7 +162,6 @@ public class GameManager {
         return true;
     }
 
-
     public String reactToAbyssOrTool() {
 
         String msg = lastReactionMessage;
@@ -224,7 +189,6 @@ public class GameManager {
         currentPlayerIndex = vivos.isEmpty() ? 0 : (currentPlayerIndex + 1) % vivos.size();
         return msg;
     }
-
 
     public boolean gameIsOver() {
         GameStatus gs = new GameStatus();
