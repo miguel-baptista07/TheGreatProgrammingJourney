@@ -1,6 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Report {
@@ -26,7 +27,7 @@ public class Report {
 
         Player vencedor = null;
         for (Player p : vivos) {
-            if (p.getPosicao() >= boardSize) {
+            if (p.getPosicao() == boardSize) {
                 vencedor = p;
                 break;
             }
@@ -37,11 +38,13 @@ public class Report {
         r.add("");
 
         r.add("RESTANTES");
-        for (Player p : vivos) {
-            if (p != vencedor) {
-                r.add(p.getNome() + " " + p.getPosicao());
-            }
-        }
+
+        final Player finalVencedor = vencedor;
+
+        vivos.stream()
+                .filter(p -> p != finalVencedor)
+                .sorted(Comparator.comparingInt(a -> Integer.parseInt(a.getId())))
+                .forEach(p -> r.add(p.getNome() + " " + p.getPosicao()));
 
         return r;
     }
