@@ -42,6 +42,8 @@ public class GameManager {
                 vivos.add(pl);
             }
 
+            players.sort((a, b) -> a.getId().compareTo(b.getId()));
+
             board = new Board(worldSize);
 
             for (int i = 1; i <= worldSize; i++) {
@@ -75,7 +77,43 @@ public class GameManager {
     public String getImagePng(int nrSquare) {
         if (board == null) return null;
         if (nrSquare < 1 || nrSquare > board.getTamanho()) return null;
-        return board.getCell(nrSquare).getImagePng();
+
+        String img = board.getCell(nrSquare).getImagePng();
+        if (img == null) return null;
+
+        // tenta o nome tal como está
+        if (resourceExists(img)) return img;
+        // tenta com prefixo images/
+        if (resourceExists("images/" + img)) return "images/" + img;
+
+        // mapa de fallback para nomes diferentes dentro do JAR
+        HashMap<String, String> fallback = new HashMap<>();
+        fallback.put("playerJava.png", "playerBlue.png");
+        fallback.put("playerPython.png", "playerGreen.png");
+        fallback.put("playerAda.png", "playerBrown.png");
+        fallback.put("playerLisp.png", "playerPurple.png");
+        fallback.put("playerBlue.png", "playerBlue.png");
+        fallback.put("playerGreen.png", "playerGreen.png");
+        fallback.put("playerBrown.png", "playerBrown.png");
+        fallback.put("playerPurple.png", "playerPurple.png");
+
+        String mapped = fallback.get(img);
+        if (mapped != null) {
+            if (resourceExists(mapped)) return mapped;
+            if (resourceExists("images/" + mapped)) return "images/" + mapped;
+        }
+
+        // fallback final para blank
+        if (resourceExists("images/blank.png")) return "images/blank.png";
+        if (resourceExists("blank.png")) return "blank.png";
+
+        return null;
+    }
+
+    private boolean resourceExists(String path) {
+        // garante que procuramos a partir da raiz do classpath
+        String p = path.startsWith("/") ? path : "/" + path;
+        return getClass().getResource(p) != null;
     }
 
     public String[] getProgrammerInfo(int id) {
@@ -84,11 +122,10 @@ public class GameManager {
                 return new String[]{
                         p.getId(),
                         p.getNome(),
-                        p.linguagensAsString(),
                         p.getCor(),
+                        p.linguagensAsString(),
                         String.valueOf(p.getPosicao())
                 };
-
             }
         }
         return null;
@@ -136,11 +173,14 @@ public class GameManager {
         Player p = vivos.get(currentPlayerIndex);
 
         if (p.getEstado() == PlayerState.PRESO) {
-            lastReactionMessage = "Nada aconteceu";
+            lastReactionMessage = "Preso";
             return true;
         }
 
-        if (!LanguageRules.isMoveAllowed(p, nrSpaces)) return false;
+        if (!LanguageRules.isMoveAllowed(p, nrSpaces)) {
+            lastReactionMessage = "Movimento inválido";
+            return false;
+        }
 
         int nova = p.getPosicao() + nrSpaces;
 
@@ -150,41 +190,41 @@ public class GameManager {
         }
 
         p.setPosicao(nova);
-
         Cell c = board.getCell(nova);
-
-        if (c.getId() == 0 || c.getId() == 1 || c.getId() == 2 || c.getId() == 3 || c.getId() == 9) {
-            if (p.hasAnyToolForAbyss(0, 1, 2)) {
-                lastReactionMessage = "O jogador já possui a ferramenta necessária";
-                return true;
-            }
-        }
-
         lastReactionMessage = c.react(p, this);
 
         return true;
     }
 
+
     public String reactToAbyssOrTool() {
-        if ("O jogador caiu num abismo".equals(lastReactionMessage)) {
+
+        String msg = lastReactionMessage;
+        lastReactionMessage = null;
+
+        if (msg == null) {
             turnCounter++;
-            if (!vivos.isEmpty()) currentPlayerIndex = (currentPlayerIndex + 1) % vivos.size();
-            lastReactionMessage = null;
+            currentPlayerIndex = vivos.isEmpty() ? 0 : (currentPlayerIndex + 1) % vivos.size();
             return null;
         }
 
-        if ("O jogador foi eliminado".equals(lastReactionMessage)) {
+        if (msg.equals("O jogador foi eliminado")) {
             Player morto = vivos.get(currentPlayerIndex);
             vivos.remove(morto);
             players.remove(morto);
-            if (!vivos.isEmpty()) currentPlayerIndex %= vivos.size();
-            return "O jogador foi eliminado";
+
+            turnCounter++;
+            if (!vivos.isEmpty()) {
+                currentPlayerIndex %= vivos.size();
+            }
+            return msg;
         }
 
         turnCounter++;
-        if (!vivos.isEmpty()) currentPlayerIndex = (currentPlayerIndex + 1) % vivos.size();
-        return lastReactionMessage;
+        currentPlayerIndex = vivos.isEmpty() ? 0 : (currentPlayerIndex + 1) % vivos.size();
+        return msg;
     }
+
 
     public boolean gameIsOver() {
         GameStatus gs = new GameStatus();
