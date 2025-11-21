@@ -465,7 +465,7 @@ public class GameManager {
             return abismo.getImagemPng();
         }
 
-        // Verificar se há ferramenta na posição
+
         if (board.temFerramenta(nrSquare)) {
             Ferramenta ferramenta = board.getFerramenta(nrSquare);
             return ferramenta.getImagemPng();
