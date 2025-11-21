@@ -263,7 +263,14 @@ public class GameManager {
         }
 
         avancarTurno();
-        ultimaMensagemReact = mensagem.toString();
+
+        // Retornar null se não houve interação (sem ferramenta, sem abismo, sem libertação)
+        if (mensagem.length() == 0) {
+            ultimaMensagemReact = null;
+        } else {
+            ultimaMensagemReact = mensagem.toString();
+        }
+
         return ultimaMensagemReact;
     }
 
