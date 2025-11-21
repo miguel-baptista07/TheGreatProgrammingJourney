@@ -14,6 +14,6 @@ public class AbyssCrash extends Cell {
     @Override
     public String react(Player p, GameManager gm) {
         p.setPosicao(1);
-        return "O jogador caiu num abismo";
+        return "Crash do sistema";
     }
 }

@@ -14,6 +14,6 @@ public class AbyssSyntaxError extends Cell {
     @Override
     public String react(Player p, GameManager gm) {
         p.setPosicao(p.posAnterior());
-        return "O jogador caiu num abismo";
+        return "Erro de sintaxe";
     }
 }

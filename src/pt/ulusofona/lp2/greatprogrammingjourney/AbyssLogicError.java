@@ -13,9 +13,7 @@ public class AbyssLogicError extends Cell {
 
     @Override
     public String react(Player p, GameManager gm) {
-        int lastMove = Math.abs(p.getPosicao() - p.posAnterior());
-        int recuo = lastMove / 2;
-        p.setPosicao(p.getPosicao() - recuo);
-        return "O jogador caiu num abismo";
+        p.setPosicao(p.posAnterior());
+        return "Erro lógico";
     }
 }

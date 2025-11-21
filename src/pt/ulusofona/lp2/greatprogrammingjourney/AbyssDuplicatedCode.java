@@ -14,6 +14,6 @@ public class AbyssDuplicatedCode extends Cell {
     @Override
     public String react(Player p, GameManager gm) {
         p.setPosicao(p.posAnterior());
-        return "O jogador caiu num abismo";
+        return "Código duplicado";
     }
 }

@@ -8,12 +8,12 @@ public class AbyssInfiniteLoop extends Cell {
 
     @Override
     public String getImagePng() {
-        return "infinite_loop.png";
+        return "loop.png";
     }
 
     @Override
     public String react(Player p, GameManager gm) {
         p.prender();
-        return "O jogador caiu num abismo";
+        return "Loop infinito";
     }
 }

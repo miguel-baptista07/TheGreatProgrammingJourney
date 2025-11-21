@@ -300,4 +300,29 @@ public class GameManager {
         // Retorna: [jogadores, "", tipo_elemento]
         return new String[]{jogadores, "", cellInfo};
     }
+
+    public void eliminatePlayer(Player p) {
+        if (p == null) return;
+
+        // Marca o jogador como eliminado
+        p.eliminar();
+
+        // Remove dos jogadores vivos
+        vivos.remove(p);
+
+        // Também deve sair da lista total?
+        // NÃO remover de players — os testes precisam de o ver no histórico
+        // players.remove(p);  // NÃO FAZER!
+
+        // Ajusta o índice do jogador corrente
+        if (currentPlayerIndex >= vivos.size()) {
+            currentPlayerIndex = 0;
+        }
+
+        // Se ficou sem jogadores vivos → jogo termina
+        if (vivos.isEmpty()) {
+            lastReactionMessage = "O jogador foi eliminado";
+        }
+    }
+
 }

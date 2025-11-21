@@ -13,7 +13,7 @@ public class AbyssBSOD extends Cell {
 
     @Override
     public String react(Player p, GameManager gm) {
-        p.eliminar();
+        gm.eliminatePlayer(p);
         return "O jogador foi eliminado";
     }
 }

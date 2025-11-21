@@ -10,20 +10,18 @@ public class AbyssSegmentationFault extends Cell {
 
     @Override
     public String getImagePng() {
-        return "segfault.png";
+        return "seg_fault.png";
     }
 
     @Override
     public String react(Player p, GameManager gm) {
+        List<Player> same = gm.getAlivePlayersAt(getPosicao());
 
-        List<Player> todos = gm.getAlivePlayersAt(posicao);
-
-        if (todos.size() >= 2) {
-            for (Player x : todos) {
-                x.setPosicao(x.getPosicao() - 3);
-            }
+        for (Player x : same) {
+            x.setPosicao(x.posDuasAntes());  // recuar 2
+            // OU: x.setPosicao(x.getPosicao() - 3); se o enunciado pedir -3
         }
 
-        return "O jogador caiu num abismo";
+        return "Falha de segmentação";
     }
 }

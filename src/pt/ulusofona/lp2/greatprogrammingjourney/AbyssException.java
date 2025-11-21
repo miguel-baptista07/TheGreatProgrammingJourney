@@ -13,7 +13,7 @@ public class AbyssException extends Cell {
 
     @Override
     public String react(Player p, GameManager gm) {
-        p.setPosicao(p.getPosicao() - 2);
-        return "O jogador caiu num abismo";
+        p.setPosicao(p.posAnterior());
+        return "Exceção não tratada";
     }
 }

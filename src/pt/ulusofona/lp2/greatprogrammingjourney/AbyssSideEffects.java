@@ -14,6 +14,6 @@ public class AbyssSideEffects extends Cell {
     @Override
     public String react(Player p, GameManager gm) {
         p.setPosicao(p.posDuasAntes());
-        return "O jogador caiu num abismo";
+        return "Efeitos secundários";
     }
 }
