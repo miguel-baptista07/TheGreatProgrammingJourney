@@ -224,7 +224,7 @@ public class GameManager {
 
         if (board.temFerramenta(posicao)) {
             Ferramenta ferramenta = board.getFerramenta(posicao);
-            
+
             if (!currentPlayer.temFerramenta(ferramenta.getId())) {
                 currentPlayer.adicionarFerramenta(ferramenta);
                 board.removerFerramenta(posicao);
@@ -263,18 +263,18 @@ public class GameManager {
         }
 
         avancarTurno();
-        ultimaMensagemReact = mensagem.length() > 0 ? mensagem.toString() : null;
+        ultimaMensagemReact = mensagem.toString();
         return ultimaMensagemReact;
     }
 
     private void avancarTurno() {
         turnCounter++;
-        
+
         int tentativas = 0;
         do {
             currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
             tentativas++;
-            
+
             if (tentativas > players.size()) {
                 break;
             }
@@ -370,7 +370,7 @@ public class GameManager {
                     } else if (p.getPosicao() >= board.getTamanhoTabuleiro()) {
                         estado = "Vencedor";
                     }
-                    
+
                     // Obter lista de ferramentas
                     List<Ferramenta> ferramentas = p.getFerramentas();
                     if (!ferramentas.isEmpty()) {
@@ -394,13 +394,13 @@ public class GameManager {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < players.size(); i++) {
             Player player = players.get(i);
-            
+
             if (sb.length() > 0) {
                 sb.append(" | ");
             }
-            
+
             sb.append(player.getNome()).append(" : ");
-            
+
             List<Ferramenta> ferramentas = player.getFerramentas();
             if (ferramentas.isEmpty()) {
                 sb.append("No tools");
@@ -520,31 +520,31 @@ public class GameManager {
             writer.println(turnCounter);
             writer.println(currentPlayerIndex);
             writer.println(players.size());
-            
+
             for (Player p : players) {
-                writer.println(p.getId() + ";" + p.getNome() + ";" + p.getLinguagens() + ";" + 
-                              p.getCor() + ";" + p.getPosicao() + ";" + p.getPosicaoAnterior() + ";" + 
-                              p.getEstado().name());
-                
+                writer.println(p.getId() + ";" + p.getNome() + ";" + p.getLinguagens() + ";" +
+                        p.getCor() + ";" + p.getPosicao() + ";" + p.getPosicaoAnterior() + ";" +
+                        p.getEstado().name());
+
                 List<Ferramenta> ferramentas = p.getFerramentas();
                 writer.println(ferramentas.size());
                 for (Ferramenta f : ferramentas) {
                     writer.println(f.getId());
                 }
             }
-            
+
             Map<Integer, Abismo> abismos = board.getAbismos();
             writer.println(abismos.size());
             for (Map.Entry<Integer, Abismo> entry : abismos.entrySet()) {
                 writer.println(entry.getKey() + ";" + entry.getValue().getId());
             }
-            
+
             Map<Integer, Ferramenta> ferramentas = board.getFerramentas();
             writer.println(ferramentas.size());
             for (Map.Entry<Integer, Ferramenta> entry : ferramentas.entrySet()) {
                 writer.println(entry.getKey() + ";" + entry.getValue().getId());
             }
-            
+
             return true;
         } catch (IOException e) {
             return false;
@@ -559,24 +559,24 @@ public class GameManager {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             players.clear();
             board.limpar();
-            
+
             int tamanho = Integer.parseInt(reader.readLine());
             board.setTamanhoTabuleiro(tamanho);
-            
+
             turnCounter = Integer.parseInt(reader.readLine());
             currentPlayerIndex = Integer.parseInt(reader.readLine());
             int numJogadores = Integer.parseInt(reader.readLine());
-            
+
             for (int i = 0; i < numJogadores; i++) {
                 String[] dados = reader.readLine().split(";");
                 if (dados.length != 7) {
                     throw new InvalidFileException("Dados de jogador inválidos");
                 }
-                
+
                 Player p = new Player(dados[0], dados[1], dados[2], dados[3]);
                 p.setPosicao(Integer.parseInt(dados[4]));
                 p.setEstado(PlayerState.valueOf(dados[6]));
-                
+
                 int numFerramentas = Integer.parseInt(reader.readLine());
                 for (int j = 0; j < numFerramentas; j++) {
                     int ferramentaId = Integer.parseInt(reader.readLine());
@@ -585,10 +585,10 @@ public class GameManager {
                         p.adicionarFerramenta(f);
                     }
                 }
-                
+
                 players.add(p);
             }
-            
+
             int numAbismos = Integer.parseInt(reader.readLine());
             for (int i = 0; i < numAbismos; i++) {
                 String[] dados = reader.readLine().split(";");
@@ -599,7 +599,7 @@ public class GameManager {
                     board.adicionarAbismo(posicao, a);
                 }
             }
-            
+
             int numFerramentas = Integer.parseInt(reader.readLine());
             for (int i = 0; i < numFerramentas; i++) {
                 String[] dados = reader.readLine().split(";");
@@ -610,7 +610,7 @@ public class GameManager {
                     board.adicionarFerramenta(posicao, f);
                 }
             }
-            
+
         } catch (IOException | IllegalArgumentException e) {
             throw new InvalidFileException("Erro ao carregar ficheiro: " + e.getMessage(), e);
         }
@@ -618,7 +618,7 @@ public class GameManager {
 
     public JPanel getAuthorsPanel() {
         JPanel panel = new JPanel();
-        panel.add(new JLabel("Desenvolvido por: Miguel Baptista e Gonçalo Almeida"));
+        panel.add(new JLabel("Desenvolvido por: [Seu Nome Aqui]"));
         return panel;
     }
 
