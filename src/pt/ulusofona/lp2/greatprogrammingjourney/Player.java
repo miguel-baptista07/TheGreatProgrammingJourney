@@ -12,12 +12,14 @@ public class Player {
     private int posicao = 1;
     private PlayerState estado = PlayerState.EM_JOGO;
     private final ArrayList<Integer> tools = new ArrayList<>();
+    private final ArrayList<Integer> historicoPosicoes = new ArrayList<>(); // NOVO!
 
     public Player(String id, String nome, String linguagens, String cor) {
         this.id = id;
         this.nome = nome;
         this.cor = cor;
         this.linguagens = formatarLinguagens(linguagens);
+        historicoPosicoes.add(1); // Começa na posição 1
     }
 
     private String formatarLinguagens(String linguagens) {
@@ -52,8 +54,16 @@ public class Player {
         return estado;
     }
 
+    // MODIFICADO: Registar histórico quando muda posição
     public void setPosicao(int pos) {
+        if (pos < 1) pos = 1;
         this.posicao = pos;
+        historicoPosicoes.add(pos);
+
+        // Manter apenas últimas 10 posições para não gastar memória
+        if (historicoPosicoes.size() > 10) {
+            historicoPosicoes.remove(0);
+        }
     }
 
     public void eliminar() {
@@ -64,16 +74,32 @@ public class Player {
         estado = PlayerState.PRESO;
     }
 
+    public void libertar() {
+        if (estado == PlayerState.PRESO) {
+            estado = PlayerState.EM_JOGO;
+        }
+    }
+
+    // CORRIGIDO: Usar histórico real
     public int posAnterior() {
+        if (historicoPosicoes.size() >= 2) {
+            return historicoPosicoes.get(historicoPosicoes.size() - 2);
+        }
         return Math.max(1, posicao - 1);
     }
 
+    // CORRIGIDO: Usar histórico real
     public int posDuasAntes() {
+        if (historicoPosicoes.size() >= 3) {
+            return historicoPosicoes.get(historicoPosicoes.size() - 3);
+        }
         return Math.max(1, posicao - 2);
     }
 
     public void addTool(int id) {
-        tools.add(id);
+        if (!tools.contains(id)) {
+            tools.add(id);
+        }
     }
 
     public boolean hasTool(int id) {

@@ -15,7 +15,7 @@ public class GameManager {
     private Board board;
     private int currentPlayerIndex = 0;
     private int turnCounter = 0;
-    private String lastReactionMessage = "Nada aconteceu";
+    private String lastReactionMessage = null;
 
     public GameManager() {
     }
@@ -30,7 +30,7 @@ public class GameManager {
             vivos.clear();
             currentPlayerIndex = 0;
             turnCounter = 0;
-            lastReactionMessage = "Nada aconteceu";
+            lastReactionMessage = null;
 
             if (playerInfo == null || playerInfo.length < 2 || playerInfo.length > 4) return false;
             if (worldSize < playerInfo.length * 2) return false;
@@ -80,15 +80,15 @@ public class GameManager {
         return board.getCell(nrSquare).getImagePng();
     }
 
-    // --- TESTS REQUIRE EXACT ORDER ---
+    // CORREÇÃO 1: Ordem correta -> id, nome, LINGUAGENS, COR, posição
     public String[] getProgrammerInfo(int id) {
         for (Player p : players) {
             if (p.getId().equals(String.valueOf(id))) {
                 return new String[]{
                         p.getId(),
                         p.getNome(),
-                        p.getCor(),              // COR -> CORRETO
-                        p.linguagensAsString(),  // LINGUAGENS
+                        p.linguagensAsString(),  // LINGUAGENS primeiro
+                        p.getCor(),              // COR depois
                         String.valueOf(p.getPosicao())
                 };
             }
@@ -102,15 +102,14 @@ public class GameManager {
         return "Derrotado";
     }
 
-    // --- TOOLTIP FORMAT EXACTLY LIKE PROFESSOR ---
     public String getProgrammerInfoAsStr(int id) {
         for (Player p : players) {
             if (p.getId().equals(String.valueOf(id))) {
                 return p.getId() + " | " +
                         p.getNome() + " | " +
                         p.getPosicao() + " | " +
-                        p.toolsAsString() + " | " +      // FERRAMENTAS (ANTES ESTAVA A COR -> ERRADO)
-                        p.linguagensAsString() + " | " + // LINGUAGENS
+                        p.toolsAsString() + " | " +
+                        p.linguagensAsString() + " | " +
                         estadoToString(p);
             }
         }
@@ -133,60 +132,80 @@ public class GameManager {
         return Integer.parseInt(vivos.get(currentPlayerIndex).getId());
     }
 
+    // CORREÇÃO 2: Separar movimento de reação
     public boolean moveCurrentPlayer(int nrSpaces) {
         if (vivos.isEmpty()) return false;
 
         Player p = vivos.get(currentPlayerIndex);
 
+        // Se está preso, NÃO move e marca para libertar no reactToAbyssOrTool
         if (p.getEstado() == PlayerState.PRESO) {
-            lastReactionMessage = "Preso";
-            return true;
-        }
-
-        if (!LanguageRules.isMoveAllowed(p, nrSpaces)) {
-            lastReactionMessage = "Movimento inválido";
+            lastReactionMessage = "PRESO_LIBERTA";
             return false;
         }
 
+        // Verifica restrições de linguagem
+        if (!LanguageRules.isMoveAllowed(p, nrSpaces)) {
+            lastReactionMessage = null;
+            return false;
+        }
+
+        // Move o jogador
         int nova = p.getPosicao() + nrSpaces;
 
         if (nova > board.getTamanho()) {
             int excesso = nova - board.getTamanho();
             nova = board.getTamanho() - excesso;
+            if (nova < 1) nova = 1;
         }
 
         p.setPosicao(nova);
-        Cell c = board.getCell(nova);
-        lastReactionMessage = c.react(p, this);
+
+        // NÃO reage aqui! Será feito no reactToAbyssOrTool()
+        lastReactionMessage = null;
 
         return true;
     }
 
+    // CORREÇÃO 3: React é chamado AQUI, não no moveCurrentPlayer
     public String reactToAbyssOrTool() {
+        if (vivos.isEmpty()) return null;
 
-        String msg = lastReactionMessage;
-        lastReactionMessage = null;
+        Player p = vivos.get(currentPlayerIndex);
 
-        if (msg == null) {
+        // Se estava preso, liberta e avança turno
+        if (lastReactionMessage != null && lastReactionMessage.equals("PRESO_LIBERTA")) {
+            lastReactionMessage = null;
+
+            // Liberta o jogador
+            p.libertar();
+
             turnCounter++;
-            currentPlayerIndex = vivos.isEmpty() ? 0 : (currentPlayerIndex + 1) % vivos.size();
-            return null;
+            currentPlayerIndex = (currentPlayerIndex + 1) % vivos.size();
+            return "O jogador estava preso"; // Mensagem para o visualizador
         }
 
-        if (msg.equals("O jogador foi eliminado")) {
-            Player morto = vivos.get(currentPlayerIndex);
-            vivos.remove(morto);
-            players.remove(morto);
+        // Reage à célula atual
+        Cell c = board.getCell(p.getPosicao());
+        String msg = c.react(p, this);
+
+        // Se jogador foi eliminado
+        if (msg != null && msg.contains("eliminado")) {
+            vivos.remove(currentPlayerIndex);
 
             turnCounter++;
             if (!vivos.isEmpty()) {
-                currentPlayerIndex %= vivos.size();
+                currentPlayerIndex = currentPlayerIndex % vivos.size();
             }
             return msg;
         }
 
+        // Avança turno
         turnCounter++;
-        currentPlayerIndex = vivos.isEmpty() ? 0 : (currentPlayerIndex + 1) % vivos.size();
+        if (!vivos.isEmpty()) {
+            currentPlayerIndex = (currentPlayerIndex + 1) % vivos.size();
+        }
+
         return msg;
     }
 
@@ -242,13 +261,33 @@ public class GameManager {
         return r;
     }
 
+    // CORREÇÃO 4: Retornar 3 elementos como esperado pelo visualizador
     public String[] getSlotInfo(int position) {
         if (board == null || position < 1 || position > board.getTamanho()) return null;
+
+        // IDs dos jogadores nesta posição
         ArrayList<String> ids = new ArrayList<>();
         for (Player p : players) {
-            if (p.getPosicao() == position && p.getEstado() != PlayerState.DERROTADO) ids.add(p.getId());
+            if (p.getPosicao() == position) {
+                ids.add(p.getId());
+            }
         }
-        if (ids.isEmpty()) return new String[]{""};
-        return new String[]{String.join(",", ids)};
+        String jogadores = ids.isEmpty() ? "" : String.join(",", ids);
+
+        // Informação da célula (abismo ou ferramenta)
+        Cell c = board.getCell(position);
+        String cellInfo = "";
+
+        if (c != null && !(c instanceof NormalCell) && !(c instanceof GloryCell)) {
+            // É um abismo ou ferramenta
+            if (c instanceof Tool) {
+                cellInfo = "T:" + c.getId();
+            } else {
+                cellInfo = "A:" + c.getId();
+            }
+        }
+
+        // Retorna: [jogadores, "", tipo_elemento]
+        return new String[]{jogadores, "", cellInfo};
     }
 }
