@@ -29,4 +29,9 @@ public class SideEffects extends Abismo {
     public boolean aceitaNeutralizacaoDe(Ferramenta ferramenta) {
         return ferramenta.podeNeutralizar(this);
     }
+
+    @Override
+    public String getImagemPng() {
+        return "secondary-effects.png";
+    }
 }

@@ -26,4 +26,9 @@ public class FerramentaAntivirus extends Ferramenta {
     public String getMensagemNeutralizacao(Abismo abismo) {
         return "Antivirus neutralizou " + abismo.getNome() + " e salvou o jogador da eliminação!";
     }
+
+    @Override
+    public String getImagemPng() {
+        return "unknownPiece.png";
+    }
 }

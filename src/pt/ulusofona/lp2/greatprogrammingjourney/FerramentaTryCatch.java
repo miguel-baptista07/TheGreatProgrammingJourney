@@ -25,4 +25,9 @@ public class FerramentaTryCatch extends Ferramenta {
     public String getMensagemNeutralizacao(Abismo abismo) {
         return "Try-Catch neutralizou " + abismo.getNome() + "!";
     }
+
+    @Override
+    public String getImagemPng() {
+        return "catch.png";
+    }
 }

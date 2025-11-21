@@ -29,4 +29,9 @@ public class FileNotFound extends Abismo {
     public boolean aceitaNeutralizacaoDe(Ferramenta ferramenta) {
         return ferramenta.podeNeutralizar(this);
     }
+
+    @Override
+    public String getImagemPng() {
+        return "file-not-found-exception.png";
+    }
 }

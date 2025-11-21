@@ -38,4 +38,10 @@ public abstract class ElementoTabuleiro {
     public String getRepresentacao() {
         return getTipo() + ":" + id;
     }
+
+    /**
+     * Retorna o nome do ficheiro PNG da imagem do elemento
+     * @return nome do ficheiro PNG (ex: "syntax.png", "IDE.png")
+     */
+    public abstract String getImagemPng();
 }

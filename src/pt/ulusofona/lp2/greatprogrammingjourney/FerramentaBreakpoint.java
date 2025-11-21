@@ -26,4 +26,9 @@ public class FerramentaBreakpoint extends Ferramenta {
     public String getMensagemNeutralizacao(Abismo abismo) {
         return "Breakpoint neutralizou " + abismo.getNome() + " e libertou o jogador!";
     }
+
+    @Override
+    public String getImagemPng() {
+        return "unit-tests.png";
+    }
 }

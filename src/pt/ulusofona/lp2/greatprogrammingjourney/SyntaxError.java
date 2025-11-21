@@ -29,4 +29,9 @@ public class SyntaxError extends Abismo {
     public boolean aceitaNeutralizacaoDe(Ferramenta ferramenta) {
         return ferramenta.podeNeutralizar(this);
     }
+
+    @Override
+    public String getImagemPng() {
+        return "syntax.png";
+    }
 }

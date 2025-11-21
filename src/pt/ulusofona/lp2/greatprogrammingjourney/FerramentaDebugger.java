@@ -25,4 +25,9 @@ public class FerramentaDebugger extends Ferramenta {
     public String getMensagemNeutralizacao(Abismo abismo) {
         return "Debugger neutralizou " + abismo.getNome() + "!";
     }
+
+    @Override
+    public String getImagemPng() {
+        return "IDE.png";
+    }
 }

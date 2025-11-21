@@ -41,4 +41,9 @@ public class SegmentationFault extends Abismo {
     public boolean aceitaNeutralizacaoDe(Ferramenta ferramenta) {
         return ferramenta.podeNeutralizar(this);
     }
+
+    @Override
+    public String getImagemPng() {
+        return "core-dumped.png";
+    }
 }

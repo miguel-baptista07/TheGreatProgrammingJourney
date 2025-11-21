@@ -25,4 +25,9 @@ public class FerramentaBackup extends Ferramenta {
     public String getMensagemNeutralizacao(Abismo abismo) {
         return "Backup neutralizou " + abismo.getNome() + "!";
     }
+
+    @Override
+    public String getImagemPng() {
+        return "inheritance.png";
+    }
 }

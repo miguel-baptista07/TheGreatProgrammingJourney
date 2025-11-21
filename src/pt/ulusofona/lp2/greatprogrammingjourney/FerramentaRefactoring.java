@@ -25,4 +25,9 @@ public class FerramentaRefactoring extends Ferramenta {
     public String getMensagemNeutralizacao(Abismo abismo) {
         return "Refactoring neutralizou " + abismo.getNome() + "!";
     }
+
+    @Override
+    public String getImagemPng() {
+        return "functional.png";
+    }
 }

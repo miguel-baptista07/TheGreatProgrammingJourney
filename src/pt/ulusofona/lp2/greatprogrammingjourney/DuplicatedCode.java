@@ -28,4 +28,9 @@ public class DuplicatedCode extends Abismo {
     public boolean aceitaNeutralizacaoDe(Ferramenta ferramenta) {
         return ferramenta.podeNeutralizar(this);
     }
+
+    @Override
+    public String getImagemPng() {
+        return "duplicated-code.png";
+    }
 }

@@ -17,6 +17,7 @@ public class GameManager {
     private int currentPlayerIndex;
     private int turnCounter;
     private String ultimaMensagemReact;
+    private int lastDiceValue;
 
     public GameManager() {
         this.players = new ArrayList<>();
@@ -24,6 +25,7 @@ public class GameManager {
         this.currentPlayerIndex = 0;
         this.turnCounter = 0;
         this.ultimaMensagemReact = "";
+        this.lastDiceValue = 0;
     }
 
     /**
@@ -185,6 +187,9 @@ public class GameManager {
         if (nrSpaces < 1 || nrSpaces > 6) {
             return false;
         }
+
+        // Guardar valor do dado para exibição
+        this.lastDiceValue = nrSpaces;
 
         Player currentPlayer = players.get(currentPlayerIndex);
 
@@ -447,7 +452,26 @@ public class GameManager {
             return "glory.png";
         }
 
+        // Verificar se há abismo na posição
+        if (board.temAbismo(nrSquare)) {
+            Abismo abismo = board.getAbismo(nrSquare);
+            return abismo.getImagemPng();
+        }
+
+        // Verificar se há ferramenta na posição
+        if (board.temFerramenta(nrSquare)) {
+            Ferramenta ferramenta = board.getFerramenta(nrSquare);
+            return ferramenta.getImagemPng();
+        }
+
         return null;
+    }
+
+    public String getDiceImage() {
+        if (lastDiceValue >= 1 && lastDiceValue <= 6) {
+            return "dice_" + lastDiceValue + ".png";
+        }
+        return "dice.png";
     }
 
     public ArrayList<String> getGameResults() {
@@ -594,7 +618,7 @@ public class GameManager {
 
     public JPanel getAuthorsPanel() {
         JPanel panel = new JPanel();
-        panel.add(new JLabel("Desenvolvido por: Miguel Baptista e Gonçao Almeida]"));
+        panel.add(new JLabel("Desenvolvido por: Miguel Baptista e Gonçalo Almeida"));
         return panel;
     }
 
