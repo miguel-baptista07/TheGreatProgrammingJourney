@@ -2,30 +2,38 @@ package pt.ulusofona.lp2.greatprogrammingjourney;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+/**
+ * Classe que representa um jogador/programador.
+ * Expandida da parte 1 para incluir ferramentas e estados.
+ */
 public class Player {
-
     private String id;
     private String nome;
     private String linguagens;
     private String cor;
-    private int posicao = 1;
-    private PlayerState estado = PlayerState.EM_JOGO;
-    private final ArrayList<Integer> tools = new ArrayList<>();
-    private final ArrayList<Integer> historicoPosicoes = new ArrayList<>(); // NOVO!
+    private int posicao;
+    private int posicaoAnterior;
+    private PlayerState estado;
+    private List<Ferramenta> ferramentas;
 
     public Player(String id, String nome, String linguagens, String cor) {
         this.id = id;
         this.nome = nome;
-        this.cor = cor;
         this.linguagens = formatarLinguagens(linguagens);
-        historicoPosicoes.add(1); // Começa na posição 1
+        this.cor = cor;
+        this.posicao = 1;
+        this.posicaoAnterior = 1;
+        this.estado = PlayerState.ATIVO;
+        this.ferramentas = new ArrayList<>();
     }
 
     private String formatarLinguagens(String linguagens) {
         if (linguagens == null || linguagens.trim().isEmpty()) {
             return "";
         }
+
         String[] langs = linguagens.split(";");
         for (int i = 0; i < langs.length; i++) {
             langs[i] = langs[i].trim();
@@ -34,12 +42,17 @@ public class Player {
         return String.join("; ", langs);
     }
 
+    // Getters
     public String getId() {
         return id;
     }
 
     public String getNome() {
         return nome;
+    }
+
+    public String getLinguagens() {
+        return linguagens;
     }
 
     public String getCor() {
@@ -50,102 +63,172 @@ public class Player {
         return posicao;
     }
 
+    public int getPosicaoAnterior() {
+        return posicaoAnterior;
+    }
+
     public PlayerState getEstado() {
         return estado;
     }
 
-    // MODIFICADO: Registar histórico quando muda posição
-    public void setPosicao(int pos) {
-        if (pos < 1) pos = 1;
-        this.posicao = pos;
-        historicoPosicoes.add(pos);
-
-        // Manter apenas últimas 10 posições para não gastar memória
-        if (historicoPosicoes.size() > 10) {
-            historicoPosicoes.remove(0);
-        }
+    public List<Ferramenta> getFerramentas() {
+        return new ArrayList<>(ferramentas);
     }
 
-    public void eliminar() {
-        estado = PlayerState.DERROTADO;
+    // Setters
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void prender() {
-        estado = PlayerState.PRESO;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
-    public void libertar() {
-        if (estado == PlayerState.PRESO) {
-            estado = PlayerState.EM_JOGO;
-        }
+    public void setLinguagens(String linguagens) {
+        this.linguagens = formatarLinguagens(linguagens);
     }
 
-    // CORRIGIDO: Usar histórico real
-    public int posAnterior() {
-        if (historicoPosicoes.size() >= 2) {
-            return historicoPosicoes.get(historicoPosicoes.size() - 2);
-        }
-        return Math.max(1, posicao - 1);
+    public void setCor(String cor) {
+        this.cor = cor;
     }
 
-    // CORRIGIDO: Usar histórico real
-    public int posDuasAntes() {
-        if (historicoPosicoes.size() >= 3) {
-            return historicoPosicoes.get(historicoPosicoes.size() - 3);
-        }
-        return Math.max(1, posicao - 2);
+    public void setPosicao(int posicao) {
+        this.posicaoAnterior = this.posicao;
+        this.posicao = posicao;
     }
 
-    public void addTool(int id) {
-        if (!tools.contains(id)) {
-            tools.add(id);
-        }
+    public void setEstado(PlayerState estado) {
+        this.estado = estado;
     }
 
-    public boolean hasTool(int id) {
-        return tools.contains(id);
+    // Métodos relacionados com ferramentas
+    
+    /**
+     * Adiciona uma ferramenta ao inventário do jogador.
+     * 
+     * @param ferramenta A ferramenta a adicionar
+     */
+    public void adicionarFerramenta(Ferramenta ferramenta) {
+        ferramentas.add(ferramenta);
     }
 
-    public boolean hasAnyToolForAbyss(int... ids) {
-        for (int t : tools) {
-            for (int x : ids) {
-                if (t == x) {
-                    return true;
-                }
+    /**
+     * Remove uma ferramenta do inventário do jogador.
+     * 
+     * @param ferramenta A ferramenta a remover
+     */
+    public void removerFerramenta(Ferramenta ferramenta) {
+        ferramentas.remove(ferramenta);
+    }
+
+    /**
+     * Verifica se o jogador tem uma ferramenta de um tipo específico (por id).
+     * 
+     * @param ferramentaId O id da ferramenta
+     * @return true se o jogador tem essa ferramenta
+     */
+    public boolean temFerramenta(int ferramentaId) {
+        for (Ferramenta f : ferramentas) {
+            if (f.getId() == ferramentaId) {
+                return true;
             }
         }
         return false;
     }
 
-    public String toolsAsString() {
-        if (tools.isEmpty()) {
-            return "No tools";
+    /**
+     * Obtém uma ferramenta que pode neutralizar o abismo dado.
+     * 
+     * @param abismo O abismo a neutralizar
+     * @return A ferramenta que neutraliza, ou null se não tiver
+     */
+    public Ferramenta getFerramentaParaNeutralizar(Abismo abismo) {
+        for (Ferramenta f : ferramentas) {
+            if (f.podeNeutralizar(abismo)) {
+                return f;
+            }
         }
-        ArrayList<String> nomes = new ArrayList<>();
-        for (int t : tools) {
-            nomes.add(ToolFactory.getToolName(t));
-        }
-        return String.join(", ", nomes);
+        return null;
     }
 
-    public String linguagensAsString() {
-        return linguagens;
+    /**
+     * Verifica se o jogador pode mover (não está eliminado nem preso).
+     * 
+     * @return true se pode mover
+     */
+    public boolean podeMover() {
+        return estado == PlayerState.ATIVO || estado == PlayerState.VENCEDOR;
     }
 
-    public String getFirstLanguage() {
-        if (linguagens == null || linguagens.isEmpty()) {
-            return "";
-        }
-        if (!linguagens.contains(";")) {
-            return linguagens;
-        }
-        return linguagens.split(";")[0].trim();
+    /**
+     * Verifica se o jogador está ativo no jogo.
+     * 
+     * @return true se está ativo
+     */
+    public boolean estaAtivo() {
+        return estado == PlayerState.ATIVO;
     }
 
-    public String toInfoString() {
-        return id + " | " + nome + " | " + posicao + " | " +
-                toolsAsString() + " | " + linguagens + " | " +
-                (estado == PlayerState.EM_JOGO ? "Em Jogo" :
-                        estado == PlayerState.PRESO ? "Preso" : "Derrotado");
+    /**
+     * Verifica se o jogador foi eliminado.
+     * 
+     * @return true se foi eliminado
+     */
+    public boolean foiEliminado() {
+        return estado == PlayerState.ELIMINADO;
+    }
+
+    /**
+     * Verifica se o jogador está preso.
+     * 
+     * @return true se está preso
+     */
+    public boolean estaPreso() {
+        return estado == PlayerState.PRESO;
+    }
+
+    /**
+     * Liberta o jogador do estado PRESO.
+     */
+    public void libertar() {
+        if (estado == PlayerState.PRESO) {
+            estado = PlayerState.ATIVO;
+        }
+    }
+
+    /**
+     * Verifica se o jogador usa Assembly (tem restrição de movimento).
+     * 
+     * @return true se usa Assembly
+     */
+    public boolean usaAssembly() {
+        return linguagens != null && linguagens.toLowerCase().contains("assembly");
+    }
+
+    /**
+     * Verifica se o jogador pode fazer um movimento específico.
+     * Assembly não pode mover 5 ou 6.
+     * 
+     * @param nrSpaces Número de casas a mover
+     * @return true se pode fazer o movimento
+     */
+    public boolean podeMovimentar(int nrSpaces) {
+        if (usaAssembly() && (nrSpaces == 5 || nrSpaces == 6)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "id='" + id + '\'' +
+                ", nome='" + nome + '\'' +
+                ", linguagens='" + linguagens + '\'' +
+                ", cor='" + cor + '\'' +
+                ", posicao=" + posicao +
+                ", estado=" + estado +
+                ", ferramentas=" + ferramentas.size() +
+                '}';
     }
 }

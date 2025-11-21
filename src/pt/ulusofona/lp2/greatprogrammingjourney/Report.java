@@ -5,47 +5,55 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Report {
-
     private final int nrTurnos;
-    private final List<Player> vivos;
+    private final List<Player> players;
     private final int boardSize;
 
-    public Report(int nrTurnos, List<Player> vivos, int boardSize) {
+    public Report(int nrTurnos, List<Player> players, int boardSize) {
         this.nrTurnos = nrTurnos;
-        this.vivos = vivos;
+        this.players = players;
         this.boardSize = boardSize;
     }
 
     public ArrayList<String> generateReport() {
-        ArrayList<String> r = new ArrayList<>();
+        ArrayList<String> results = new ArrayList<>();
 
-        r.add("THE GREAT PROGRAMMING JOURNEY");
-        r.add("");
-        r.add("NR. DE TURNOS");
-        r.add(String.valueOf(nrTurnos));
-        r.add("");
+        results.add("THE GREAT PROGRAMMING JOURNEY");
+        results.add("");
+        results.add("NR. DE TURNOS");
+        results.add(String.valueOf(nrTurnos));
 
-        Player vencedor = null;
-        for (Player p : vivos) {
-            if (p.getPosicao() == boardSize) {
-                vencedor = p;
-                break;
+        results.add("");
+
+        String vencedor = "Nenhum";
+        int maxPosicao = 0;
+
+        for (Player player : players) {
+            if (player.getPosicao() > maxPosicao) {
+                maxPosicao = player.getPosicao();
+                vencedor = player.getNome();
             }
         }
 
-        r.add("VENCEDOR");
-        r.add(vencedor == null ? "Nenhum" : vencedor.getNome());
-        r.add("");
+        results.add("VENCEDOR");
+        results.add(vencedor);
+        results.add("");
 
-        r.add("RESTANTES");
+        ArrayList<Player> restantes = new ArrayList<>();
+        for (Player p : players) {
+            if (p.getPosicao() < boardSize) {
+                restantes.add(p);
+            }
+        }
 
-        final Player finalVencedor = vencedor;
 
-        vivos.stream()
-                .filter(p -> p != finalVencedor)
-                .sorted(Comparator.comparingInt(a -> Integer.parseInt(a.getId())))
-                .forEach(p -> r.add(p.getNome() + " " + p.getPosicao()));
+        restantes.sort(Comparator.comparingInt(Player::getPosicao).reversed());
 
-        return r;
+        results.add("RESTANTES");
+        for (Player p : restantes) {
+            results.add(p.getNome() + " " + p.getPosicao());
+        }
+
+        return results;
     }
 }
