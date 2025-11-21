@@ -101,9 +101,7 @@ public class Player {
         this.estado = estado;
     }
 
-    public void setPosicaoAnterior(int posicaoAnterior) {
-        this.posicaoAnterior = posicaoAnterior;
-    }
+
 
     // Métodos relacionados com ferramentas
     
@@ -209,6 +207,10 @@ public class Player {
         return linguagens != null && linguagens.toLowerCase().contains("assembly");
     }
 
+    public boolean usaC() {
+        return linguagens != null && linguagens.toLowerCase().contains("c");
+    }
+
     /**
      * Verifica se o jogador pode fazer um movimento específico.
      * Assembly só pode mover 1 ou 2 casas.
@@ -218,6 +220,9 @@ public class Player {
      */
     public boolean podeMovimentar(int nrSpaces) {
         if (usaAssembly() && nrSpaces > 2) {
+            return false;
+        }
+        if (usaC() && nrSpaces > 3) {
             return false;
         }
         return true;

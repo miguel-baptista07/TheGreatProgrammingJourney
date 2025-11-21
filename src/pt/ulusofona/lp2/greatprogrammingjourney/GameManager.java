@@ -114,23 +114,25 @@ public class GameManager {
                     int id = Integer.parseInt(elemento[2]);
 
                     if (tipo.equals("A")) {
-                        // Validar ID de abismo (mínimo 0)
-                        if (id < 0) {
+                        // Validar ID de abismo (0-9)
+                        if (id < 0 || id > 9) {
                             return false;
                         }
                         Abismo abismo = criarAbismo(id, posicao);
-                        if (abismo != null) {
-                            board.adicionarAbismo(posicao, abismo);
+                        if (abismo == null) { // Se criarAbismo retornar null, é um ID inválido
+                            return false;
                         }
+                        board.adicionarAbismo(posicao, abismo);
                     } else if (tipo.equals("T")) {
-                        // Validar ID de ferramenta (mínimo 0)
-                        if (id < 0) {
+                        // Validar ID de ferramenta (0-5)
+                        if (id < 0 || id > 5) {
                             return false;
                         }
                         Ferramenta ferramenta = criarFerramenta(id, posicao);
-                        if (ferramenta != null) {
-                            board.adicionarFerramenta(posicao, ferramenta);
+                        if (ferramenta == null) { // Se criarFerramenta retornar null, é um ID inválido
+                            return false;
                         }
+                        board.adicionarFerramenta(posicao, ferramenta);
                     } else {
                         // Tipo inválido
                         return false;
@@ -209,6 +211,10 @@ public class GameManager {
         }
 
         currentPlayer.setPosicao(novaPosicao);
+
+        if (novaPosicao >= board.getTamanhoTabuleiro()) {
+            currentPlayer.setEstado(PlayerState.VENCEDOR);
+        }
 
         return true;
     }
@@ -588,7 +594,7 @@ public class GameManager {
 
                 Player p = new Player(dados[0], dados[1], dados[2], dados[3]);
                 p.setPosicao(Integer.parseInt(dados[4]));
-                p.setPosicaoAnterior(Integer.parseInt(dados[5]));
+                // A posição anterior não deve ser restaurada
                 p.setEstado(PlayerState.valueOf(dados[6]));
 
                 int numFerramentas = Integer.parseInt(reader.readLine());
