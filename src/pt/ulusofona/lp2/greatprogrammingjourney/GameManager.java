@@ -114,8 +114,8 @@ public class GameManager {
                     int id = Integer.parseInt(elemento[2]);
 
                     if (tipo.equals("A")) {
-                        // Validar ID de abismo (0-9)
-                        if (id < 0 || id > 9) {
+                        // Validar ID de abismo (mínimo 0)
+                        if (id < 0) {
                             return false;
                         }
                         Abismo abismo = criarAbismo(id, posicao);
@@ -123,8 +123,8 @@ public class GameManager {
                             board.adicionarAbismo(posicao, abismo);
                         }
                     } else if (tipo.equals("T")) {
-                        // Validar ID de ferramenta (0-5)
-                        if (id < 0 || id > 5) {
+                        // Validar ID de ferramenta (mínimo 0)
+                        if (id < 0) {
                             return false;
                         }
                         Ferramenta ferramenta = criarFerramenta(id, posicao);
@@ -209,10 +209,6 @@ public class GameManager {
         }
 
         currentPlayer.setPosicao(novaPosicao);
-
-        if (novaPosicao >= board.getTamanhoTabuleiro()) {
-            currentPlayer.setEstado(PlayerState.VENCEDOR);
-        }
 
         return true;
     }
@@ -515,7 +511,13 @@ public class GameManager {
             }
         }
 
-        restantes.sort((p1, p2) -> Integer.compare(p2.getPosicao(), p1.getPosicao()));
+        restantes.sort((p1, p2) -> {
+            int comparePosicao = Integer.compare(p2.getPosicao(), p1.getPosicao());
+            if (comparePosicao != 0) {
+                return comparePosicao;
+            }
+            return p1.getNome().compareTo(p2.getNome());
+        });
 
         results.add("RESTANTES");
         for (Player p : restantes) {
@@ -586,6 +588,7 @@ public class GameManager {
 
                 Player p = new Player(dados[0], dados[1], dados[2], dados[3]);
                 p.setPosicao(Integer.parseInt(dados[4]));
+                p.setPosicaoAnterior(Integer.parseInt(dados[5]));
                 p.setEstado(PlayerState.valueOf(dados[6]));
 
                 int numFerramentas = Integer.parseInt(reader.readLine());
