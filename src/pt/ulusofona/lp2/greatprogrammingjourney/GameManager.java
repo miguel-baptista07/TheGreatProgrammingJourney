@@ -232,6 +232,10 @@ public class GameManager {
                         .append(" apanhou ")
                         .append(ferramenta.getNome())
                         .append("!");
+            } else {
+                mensagem.append(currentPlayer.getNome())
+                        .append(" já tem ")
+                        .append(ferramenta.getNome());
             }
         }
 
@@ -465,7 +469,7 @@ public class GameManager {
             return abismo.getImagemPng();
         }
 
-
+        // Verificar se há ferramenta na posição
         if (board.temFerramenta(nrSquare)) {
             Ferramenta ferramenta = board.getFerramenta(nrSquare);
             return ferramenta.getImagemPng();
