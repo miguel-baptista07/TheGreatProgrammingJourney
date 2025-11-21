@@ -182,7 +182,17 @@ public class GameManager {
 
             turnCounter++;
             currentPlayerIndex = (currentPlayerIndex + 1) % vivos.size();
-            return "O jogador estava preso"; // Mensagem para o visualizador
+            return "O jogador estava preso";
+        }
+
+        // IMPORTANTE: Verificar se chegou ao fim ANTES de reagir
+        if (p.getPosicao() >= board.getTamanho()) {
+            // Jogador venceu! Não avança mais o turno para ele
+            turnCounter++;
+            if (!vivos.isEmpty()) {
+                currentPlayerIndex = (currentPlayerIndex + 1) % vivos.size();
+            }
+            return "O jogador chegou ao fim!";
         }
 
         // Reage à célula atual
