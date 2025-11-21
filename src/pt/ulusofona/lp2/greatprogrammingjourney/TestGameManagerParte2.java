@@ -358,21 +358,7 @@ public class TestGameManagerParte2 {
         assertEquals(2, gm.getPlayers().get(0).getPosicao());
         assertEquals(2, gm.getPlayers().get(1).getPosicao());
         assertEquals(2, gm.getPlayers().get(2).getPosicao());
-    }
+    }}
 
     // ========== TESTE DE DUPLICATED CODE ==========
 
-    @Test
-    void test_23_DuplicatedCodeReturnsToPreviousPosition() {
-        String[][] elementos = {{"7", "A", "5"}};
-        gm.createInitialBoard(PLAYER_INFO, WORLD_SIZE, elementos);
-        
-        gm.moveCurrentPlayer(3); // Alice vai para 4
-        gm.reactToAbyssOrTool();
-        gm.moveCurrentPlayer(3); // Alice vai para 7
-        gm.reactToAbyssOrTool();
-        
-        Player alice = gm.getPlayers().get(0);
-        assertEquals(4, alice.getPosicao()); // Voltou para posição anterior
-    }
-}

@@ -103,7 +103,7 @@ public class GameManager {
         if (abyssesAndTools != null) {
             for (String[] elemento : abyssesAndTools) {
                 if (elemento == null || elemento.length != 3) {
-                    continue;
+                    return false;
                 }
 
                 try {
@@ -112,18 +112,29 @@ public class GameManager {
                     int id = Integer.parseInt(elemento[2]);
 
                     if (tipo.equals("A")) {
+                        // Validar ID de abismo (0-9)
+                        if (id < 0 || id > 9) {
+                            return false;
+                        }
                         Abismo abismo = criarAbismo(id, posicao);
                         if (abismo != null) {
                             board.adicionarAbismo(posicao, abismo);
                         }
                     } else if (tipo.equals("T")) {
+                        // Validar ID de ferramenta (0-5)
+                        if (id < 0 || id > 5) {
+                            return false;
+                        }
                         Ferramenta ferramenta = criarFerramenta(id, posicao);
                         if (ferramenta != null) {
                             board.adicionarFerramenta(posicao, ferramenta);
                         }
+                    } else {
+                        // Tipo inválido
+                        return false;
                     }
                 } catch (NumberFormatException e) {
-                    // Ignorar elementos inválidos
+                    return false;
                 }
             }
         }
@@ -247,7 +258,7 @@ public class GameManager {
         }
 
         avancarTurno();
-        ultimaMensagemReact = mensagem.toString();
+        ultimaMensagemReact = mensagem.length() > 0 ? mensagem.toString() : null;
         return ultimaMensagemReact;
     }
 
@@ -344,6 +355,7 @@ public class GameManager {
         }
 
         String estado = "Em Jogo";
+        String ferramentasStr = "No tools";
 
         for (Player p : players) {
             try {
@@ -353,6 +365,16 @@ public class GameManager {
                     } else if (p.getPosicao() >= board.getTamanhoTabuleiro()) {
                         estado = "Vencedor";
                     }
+                    
+                    // Obter lista de ferramentas
+                    List<Ferramenta> ferramentas = p.getFerramentas();
+                    if (!ferramentas.isEmpty()) {
+                        List<String> nomes = new ArrayList<>();
+                        for (Ferramenta f : ferramentas) {
+                            nomes.add(f.getNome());
+                        }
+                        ferramentasStr = String.join("; ", nomes);
+                    }
                     break;
                 }
             } catch (NumberFormatException e) {
@@ -360,23 +382,30 @@ public class GameManager {
             }
         }
 
-        return info[0] + " | " + info[1] + " | " + info[4] + " | " + info[2] + " | " + estado;
+        return info[0] + " | " + info[1] + " | " + info[4] + " | " + ferramentasStr + " | " + info[2] + " | " + estado;
     }
 
     public String getProgrammersInfo() {
         StringBuilder sb = new StringBuilder();
-        for (Player player : players) {
-            try {
-                int id = Integer.parseInt(player.getId());
-                String info = getProgrammerInfoAsStr(id);
-                if (info != null) {
-                    if (sb.length() > 0) {
-                        sb.append("\n");
+        for (int i = 0; i < players.size(); i++) {
+            Player player = players.get(i);
+            
+            if (sb.length() > 0) {
+                sb.append(" | ");
+            }
+            
+            sb.append(player.getNome()).append(" : ");
+            
+            List<Ferramenta> ferramentas = player.getFerramentas();
+            if (ferramentas.isEmpty()) {
+                sb.append("No tools");
+            } else {
+                for (int j = 0; j < ferramentas.size(); j++) {
+                    if (j > 0) {
+                        sb.append("; ");
                     }
-                    sb.append(info);
+                    sb.append(ferramentas.get(j).getNome());
                 }
-            } catch (NumberFormatException e) {
-                // Ignorar
             }
         }
         return sb.toString();
@@ -565,7 +594,7 @@ public class GameManager {
 
     public JPanel getAuthorsPanel() {
         JPanel panel = new JPanel();
-        panel.add(new JLabel("Desenvolvido por: [Seu Nome Aqui]"));
+        panel.add(new JLabel("Desenvolvido por: Miguel Baptista e Gonçao Almeida]"));
         return panel;
     }
 
