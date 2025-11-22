@@ -72,6 +72,17 @@ public class GameManager {
                 return false;
             }
 
+            // Validar ID >= 1
+            try {
+                int idNum = Integer.parseInt(id);
+                if (idNum < 1) {
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                // Se não for número, aceitar (mas validar unicidade)
+            }
+
+            // Validar IDs únicos
             for (Player p : players) {
                 if (p.getId().equals(id)) {
                     return false;
@@ -84,6 +95,13 @@ public class GameManager {
 
             if (cor == null || !isValidColor(cor)) {
                 return false;
+            }
+
+            // Validar cores únicas
+            for (Player p : players) {
+                if (p.getCor().equalsIgnoreCase(cor)) {
+                    return false;
+                }
             }
 
             Player player = new Player(id, nome, linguagens, cor);
@@ -195,6 +213,11 @@ public class GameManager {
 
         Player currentPlayer = players.get(currentPlayerIndex);
 
+        // Validar se jogador está "Em Jogo" (não ELIMINADO e não PRESO)
+        if (currentPlayer.foiEliminado()) {
+            return false;
+        }
+
         if (currentPlayer.estaPreso()) {
             return false;
         }
@@ -211,10 +234,6 @@ public class GameManager {
         }
 
         currentPlayer.setPosicao(novaPosicao);
-
-        if (novaPosicao >= board.getTamanhoTabuleiro()) {
-            currentPlayer.setEstado(PlayerState.VENCEDOR);
-        }
 
         return true;
     }
@@ -268,7 +287,8 @@ public class GameManager {
             mensagem.append(currentPlayer.getNome()).append(" foi libertado!");
         }
 
-        avancarTurno();
+        // Avançar para o próximo jogador
+        nextPlayer();
 
         // Retornar null se não houve interação (sem ferramenta, sem abismo, sem libertação)
         if (mensagem.length() == 0) {
@@ -280,7 +300,11 @@ public class GameManager {
         return ultimaMensagemReact;
     }
 
-    private void avancarTurno() {
+    /**
+     * Avança para o próximo jogador ativo (não eliminado e não preso).
+     * Incrementa o contador de turnos.
+     */
+    public void nextPlayer() {
         turnCounter++;
 
         int tentativas = 0;
@@ -291,7 +315,7 @@ public class GameManager {
             if (tentativas > players.size()) {
                 break;
             }
-        } while (players.get(currentPlayerIndex).foiEliminado());
+        } while (players.get(currentPlayerIndex).foiEliminado() || players.get(currentPlayerIndex).estaPreso());
     }
 
     public int getCurrentPlayerID() {
@@ -315,7 +339,8 @@ public class GameManager {
             if (player.getPosicao() >= board.getTamanhoTabuleiro()) {
                 alguemChegouAoFim = true;
             }
-            if (!player.foiEliminado()) {
+            // Contar apenas jogadores que não estão eliminados nem presos
+            if (!player.foiEliminado() && !player.estaPreso()) {
                 jogadoresAtivos++;
             }
         }
@@ -380,7 +405,7 @@ public class GameManager {
                 if (Integer.parseInt(p.getId()) == id) {
                     if (p.foiEliminado()) {
                         estado = "Eliminado";
-                    } else if (p.getPosicao() >= board.getTamanhoTabuleiro()) {
+                    } else if (p.getPosicao() >= board.getTamanhoTabuleiro() && gameIsOver()) {
                         estado = "Vencedor";
                     }
 
@@ -437,7 +462,8 @@ public class GameManager {
         ArrayList<String> playersInPosition = new ArrayList<>();
 
         for (Player player : players) {
-            if (player.getPosicao() == position && !player.foiEliminado()) {
+            // Incluir apenas jogadores vivos (não ELIMINADO e não PRESO)
+            if (player.getPosicao() == position && !player.foiEliminado() && !player.estaPreso()) {
                 playersInPosition.add(player.getId());
             }
         }
@@ -582,8 +608,10 @@ public class GameManager {
             int tamanho = Integer.parseInt(reader.readLine());
             board.setTamanhoTabuleiro(tamanho);
 
+            // Restaurar turnCounter e currentPlayerIndex
             turnCounter = Integer.parseInt(reader.readLine());
             currentPlayerIndex = Integer.parseInt(reader.readLine());
+
             int numJogadores = Integer.parseInt(reader.readLine());
 
             for (int i = 0; i < numJogadores; i++) {
@@ -594,7 +622,7 @@ public class GameManager {
 
                 Player p = new Player(dados[0], dados[1], dados[2], dados[3]);
                 p.setPosicao(Integer.parseInt(dados[4]));
-                // A posição anterior não deve ser restaurada
+                p.setPosicaoAnterior(Integer.parseInt(dados[5]));
                 p.setEstado(PlayerState.valueOf(dados[6]));
 
                 int numFerramentas = Integer.parseInt(reader.readLine());

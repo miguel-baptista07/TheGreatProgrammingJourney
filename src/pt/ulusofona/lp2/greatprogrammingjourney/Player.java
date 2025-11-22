@@ -97,17 +97,19 @@ public class Player {
         this.posicao = posicao;
     }
 
+    public void setPosicaoAnterior(int posicaoAnterior) {
+        this.posicaoAnterior = posicaoAnterior;
+    }
+
     public void setEstado(PlayerState estado) {
         this.estado = estado;
     }
 
-
-
     // Métodos relacionados com ferramentas
-    
+
     /**
      * Adiciona uma ferramenta ao inventário do jogador.
-     * 
+     *
      * @param ferramenta A ferramenta a adicionar
      */
     public void adicionarFerramenta(Ferramenta ferramenta) {
@@ -116,7 +118,7 @@ public class Player {
 
     /**
      * Remove uma ferramenta do inventário do jogador.
-     * 
+     *
      * @param ferramenta A ferramenta a remover
      */
     public void removerFerramenta(Ferramenta ferramenta) {
@@ -125,7 +127,7 @@ public class Player {
 
     /**
      * Verifica se o jogador tem uma ferramenta de um tipo específico (por id).
-     * 
+     *
      * @param ferramentaId O id da ferramenta
      * @return true se o jogador tem essa ferramenta
      */
@@ -140,7 +142,7 @@ public class Player {
 
     /**
      * Obtém uma ferramenta que pode neutralizar o abismo dado.
-     * 
+     *
      * @param abismo O abismo a neutralizar
      * @return A ferramenta que neutraliza, ou null se não tiver
      */
@@ -155,16 +157,16 @@ public class Player {
 
     /**
      * Verifica se o jogador pode mover (não está eliminado nem preso).
-     * 
+     *
      * @return true se pode mover
      */
     public boolean podeMover() {
-        return estado == PlayerState.ATIVO || estado == PlayerState.VENCEDOR;
+        return estado == PlayerState.ATIVO;
     }
 
     /**
      * Verifica se o jogador está ativo no jogo.
-     * 
+     *
      * @return true se está ativo
      */
     public boolean estaAtivo() {
@@ -173,7 +175,7 @@ public class Player {
 
     /**
      * Verifica se o jogador foi eliminado.
-     * 
+     *
      * @return true se foi eliminado
      */
     public boolean foiEliminado() {
@@ -182,7 +184,7 @@ public class Player {
 
     /**
      * Verifica se o jogador está preso.
-     * 
+     *
      * @return true se está preso
      */
     public boolean estaPreso() {
@@ -200,31 +202,41 @@ public class Player {
 
     /**
      * Verifica se o jogador usa Assembly (tem restrição de movimento).
-     * 
+     *
      * @return true se usa Assembly
      */
     public boolean usaAssembly() {
         return linguagens != null && linguagens.toLowerCase().contains("assembly");
     }
 
+    /**
+     * Verifica se o jogador usa C (tem restrição de movimento).
+     *
+     * @return true se usa C
+     */
     public boolean usaC() {
         return linguagens != null && linguagens.toLowerCase().contains("c");
     }
 
     /**
      * Verifica se o jogador pode fazer um movimento específico.
-     * Assembly só pode mover 1 ou 2 casas.
-     * 
+     * Assembly: máximo 2 casas (1-2)
+     * C: máximo 3 casas (1-3)
+     * Python: sem restrições (1-6)
+     *
      * @param nrSpaces Número de casas a mover
      * @return true se pode fazer o movimento
      */
     public boolean podeMovimentar(int nrSpaces) {
+        // Assembly: máximo 2 casas
         if (usaAssembly() && nrSpaces > 2) {
             return false;
         }
-        if (usaC() && nrSpaces > 3) {
+        // C: máximo 3 casas (mas só se não for Assembly)
+        if (!usaAssembly() && usaC() && nrSpaces > 3) {
             return false;
         }
+        // Python e outras linguagens: sem restrições
         return true;
     }
 
