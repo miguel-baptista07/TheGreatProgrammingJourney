@@ -22,22 +22,21 @@ public class Abyss extends BoardElement {
     public String applyEffect(Player player, GameManager manager) {
         Integer active = player.getFerramentaAtiva();
 
-
         if (active != null && toolNeutralizes(active, id)) {
-            return "neutralizado";
+            return "neutralized";
         }
 
         switch (id) {
             case 0:
                 player.setPosicao(player.getPosicaoAnteriorMovimento());
-                return "Erro de sintaxe";
+                return "syntax error";
             case 1:
                 int move = player.getLastMoveSpaces() / 2;
                 player.setPosicao(player.getPosicao() - move);
-                return "erro logico";
+                return "logical error";
             case 2:
                 player.setPosicao(player.getPosicao() - 2);
-                return "excecao";
+                return "exception";
             case 3:
                 player.setPosicao(player.getPosicao() - 3);
                 return "file not found";
@@ -56,7 +55,7 @@ public class Abyss extends BoardElement {
                 return "bsod";
             case 8:
                 player.setPreso(true);
-                return "loop";
+                return "infinite loop";
             case 9:
                 List<Player> same = manager.getPlayersAtPosition(position);
                 for (Player p : same) {
@@ -64,7 +63,7 @@ public class Abyss extends BoardElement {
                         p.setPosicao(p.getPosicao() - 3);
                     }
                 }
-                return "segfault";
+                return "segmentation fault";
             default:
                 return "abyss";
         }

@@ -64,7 +64,6 @@ public class Player {
         this.posicao = posicao;
     }
 
-
     public void prepararMovimento() {
         this.posicaoAnteriorMovimento = this.posicao;
     }

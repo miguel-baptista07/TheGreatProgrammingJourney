@@ -25,13 +25,13 @@ public class GameManager {
     public static String toolName(int id) {
         switch (id) {
             case 0:
-                return "Herança";
+                return "Inheritance";
             case 1:
-                return "Programação Funcional";
+                return "Functional Programming";
             case 2:
-                return "Testes unitários";
+                return "Unit Tests";
             case 3:
-                return "Tratamento de Excepções";
+                return "Exception Handling";
             case 4:
                 return "IDE";
             case 5:
@@ -186,9 +186,9 @@ public class GameManager {
                 ? "No tools"
                 : toolName(found.getFerramentaAtiva());
 
-        String estado = found.isEliminado() ? "Derrotado"
-                : found.isPreso() ? "Preso"
-                : "Em Jogo";
+        String estado = found.isEliminado() ? "Eliminated"
+                : found.isPreso() ? "Stuck"
+                : "In Game";
 
         return found.getId()
                 + " | " + found.getNome()
@@ -305,12 +305,11 @@ public class GameManager {
             message = el.applyEffect(current, this);
         }
 
-
         checkGameOverCondition();
         advanceToNextAlive();
         turnCounter++;
 
-        if (message == null || message.equals("neutralizado")) {
+        if (message == null || message.equals("neutralized")) {
             current.setFerramentaAtiva(null);
         }
 
@@ -498,7 +497,7 @@ public class GameManager {
 
     public JPanel getAuthorsPanel() {
         JPanel panel = new JPanel();
-        panel.add(new JLabel("Desenvolvido por: Miguel Baptista e Gonçalo Almeida"));
+        panel.add(new JLabel("Developed by: Miguel Baptista and Gonçalo Almeida"));
         return panel;
     }
 
@@ -537,4 +536,3 @@ public class GameManager {
         return turnCounter;
     }
 }
-
