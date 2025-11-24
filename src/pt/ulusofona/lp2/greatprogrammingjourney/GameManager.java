@@ -25,13 +25,13 @@ public class GameManager {
     public static String toolName(int id) {
         switch (id) {
             case 0:
-                return "Inheritance";
+                return "Herança";
             case 1:
-                return "Functional Programming";
+                return "Programação Funcional";
             case 2:
-                return "Unit Tests";
+                return "Testes unitários";
             case 3:
-                return "Exception Handling";
+                return "Tratamento de Excepções";
             case 4:
                 return "IDE";
             case 5:
@@ -131,11 +131,37 @@ public class GameManager {
     public String getImagePng(int nrSquare) {
         if (nrSquare < 1 || nrSquare > board.getTamanhoTabuleiro()) return null;
         if (nrSquare == board.getTamanhoTabuleiro()) return "glory.png";
+
         BoardElement el = board.getElementAt(nrSquare);
         if (el == null) return null;
-        if (el.isAbyss()) return "abyss-" + el.getId() + ".png";
-        return "tool-" + el.getId() + ".png";
+
+        if (el.isAbyss()) {
+            switch (el.getId()) {
+                case 0: return "syntax.png";
+                case 1: return "logic.png";
+                case 2: return "exception.png";
+                case 3: return "file-not-found-exception.png";
+                case 4: return "crash.png";
+                case 5: return "duplicated-code.png";
+                case 6: return "secondary-effects.png";
+                case 7: return "bsod.png";
+                case 8: return "infinite-loop.png";
+                case 9: return "core-dumped.png";
+                default: return "unknownPiece.png";
+            }
+        } else {
+            switch (el.getId()) {
+                case 0: return "inheritance.png";
+                case 1: return "functional.png";
+                case 2: return "unit-tests.png";
+                case 3: return "catch.png";
+                case 4: return "IDE.png";
+                case 5: return "ajuda-professor.png";
+                default: return "unknownPiece.png";
+            }
+        }
     }
+
 
     public String[] getProgrammerInfo(int id) {
         for (Player p : allPlayers) {
@@ -186,9 +212,9 @@ public class GameManager {
                 ? "No tools"
                 : toolName(found.getFerramentaAtiva());
 
-        String estado = found.isEliminado() ? "Eliminated"
-                : found.isPreso() ? "Stuck"
-                : "In Game";
+        String estado = found.isEliminado() ? "Derrotado"
+                : found.isPreso() ? "Preso"
+                : "Em Jogo";
 
         return found.getId()
                 + " | " + found.getNome()
@@ -264,13 +290,11 @@ public class GameManager {
         Player current = players.get(currentPlayerIndex);
 
         if (current.isPreso()) {
-
             current.setPreso(false);
             advanceToNextAlive();
             turnCounter++;
             return false;
         }
-
 
         if (current.getLinguagens().contains("Assembly")) {
             if (nrSpaces == 5 || nrSpaces == 6) {
@@ -309,7 +333,7 @@ public class GameManager {
         advanceToNextAlive();
         turnCounter++;
 
-        if (message == null || message.equals("neutralized")) {
+        if (message == null || message.equals("neutralizado")) {
             current.setFerramentaAtiva(null);
         }
 
@@ -497,7 +521,7 @@ public class GameManager {
 
     public JPanel getAuthorsPanel() {
         JPanel panel = new JPanel();
-        panel.add(new JLabel("Developed by: Miguel Baptista and Gonçalo Almeida"));
+        panel.add(new JLabel("Desenvolvido por: Miguel Baptista e Gonçalo Almeida"));
         return panel;
     }
 

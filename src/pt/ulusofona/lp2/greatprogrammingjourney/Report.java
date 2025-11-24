@@ -19,34 +19,34 @@ public class Report {
         ArrayList<String> results = new ArrayList<>();
         results.add("THE GREAT PROGRAMMING JOURNEY");
         results.add("");
-        results.add("NR. OF TURNS");
+        results.add("NR. DE TURNOS");
         results.add(String.valueOf(nrTurnos));
         results.add("");
 
-        String winner = "None";
+        String vencedor = "Nenhum";
         int maxPos = 0;
         for (Player p : players) {
             if (!p.isEliminado() && p.getPosicao() > maxPos) {
                 maxPos = p.getPosicao();
-                winner = p.getNome();
+                vencedor = p.getNome();
             }
         }
 
-        results.add("WINNER");
-        results.add(winner);
+        results.add("VENCEDOR");
+        results.add(vencedor);
         results.add("");
 
-        List<Player> remaining = new ArrayList<>();
+        List<Player> restantes = new ArrayList<>();
         for (Player p : players) {
             if (!p.isEliminado() && p.getPosicao() < boardSize) {
-                remaining.add(p);
+                restantes.add(p);
             }
         }
 
-        remaining.sort(Comparator.comparingInt(Player::getPosicao).reversed());
+        restantes.sort(Comparator.comparingInt(Player::getPosicao).reversed());
 
-        results.add("REMAINING");
-        for (Player p : remaining) {
+        results.add("RESTANTES");
+        for (Player p : restantes) {
             results.add(p.getNome() + " " + p.getPosicao());
         }
 
