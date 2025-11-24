@@ -16,6 +16,7 @@ public class Player {
     private boolean eliminado;
     private boolean preso;
     private int lastMoveSpaces;
+    private final List<Integer> posicaoHistorico;
 
     public Player(String id, String nome, String linguagens, String cor) {
         this.id = id;
@@ -29,6 +30,8 @@ public class Player {
         this.eliminado = false;
         this.preso = false;
         this.lastMoveSpaces = 0;
+        this.posicaoHistorico = new ArrayList<>();
+        this.posicaoHistorico.add(1);
     }
 
     private String formatarLinguagens(String linguagens) {
@@ -39,82 +42,47 @@ public class Player {
         return String.join("; ", langs);
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public String getLinguagens() {
-        return linguagens;
-    }
-
-    public String getCor() {
-        return cor;
-    }
-
-    public int getPosicao() {
-        return posicao;
-    }
+    public String getId() { return id; }
+    public String getNome() { return nome; }
+    public String getLinguagens() { return linguagens; }
+    public String getCor() { return cor; }
+    public int getPosicao() { return posicao; }
 
     public void setPosicao(int posicao) {
         if (posicao < 1) posicao = 1;
+        this.posicaoAnteriorMovimento = this.posicao;
         this.posicao = posicao;
+        this.posicaoHistorico.add(this.posicao);
+        if (this.posicaoHistorico.size() > 10) this.posicaoHistorico.remove(0);
     }
 
     public void prepararMovimento() {
         this.posicaoAnteriorMovimento = this.posicao;
     }
 
-    public int getPosicaoAnteriorMovimento() {
-        return posicaoAnteriorMovimento;
-    }
+    public int getPosicaoAnteriorMovimento() { return posicaoAnteriorMovimento; }
 
-    public boolean hasTool(int toolId) {
-        return ferramentas.contains(toolId);
-    }
+    public boolean hasTool(int toolId) { return ferramentas.contains(toolId); }
 
-    public void addTool(int toolId) {
-        if (!ferramentas.contains(toolId)) ferramentas.add(toolId);
-    }
+    public void addTool(int toolId) { if (!ferramentas.contains(toolId)) ferramentas.add(toolId); }
 
-    public List<Integer> getFerramentas() {
-        return new ArrayList<>(ferramentas);
-    }
+    public List<Integer> getFerramentas() { return new ArrayList<>(ferramentas); }
 
-    public Integer getFerramentaAtiva() {
-        return ferramentaAtiva;
-    }
+    public Integer getFerramentaAtiva() { return ferramentaAtiva; }
 
-    public void setFerramentaAtiva(Integer ferramentaAtiva) {
-        this.ferramentaAtiva = ferramentaAtiva;
-    }
+    public void setFerramentaAtiva(Integer ferramentaAtiva) { this.ferramentaAtiva = ferramentaAtiva; }
 
-    public boolean isEliminado() {
-        return eliminado;
-    }
+    public boolean isEliminado() { return eliminado; }
 
-    public void setEliminado(boolean eliminado) {
-        this.eliminado = eliminado;
-    }
+    public void setEliminado(boolean eliminado) { this.eliminado = eliminado; }
 
-    public boolean isPreso() {
-        return preso;
-    }
+    public boolean isPreso() { return preso; }
 
-    public void setPreso(boolean preso) {
-        this.preso = preso;
-    }
+    public void setPreso(boolean preso) { this.preso = preso; }
 
-    public void setLastMoveSpaces(int lastMoveSpaces) {
-        this.lastMoveSpaces = lastMoveSpaces;
-    }
+    public void setLastMoveSpaces(int lastMoveSpaces) { this.lastMoveSpaces = lastMoveSpaces; }
 
-    public int getLastMoveSpaces() {
-        return lastMoveSpaces;
-    }
+    public int getLastMoveSpaces() { return lastMoveSpaces; }
 
     public String getFerramentasAsString() {
         if (ferramentas.isEmpty()) return "";
@@ -124,5 +92,11 @@ public class Player {
             if (i < ferramentas.size() - 1) sb.append(",");
         }
         return sb.toString();
+    }
+
+    public int getHistoricalPosition(int movesBack) {
+        int idx = posicaoHistorico.size() - 1 - movesBack;
+        if (idx < 0) return posicaoHistorico.get(0);
+        return posicaoHistorico.get(idx);
     }
 }

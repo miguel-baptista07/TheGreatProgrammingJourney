@@ -13,13 +13,9 @@ public class GameStatus {
         this.players = players;
     }
 
-    public boolean isGameOver() {
-        return gameOver;
-    }
+    public boolean isGameOver() { return gameOver; }
 
-    public void setGameOver(boolean gameOver) {
-        this.gameOver = gameOver;
-    }
+    public void setGameOver(boolean gameOver) { this.gameOver = gameOver; }
 
     public boolean checkGameOver(List<Player> players) {
         if (gameOver) return true;

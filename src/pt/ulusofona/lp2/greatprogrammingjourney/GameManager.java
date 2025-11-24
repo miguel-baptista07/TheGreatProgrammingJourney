@@ -1,4 +1,4 @@
- package pt.ulusofona.lp2.greatprogrammingjourney;
+package pt.ulusofona.lp2.greatprogrammingjourney;
 
 import javax.swing.*;
 import java.io.*;
@@ -35,10 +35,10 @@ public class GameManager {
         switch (id) {
             case 0: return "Herança";
             case 1: return "Programação Funcional";
-            case 2: return "Testes unitários";
+            case 2: return "Testes Unitários";
             case 3: return "Tratamento de Excepções";
             case 4: return "IDE";
-            case 5: return "Debugging";
+            case 5: return "Ajuda do Professor";
             default: return "T" + id;
         }
     }
@@ -48,9 +48,7 @@ public class GameManager {
     }
 
     public boolean createInitialBoard(String[][] playerInfo, int worldSize, String[][] abyssesAndTools) {
-
         resetGame();
-
         if (playerInfo == null || worldSize < 2) return false;
         if (playerInfo.length < 2 || playerInfo.length > 4) return false;
         if (worldSize < 2 * playerInfo.length) return false;
@@ -95,13 +93,8 @@ public class GameManager {
                 if (type != 0 && type != 1) return false;
                 if (position < 1 || position > worldSize) return false;
 
-                if (type == 0) {
-                    if (subtype < 0 || subtype > 9) return false;
-                    board.addElement(new Abyss(subtype, position));
-                } else {
-                    if (subtype < 0 || subtype > 5) return false;
-                    board.addElement(new Tool(subtype, position));
-                }
+                BoardElement e = ElementsIOAdapter.toElement(type, subtype, position);
+                board.addElement(e);
             }
         }
 
@@ -115,15 +108,11 @@ public class GameManager {
                 || cor.equalsIgnoreCase("Blue");
     }
 
-
-
     public String getImagePng(int nrSquare) {
         if (nrSquare < 1 || nrSquare > board.getTamanhoTabuleiro()) return null;
         if (nrSquare == board.getTamanhoTabuleiro()) return "glory.png";
-
         BoardElement el = board.getElementAt(nrSquare);
         if (el == null) return null;
-
         if (el.isAbyss()) {
             switch (el.getId()) {
                 case 0: return "syntax.png";
@@ -195,9 +184,9 @@ public class GameManager {
         }
         if (found == null) return null;
 
-        String toolStr = found.getFerramentaAtiva() == null
+        String toolStr = found.getFerramentas().isEmpty()
                 ? "No tools"
-                : toolName(found.getFerramentaAtiva());
+                : found.getFerramentasAsString();
 
         String estado = found.isEliminado() ? "Derrotado"
                 : found.isPreso() ? "Preso"
@@ -218,9 +207,9 @@ public class GameManager {
             if (!first) sb.append(" | ");
             sb.append(p.getNome())
                     .append(" : ")
-                    .append(p.getFerramentaAtiva() == null
+                    .append(p.getFerramentas().isEmpty()
                             ? "No tools"
-                            : toolName(p.getFerramentaAtiva()));
+                            : p.getFerramentasAsString());
             first = false;
         }
         return sb.toString();
@@ -228,23 +217,19 @@ public class GameManager {
 
     public String[] getSlotInfo(int position) {
         if (position < 1 || position > board.getTamanhoTabuleiro()) return null;
-
         List<String> ids = new ArrayList<>();
         for (Player p : players) {
             if (p.getPosicao() == position) {
                 ids.add(p.getId());
             }
         }
-
         String joined = ids.isEmpty() ? "" : String.join(",", ids);
-
         BoardElement e = board.getElementAt(position);
         String type = "";
         if (e != null) {
             if (e.isAbyss()) type = "A:" + e.getId();
             else type = "T:" + e.getId();
         }
-
         return new String[]{joined, "", type};
     }
 
@@ -312,7 +297,7 @@ public class GameManager {
         advanceToNextAlive();
         turnCounter++;
 
-        if (message == null || message.equals("neutralizado")) {
+        if (message != null && message.contains("anulado por")) {
             current.setFerramentaAtiva(null);
         }
 
@@ -514,8 +499,8 @@ public class GameManager {
             if (pos < 1 || pos > worldSize)
                 throw new InvalidFileException("Element position out of bounds");
 
-            if (type == 0) elems.put(pos, new Abyss(subtype, pos));
-            else elems.put(pos, new Tool(subtype, pos));
+            BoardElement be = ElementsIOAdapter.toElement(type, subtype, pos);
+            elems.put(pos, be);
         }
 
         return elems;
@@ -560,4 +545,7 @@ public class GameManager {
         return turnCounter;
     }
 
+    public int getPreviousPosition(Player p, int movesBack) {
+        return p.getHistoricalPosition(movesBack);
+    }
 }
