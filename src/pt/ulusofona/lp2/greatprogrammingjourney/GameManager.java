@@ -151,29 +151,17 @@ public class GameManager {
 
     public String[] getProgrammerInfo(int id) {
         for (Player p : allPlayers) {
-            try {
-                if (Integer.parseInt(p.getId()) == id) {
-                    return new String[]{
-                            p.getId(),
-                            p.getNome(),
-                            p.getLinguagens(),
-                            formatColor(p.getCor()),
-                            String.valueOf(p.getPosicao())
-                    };
-                }
-            } catch (NumberFormatException e) {
-                if (p.getId().equals(String.valueOf(id))) {
-                    return new String[]{
-                            p.getId(),
-                            p.getNome(),
-                            p.getLinguagens(),
-                            formatColor(p.getCor()),
-                            String.valueOf(p.getPosicao())
-                    };
-                }
+            if (p.getId().equals(String.valueOf(id))) {
+                return new String[]{
+                        p.getId(),
+                        p.getNome(),
+                        p.getLinguagens(),
+                        formatColor(p.getCor()),
+                        String.valueOf(p.getPosicao())
+                };
             }
         }
-        return null;
+        return new String[]{"", "", "", "", "1"};
     }
 
     private String formatColor(String cor) {
@@ -183,15 +171,12 @@ public class GameManager {
     public String getProgrammerInfoAsStr(int id) {
         Player found = null;
         for (Player p : allPlayers) {
-            String pid = p.getId().trim();
-            try {
-                if (Integer.parseInt(pid) == id) found = p;
-            } catch (NumberFormatException ignored) {
-                if (pid.equals(String.valueOf(id))) found = p;
+            if (p.getId().equals(String.valueOf(id))) {
+                found = p;
+                break;
             }
-            if (found != null) break;
         }
-        if (found == null) return null;
+        if (found == null) return "";
 
         String toolStr = found.getFerramentaAtiva() == null
                 ? "No tools"
@@ -229,9 +214,7 @@ public class GameManager {
 
         List<String> ids = new ArrayList<>();
         for (Player p : players) {
-            if (p.getPosicao() == position) {
-                ids.add(p.getId());
-            }
+            if (p.getPosicao() == position) ids.add(p.getId());
         }
 
         String joined = ids.isEmpty() ? "" : String.join(",", ids);
@@ -247,14 +230,10 @@ public class GameManager {
     }
 
     public int getCurrentPlayerID() {
-        if (players.isEmpty()) return -1;
+        if (players.isEmpty()) return 1;
         normalizeCurrentIndex();
         Player cur = players.get(currentPlayerIndex);
-        try {
-            return Integer.parseInt(cur.getId());
-        } catch (NumberFormatException e) {
-            return -1;
-        }
+        return Integer.parseInt(cur.getId());
     }
 
     private void normalizeCurrentIndex() {
