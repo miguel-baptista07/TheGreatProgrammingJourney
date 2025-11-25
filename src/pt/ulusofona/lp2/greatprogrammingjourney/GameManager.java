@@ -322,10 +322,11 @@ public class GameManager {
         }
 
         if (current.getLinguagens().contains("Assembly")) {
-            if (nrSpaces == 5 || nrSpaces == 6) {
+            if (nrSpaces > 2) {
                 return false;
             }
         }
+
 
         current.prepararMovimento();
 
