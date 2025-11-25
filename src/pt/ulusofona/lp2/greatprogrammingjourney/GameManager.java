@@ -327,6 +327,13 @@ public class GameManager {
             }
         }
 
+        if (current.getLinguagens().contains("C")) {
+            if (nrSpaces > 3) {
+                return false;
+            }
+        }
+
+
 
         current.prepararMovimento();
 
