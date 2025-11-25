@@ -2,8 +2,8 @@ package pt.ulusofona.lp2.greatprogrammingjourney;
 
 import java.util.List;
 
-public class Abyss9_SegmentationFault extends AbyssBase {
-    public Abyss9_SegmentationFault(int position) { super(9, position); }
+public class AbyssSegmentationFault extends AbyssBase {
+    public AbyssSegmentationFault(int position) { super(9, position); }
 
     @Override
     public String getName() { return "Segmentation Fault"; }

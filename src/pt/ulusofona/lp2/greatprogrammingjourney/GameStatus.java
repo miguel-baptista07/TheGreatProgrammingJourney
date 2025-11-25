@@ -18,7 +18,10 @@ public class GameStatus {
     public void setGameOver(boolean gameOver) { this.gameOver = gameOver; }
 
     public boolean checkGameOver(List<Player> players) {
-        if (gameOver) return true;
+        if (gameOver) {
+            return true;
+
+        }
         for (Player player : players) {
             if (player.getPosicao() >= boardSize) {
                 this.gameOver = true;

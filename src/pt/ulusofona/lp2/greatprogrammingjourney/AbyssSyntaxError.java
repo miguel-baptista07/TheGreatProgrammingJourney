@@ -1,7 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-public class Abyss0_SyntaxError extends AbyssBase {
-    public Abyss0_SyntaxError(int position) { super(0, position); }
+public class AbyssSyntaxError extends AbyssBase {
+    public AbyssSyntaxError(int position) { super(0, position); }
 
     @Override
     public String getName() { return "Syntax Error"; }

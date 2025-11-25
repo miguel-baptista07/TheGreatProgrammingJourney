@@ -1,7 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-public class Abyss2_Exception extends AbyssBase {
-    public Abyss2_Exception(int position) { super(2, position); }
+public class AbyssException extends AbyssBase {
+    public AbyssException(int position) { super(2, position); }
 
     @Override
     public String getName() { return "Exception"; }

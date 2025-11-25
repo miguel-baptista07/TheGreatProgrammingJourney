@@ -1,7 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-public class Abyss7_BSOD extends AbyssBase {
-    public Abyss7_BSOD(int position) { super(7, position); }
+public class AbyssBSOD extends AbyssBase {
+    public AbyssBSOD(int position) { super(7, position); }
 
     @Override
     public String getName() { return "BSOD"; }

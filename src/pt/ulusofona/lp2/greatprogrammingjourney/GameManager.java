@@ -49,20 +49,38 @@ public class GameManager {
 
     public boolean createInitialBoard(String[][] playerInfo, int worldSize, String[][] abyssesAndTools) {
         resetGame();
-        if (playerInfo == null || worldSize < 2) return false;
-        if (playerInfo.length < 2 || playerInfo.length > 4) return false;
-        if (worldSize < 2 * playerInfo.length) return false;
+        if (playerInfo == null || worldSize < 2) {
+            return false;
+        }
+        if (playerInfo.length < 2 || playerInfo.length > 4) {
+            return false;
+        }
+        if (worldSize < 2 * playerInfo.length) {
+            return false;
+        }
 
         for (String[] info : playerInfo) {
-            if (info == null || info.length != 4) return false;
+            if (info == null || info.length != 4) {
+                return false;
+            }
             String id = info[0];
             String nome = info[1];
             String linguagens = info[2];
             String cor = info[3];
-            if (id == null || id.isEmpty()) return false;
-            for (Player p : players) if (p.getId().equals(id)) return false;
-            if (nome == null || nome.isEmpty()) return false;
-            if (cor == null || !isValidColor(cor)) return false;
+            if (id == null || id.isEmpty()) {
+                return false;
+            }
+            for (Player p : players) {
+                if (p.getId().equals(id)) {
+                    return false;
+                }
+            }
+            if (nome == null || nome.isEmpty()) {
+                return false;
+            }
+            if (cor == null || !isValidColor(cor)) {
+                return false;
+            }
 
             Player newPlayer = new Player(id, nome, linguagens, cor);
             newPlayer.setPosicao(1);
@@ -81,7 +99,9 @@ public class GameManager {
 
         if (abyssesAndTools != null) {
             for (String[] row : abyssesAndTools) {
-                if (row == null || row.length < 3) return false;
+                if (row == null || row.length < 3) {
+                    return false;
+                }
                 int type, subtype, position;
                 try {
                     type = Integer.parseInt(row[0]);
@@ -90,8 +110,12 @@ public class GameManager {
                 } catch (NumberFormatException e) {
                     return false;
                 }
-                if (type != 0 && type != 1) return false;
-                if (position < 1 || position > worldSize) return false;
+                if (type != 0 && type != 1) {
+                    return false;
+                }
+                if (position < 1 || position > worldSize) {
+                    return false;
+                }
 
                 BoardElement e = ElementsIOAdapter.toElement(type, subtype, position);
                 board.addElement(e);
@@ -109,10 +133,16 @@ public class GameManager {
     }
 
     public String getImagePng(int nrSquare) {
-        if (nrSquare < 1 || nrSquare > board.getTamanhoTabuleiro()) return null;
-        if (nrSquare == board.getTamanhoTabuleiro()) return "glory.png";
+        if (nrSquare < 1 || nrSquare > board.getTamanhoTabuleiro()) {
+            return null;
+        }
+        if (nrSquare == board.getTamanhoTabuleiro()) {
+            return "glory.png";
+        }
         BoardElement el = board.getElementAt(nrSquare);
-        if (el == null) return null;
+        if (el == null) {
+            return null;
+        }
         if (el.isAbyss()) {
             switch (el.getId()) {
                 case 0: return "syntax.png";
@@ -176,13 +206,21 @@ public class GameManager {
         for (Player p : allPlayers) {
             String pid = p.getId().trim();
             try {
-                if (Integer.parseInt(pid) == id) found = p;
+                if (Integer.parseInt(pid) == id) {
+                    found = p;
+                }
             } catch (NumberFormatException ignored) {
-                if (pid.equals(String.valueOf(id))) found = p;
+                if (pid.equals(String.valueOf(id))) {
+                    found = p;
+                }
             }
-            if (found != null) break;
+            if (found != null) {
+                break;
+            }
         }
-        if (found == null) return null;
+        if (found == null) {
+            return null;
+        }
 
         String toolStr = found.getFerramentas().isEmpty()
                 ? "No tools"
@@ -204,7 +242,9 @@ public class GameManager {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (Player p : players) {
-            if (!first) sb.append(" | ");
+            if (!first) {
+                sb.append(" | ");
+            }
             sb.append(p.getNome())
                     .append(" : ")
                     .append(p.getFerramentas().isEmpty()
@@ -216,7 +256,9 @@ public class GameManager {
     }
 
     public String[] getSlotInfo(int position) {
-        if (position < 1 || position > board.getTamanhoTabuleiro()) return null;
+        if (position < 1 || position > board.getTamanhoTabuleiro()) {
+            return null;
+        }
         List<String> ids = new ArrayList<>();
         for (Player p : players) {
             if (p.getPosicao() == position) {
@@ -227,14 +269,19 @@ public class GameManager {
         BoardElement e = board.getElementAt(position);
         String type = "";
         if (e != null) {
-            if (e.isAbyss()) type = "A:" + e.getId();
-            else type = "T:" + e.getId();
+            if (e.isAbyss()) {
+                type = "A:" + e.getId();
+            } else {
+                type = "T:" + e.getId();
+            }
         }
         return new String[]{joined, "", type};
     }
 
     public int getCurrentPlayerID() {
-        if (players.isEmpty()) return -1;
+        if (players.isEmpty()) {
+            return -1;
+        }
         normalizeCurrentIndex();
         Player cur = players.get(currentPlayerIndex);
         try {
@@ -245,14 +292,24 @@ public class GameManager {
     }
 
     private void normalizeCurrentIndex() {
-        if (players.isEmpty()) currentPlayerIndex = 0;
-        if (currentPlayerIndex >= players.size()) currentPlayerIndex = 0;
+        if (players.isEmpty()) {
+            currentPlayerIndex = 0;
+        }
+        if (currentPlayerIndex >= players.size()) {
+            currentPlayerIndex = 0;
+        }
     }
 
     public boolean moveCurrentPlayer(int nrSpaces) {
-        if (gameOver) return false;
-        if (nrSpaces < 1 || nrSpaces > 6) return false;
-        if (players.isEmpty()) return false;
+        if (gameOver) {
+            return false;
+        }
+        if (nrSpaces < 1 || nrSpaces > 6) {
+            return false;
+        }
+        if (players.isEmpty()) {
+            return false;
+        }
 
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
@@ -265,7 +322,9 @@ public class GameManager {
         }
 
         if (current.getLinguagens().contains("Assembly")) {
-            if (nrSpaces == 5 || nrSpaces == 6) return false;
+            if (nrSpaces == 5 || nrSpaces == 6) {
+                return false;
+            }
         }
 
         current.prepararMovimento();
@@ -274,7 +333,9 @@ public class GameManager {
         if (novaPos > board.getTamanhoTabuleiro()) {
             int excesso = novaPos - board.getTamanhoTabuleiro();
             novaPos = board.getTamanhoTabuleiro() - excesso;
-            if (novaPos < 1) novaPos = 1;
+            if (novaPos < 1) {
+                novaPos = 1;
+            }
         }
 
         current.setLastMoveSpaces(nrSpaces);
@@ -283,7 +344,9 @@ public class GameManager {
     }
 
     public String reactToAbyssOrTool() {
-        if (gameOver || players.isEmpty()) return null;
+        if (gameOver || players.isEmpty()) {
+            return null;
+        }
 
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
@@ -291,7 +354,9 @@ public class GameManager {
         BoardElement el = board.getElementAt(current.getPosicao());
         String message = null;
 
-        if (el != null) message = el.applyEffect(current, this);
+        if (el != null) {
+            message = el.applyEffect(current, this);
+        }
 
         checkGameOverCondition();
         advanceToNextAlive();
@@ -301,7 +366,9 @@ public class GameManager {
             current.setFerramentaAtiva(null);
         }
 
-        if (players.isEmpty()) gameOver = true;
+        if (players.isEmpty()) {
+            gameOver = true;
+        }
 
         return message;
     }
@@ -324,7 +391,9 @@ public class GameManager {
     }
 
     public boolean gameIsOver() {
-        if (gameOver) return true;
+        if (gameOver) {
+            return true;
+        }
         checkGameOverCondition();
         return gameOver;
     }
@@ -335,7 +404,9 @@ public class GameManager {
     }
 
     public boolean saveGame(File file) {
-        if (file == null) return false;
+        if (file == null) {
+            return false;
+        }
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
             bw.write(String.valueOf(board.getTamanhoTabuleiro()));
             bw.newLine();
@@ -382,7 +453,9 @@ public class GameManager {
     }
 
     public void loadGame(File file) throws InvalidFileException, FileNotFoundException {
-        if (file == null || !file.exists()) throw new FileNotFoundException();
+        if (file == null || !file.exists()) {
+            throw new FileNotFoundException();
+        }
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             int worldSize = loadIntLine(br, "Empty or invalid world size");
@@ -406,7 +479,9 @@ public class GameManager {
             }
 
             board.clearElements();
-            for (BoardElement be : loadedElements.values()) board.addElement(be);
+            for (BoardElement be : loadedElements.values()) {
+                board.addElement(be);
+            }
             board.setTamanhoTabuleiro(worldSize);
 
             turnCounter = savedTurn;
@@ -422,7 +497,9 @@ public class GameManager {
 
     private int loadIntLine(BufferedReader br, String errMsg) throws IOException, InvalidFileException {
         String line = br.readLine();
-        if (line == null) throw new InvalidFileException(errMsg);
+        if (line == null) {
+            throw new InvalidFileException(errMsg);
+        }
         try {
             return Integer.parseInt(line.trim());
         } catch (NumberFormatException e) {
@@ -437,10 +514,14 @@ public class GameManager {
 
         for (int i = 0; i < count; i++) {
             String line = br.readLine();
-            if (line == null) throw new InvalidFileException("Incomplete players data");
+            if (line == null) {
+                throw new InvalidFileException("Incomplete players data");
+            }
 
             String[] parts = line.split(";", -1);
-            if (parts.length < 6) throw new InvalidFileException("Invalid player line");
+            if (parts.length < 6) {
+                throw new InvalidFileException("Invalid player line");
+            }
 
             String id = parts[0];
             String name = parts[1];
@@ -481,10 +562,14 @@ public class GameManager {
 
         for (int i = 0; i < count; i++) {
             String line = br.readLine();
-            if (line == null) throw new InvalidFileException("Incomplete elements");
+            if (line == null) {
+                throw new InvalidFileException("Incomplete elements");
+            }
 
             String[] parts = line.split(";", -1);
-            if (parts.length < 3) throw new InvalidFileException("Invalid element line");
+            if (parts.length < 3) {
+                throw new InvalidFileException("Invalid element line");
+            }
 
             int type, subtype, pos;
 
@@ -496,8 +581,9 @@ public class GameManager {
                 throw new InvalidFileException("Invalid element numbers");
             }
 
-            if (pos < 1 || pos > worldSize)
+            if (pos < 1 || pos > worldSize) {
                 throw new InvalidFileException("Element position out of bounds");
+            }
 
             BoardElement be = ElementsIOAdapter.toElement(type, subtype, pos);
             elems.put(pos, be);
@@ -519,21 +605,26 @@ public class GameManager {
     public List<Player> getPlayersAtPosition(int pos) {
         List<Player> res = new ArrayList<>();
         for (Player p : players) {
-            if (p.getPosicao() == pos) res.add(p);
+            if (p.getPosicao() == pos) {
+                res.add(p);
+            }
         }
         return res;
     }
 
     public void eliminatePlayer(Player p) {
-        if (p == null) return;
+        if (p == null) {
+            return;
+        }
         p.setEliminado(true);
         players.remove(p);
         if (players.isEmpty()) {
             currentPlayerIndex = 0;
             gameOver = true;
         } else {
-            if (currentPlayerIndex >= players.size())
+            if (currentPlayerIndex >= players.size()) {
                 currentPlayerIndex = 0;
+            }
         }
     }
 

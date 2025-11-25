@@ -1,7 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-public class Tool1_Functional extends ToolBase {
-    public Tool1_Functional(int position) { super(1, position); }
+public class ToolFunctional extends ToolBase {
+    public ToolFunctional(int position) { super(1, position); }
 
     @Override
     public String getName() { return "Programação Funcional"; }

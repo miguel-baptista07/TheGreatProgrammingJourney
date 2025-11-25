@@ -1,7 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-public class Abyss4_Crash extends AbyssBase {
-    public Abyss4_Crash(int position) { super(4, position); }
+public class AbyssCrash extends AbyssBase {
+    public AbyssCrash(int position) { super(4, position); }
 
     @Override
     public String getName() { return "Crash"; }

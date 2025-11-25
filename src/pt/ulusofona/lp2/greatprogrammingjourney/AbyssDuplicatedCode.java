@@ -1,7 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-public class Abyss5_DuplicatedCode extends AbyssBase {
-    public Abyss5_DuplicatedCode(int position) { super(5, position); }
+public class AbyssDuplicatedCode extends AbyssBase {
+    public AbyssDuplicatedCode(int position) { super(5, position); }
 
     @Override
     public String getName() { return "Duplicated Code"; }

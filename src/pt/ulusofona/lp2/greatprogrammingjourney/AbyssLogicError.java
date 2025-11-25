@@ -1,7 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-public class Abyss1_LogicError extends AbyssBase {
-    public Abyss1_LogicError(int position) { super(1, position); }
+public class AbyssLogicError extends AbyssBase {
+    public AbyssLogicError(int position) { super(1, position); }
 
     @Override
     public String getName() { return "Logic Error"; }

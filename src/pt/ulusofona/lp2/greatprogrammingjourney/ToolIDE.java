@@ -1,7 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-public class Tool4_IDE extends ToolBase {
-    public Tool4_IDE(int position) { super(4, position); }
+public class ToolIDE extends ToolBase {
+    public ToolIDE(int position) { super(4, position); }
 
     @Override
     public String getName() { return "IDE"; }
