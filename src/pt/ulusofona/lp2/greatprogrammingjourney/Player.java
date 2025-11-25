@@ -35,23 +35,16 @@ public class Player {
     }
 
     private String formatarLinguagens(String linguagens) {
-        if (linguagens == null || linguagens.trim().isEmpty()) return "";
-
-        String[] langs = linguagens.split(";");
-        List<String> clean = new ArrayList<>();
-
-        for (String l : langs) {
-            l = l.trim();
-            if (!l.isEmpty()) {
-                clean.add(l);
-            }
+        if (linguagens == null || linguagens.trim().isEmpty()) {
+            return "";
         }
-
-        clean.sort(String::compareToIgnoreCase);
-
-        return String.join(";", clean);
+        String[] langs = linguagens.split(";");
+        for (int i = 0; i < langs.length; i++) {
+            langs[i] = langs[i].trim();
+        }
+        Arrays.sort(langs);
+        return String.join("; ", langs);
     }
-
 
     public String getId() { return id; }
     public String getNome() { return nome; }
@@ -124,18 +117,14 @@ public class Player {
         }
         return posicaoHistorico.get(idx);
     }
-    public boolean hasLanguage(String lang) {
-        lang = lang.trim().toLowerCase();
-        String[] ls = linguagens.split(";");
 
+    public boolean hasLanguage(String lang) {
+        String[] ls = linguagens.split(";");
         for (String l : ls) {
-            if (l.trim().toLowerCase().equals(lang)) {
+            if (l.trim().equalsIgnoreCase(lang)) {
                 return true;
             }
         }
         return false;
     }
-
-
-
 }

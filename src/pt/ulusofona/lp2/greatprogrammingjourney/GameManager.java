@@ -49,12 +49,15 @@ public class GameManager {
 
     public boolean createInitialBoard(String[][] playerInfo, int worldSize, String[][] abyssesAndTools) {
         resetGame();
+
         if (playerInfo == null || worldSize < 2) {
             return false;
         }
+
         if (playerInfo.length < 2 || playerInfo.length > 4) {
             return false;
         }
+
         if (worldSize < 2 * playerInfo.length) {
             return false;
         }
@@ -63,21 +66,26 @@ public class GameManager {
             if (info == null || info.length != 4) {
                 return false;
             }
+
             String id = info[0];
             String nome = info[1];
             String linguagens = info[2];
             String cor = info[3];
+
             if (id == null || id.isEmpty()) {
                 return false;
             }
+
             for (Player p : players) {
                 if (p.getId().equals(id)) {
                     return false;
                 }
             }
+
             if (nome == null || nome.isEmpty()) {
                 return false;
             }
+
             if (cor == null || !isValidColor(cor)) {
                 return false;
             }
@@ -87,7 +95,6 @@ public class GameManager {
             newPlayer.setEliminado(false);
             newPlayer.setPreso(false);
             newPlayer.setFerramentaAtiva(null);
-
             players.add(newPlayer);
             allPlayers.add(newPlayer);
         }
@@ -102,6 +109,7 @@ public class GameManager {
                 if (row == null || row.length < 3) {
                     return false;
                 }
+
                 int type, subtype, position;
                 try {
                     type = Integer.parseInt(row[0]);
@@ -110,9 +118,11 @@ public class GameManager {
                 } catch (NumberFormatException e) {
                     return false;
                 }
+
                 if (type != 0 && type != 1) {
                     return false;
                 }
+
                 if (position < 1 || position > worldSize) {
                     return false;
                 }
@@ -126,23 +136,26 @@ public class GameManager {
     }
 
     private boolean isValidColor(String cor) {
-        return cor.equalsIgnoreCase("Purple")
-                || cor.equalsIgnoreCase("Green")
-                || cor.equalsIgnoreCase("Brown")
-                || cor.equalsIgnoreCase("Blue");
+        return cor.equalsIgnoreCase("Purple") ||
+                cor.equalsIgnoreCase("Green") ||
+                cor.equalsIgnoreCase("Brown") ||
+                cor.equalsIgnoreCase("Blue");
     }
 
     public String getImagePng(int nrSquare) {
         if (nrSquare < 1 || nrSquare > board.getTamanhoTabuleiro()) {
             return null;
         }
+
         if (nrSquare == board.getTamanhoTabuleiro()) {
             return "glory.png";
         }
+
         BoardElement el = board.getElementAt(nrSquare);
         if (el == null) {
             return null;
         }
+
         if (el.isAbyss()) {
             switch (el.getId()) {
                 case 0: return "syntax.png";
@@ -218,24 +231,16 @@ public class GameManager {
                 break;
             }
         }
+
         if (found == null) {
             return null;
         }
 
-        String toolStr = found.getFerramentas().isEmpty()
-                ? "No tools"
-                : found.getFerramentasAsString();
+        String toolStr = found.getFerramentas().isEmpty() ? "No tools" : found.getFerramentasAsString();
+        String estado = found.isEliminado() ? "Derrotado" : found.isPreso() ? "Preso" : "Em Jogo";
 
-        String estado = found.isEliminado() ? "Derrotado"
-                : found.isPreso() ? "Preso"
-                : "Em Jogo";
-
-        return found.getId()
-                + " | " + found.getNome()
-                + " | " + found.getPosicao()
-                + " | " + toolStr
-                + " | " + found.getLinguagens()
-                + " | " + estado;
+        return found.getId() + " | " + found.getNome() + " | " + found.getPosicao() + " | " +
+                toolStr + " | " + found.getLinguagens() + " | " + estado;
     }
 
     public String getProgrammersInfo() {
@@ -247,9 +252,7 @@ public class GameManager {
             }
             sb.append(p.getNome())
                     .append(" : ")
-                    .append(p.getFerramentas().isEmpty()
-                            ? "No tools"
-                            : p.getFerramentasAsString());
+                    .append(p.getFerramentas().isEmpty() ? "No tools" : p.getFerramentasAsString());
             first = false;
         }
         return sb.toString();
@@ -259,6 +262,7 @@ public class GameManager {
         if (position < 1 || position > board.getTamanhoTabuleiro()) {
             return null;
         }
+
         List<String> ids = new ArrayList<>();
         for (Player p : players) {
             if (p.getPosicao() == position) {
@@ -266,6 +270,7 @@ public class GameManager {
             }
         }
         String joined = ids.isEmpty() ? "" : String.join(",", ids);
+
         BoardElement e = board.getElementAt(position);
         String type = "";
         if (e != null) {
@@ -275,6 +280,7 @@ public class GameManager {
                 type = "T:" + e.getId();
             }
         }
+
         return new String[]{joined, "", type};
     }
 
@@ -301,9 +307,17 @@ public class GameManager {
     }
 
     public boolean moveCurrentPlayer(int nrSpaces) {
-        if (gameOver) return false;
-        if (nrSpaces < 1 || nrSpaces > 6) return false;
-        if (players.isEmpty()) return false;
+        if (gameOver) {
+            return false;
+        }
+
+        if (nrSpaces < 1 || nrSpaces > 6) {
+            return false;
+        }
+
+        if (players.isEmpty()) {
+            return false;
+        }
 
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
@@ -316,13 +330,16 @@ public class GameManager {
         }
 
         if (current.hasLanguage("Assembly")) {
-            if (nrSpaces > 2) return false;
+            if (nrSpaces > 2) {
+                return false;
+            }
         }
 
-        boolean isCFamily = current.hasLanguage("C") ||
-                current.hasLanguage("C++") ||
-                current.hasLanguage("C#");
-        if (isCFamily && nrSpaces > 3) return false;
+        if (current.hasLanguage("C")) {
+            if (nrSpaces > 3) {
+                return false;
+            }
+        }
 
         current.prepararMovimento();
 
@@ -330,14 +347,15 @@ public class GameManager {
         if (novaPos > board.getTamanhoTabuleiro()) {
             int excesso = novaPos - board.getTamanhoTabuleiro();
             novaPos = board.getTamanhoTabuleiro() - excesso;
-            if (novaPos < 1) novaPos = 1;
+            if (novaPos < 1) {
+                novaPos = 1;
+            }
         }
 
         current.setLastMoveSpaces(nrSpaces);
         current.setPosicao(novaPos);
         return true;
     }
-
 
     public String reactToAbyssOrTool() {
         if (gameOver || players.isEmpty()) {
@@ -346,10 +364,9 @@ public class GameManager {
 
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
-
         BoardElement el = board.getElementAt(current.getPosicao());
-        String message = null;
 
+        String message = null;
         if (el != null) {
             message = el.applyEffect(current, this);
         }
@@ -403,6 +420,7 @@ public class GameManager {
         if (file == null) {
             return false;
         }
+
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
             bw.write(String.valueOf(board.getTamanhoTabuleiro()));
             bw.newLine();
@@ -442,7 +460,6 @@ public class GameManager {
 
             bw.flush();
             return true;
-
         } catch (IOException e) {
             return false;
         }
@@ -460,7 +477,6 @@ public class GameManager {
             int playersCount = loadIntLine(br, "Invalid players count");
 
             List<Player> loadedPlayers = loadPlayersBlock(br, playersCount);
-
             int elementsCount = loadIntLine(br, "Invalid elements count");
             Map<Integer, BoardElement> loadedElements = loadElementsBlock(br, elementsCount, worldSize);
 
@@ -478,12 +494,11 @@ public class GameManager {
             for (BoardElement be : loadedElements.values()) {
                 board.addElement(be);
             }
-            board.setTamanhoTabuleiro(worldSize);
 
+            board.setTamanhoTabuleiro(worldSize);
             turnCounter = savedTurn;
             currentPlayerIndex = Math.max(0, Math.min(savedCurrentIdx, players.size() - 1));
             gameOver = false;
-
             checkGameOverCondition();
 
         } catch (IOException ex) {
@@ -503,11 +518,8 @@ public class GameManager {
         }
     }
 
-    private List<Player> loadPlayersBlock(BufferedReader br, int count)
-            throws IOException, InvalidFileException {
-
+    private List<Player> loadPlayersBlock(BufferedReader br, int count) throws IOException, InvalidFileException {
         List<Player> loaded = new ArrayList<>();
-
         for (int i = 0; i < count; i++) {
             String line = br.readLine();
             if (line == null) {
@@ -545,17 +557,12 @@ public class GameManager {
 
             loaded.add(p);
         }
-
         return loaded;
     }
 
-    private Map<Integer, BoardElement> loadElementsBlock(BufferedReader br,
-                                                         int count,
-                                                         int worldSize)
+    private Map<Integer, BoardElement> loadElementsBlock(BufferedReader br, int count, int worldSize)
             throws IOException, InvalidFileException {
-
         Map<Integer, BoardElement> elems = new HashMap<>();
-
         for (int i = 0; i < count; i++) {
             String line = br.readLine();
             if (line == null) {
@@ -568,7 +575,6 @@ public class GameManager {
             }
 
             int type, subtype, pos;
-
             try {
                 type = Integer.parseInt(parts[0]);
                 subtype = Integer.parseInt(parts[1]);
@@ -584,7 +590,6 @@ public class GameManager {
             BoardElement be = ElementsIOAdapter.toElement(type, subtype, pos);
             elems.put(pos, be);
         }
-
         return elems;
     }
 
@@ -612,8 +617,10 @@ public class GameManager {
         if (p == null) {
             return;
         }
+
         p.setEliminado(true);
         players.remove(p);
+
         if (players.isEmpty()) {
             currentPlayerIndex = 0;
             gameOver = true;
