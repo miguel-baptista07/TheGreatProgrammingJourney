@@ -311,6 +311,7 @@ public class GameManager {
             return false;
         }
 
+        // PRIMEIRO: Validar se o valor está no intervalo básico (1-6)
         if (nrSpaces < 1 || nrSpaces > 6) {
             return false;
         }
@@ -322,6 +323,7 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
+        // Se está preso, liberta mas não move
         if (current.isPreso()) {
             current.setPreso(false);
             advanceToNextAlive();
@@ -329,18 +331,23 @@ public class GameManager {
             return false;
         }
 
+        // SEGUNDO: Determinar o limite máximo baseado nas linguagens
+        int maxMovement = 6; // Por padrão, pode mover até 6
+
         if (current.hasLanguage("Assembly")) {
-            if (nrSpaces > 2) {
-                return false;
-            }
+            maxMovement = Math.min(maxMovement, 2);
         }
 
         if (current.hasLanguage("C")) {
-            if (nrSpaces > 3) {
-                return false;
-            }
+            maxMovement = Math.min(maxMovement, 3);
         }
 
+        // TERCEIRO: Verificar se o movimento solicitado excede o limite da linguagem
+        if (nrSpaces > maxMovement) {
+            return false;
+        }
+
+        // QUARTO: Executar o movimento
         current.prepararMovimento();
 
         int novaPos = current.getPosicao() + nrSpaces;
@@ -354,6 +361,8 @@ public class GameManager {
 
         current.setLastMoveSpaces(nrSpaces);
         current.setPosicao(novaPos);
+
+        // Movimento foi executado com sucesso
         return true;
     }
 
