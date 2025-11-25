@@ -54,7 +54,8 @@ public class GameManager {
             return false;
         }
 
-        if (playerInfo.length < 2 || playerInfo.length > 4) {
+
+        if (playerInfo.length < 1 || playerInfo.length > 4) {
             return false;
         }
 
