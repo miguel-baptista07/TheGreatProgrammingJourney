@@ -321,8 +321,13 @@ public class GameManager {
             return false;
         }
 
-        if (current.getLinguagens().contains("Assembly")) {
+        if (current.hasLanguage("Assembly")) {
             if (nrSpaces > 2) {
+                return false;
+            }
+        }
+        if (current.hasLanguage("C")) {
+            if (nrSpaces > 3) {
                 return false;
             }
         }

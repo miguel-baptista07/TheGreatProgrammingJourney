@@ -117,4 +117,14 @@ public class Player {
         }
         return posicaoHistorico.get(idx);
     }
+    public boolean hasLanguage(String lang) {
+        String[] ls = linguagens.split(";");
+        for (String l : ls) {
+            if (l.trim().equalsIgnoreCase(lang)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
