@@ -326,7 +326,7 @@ public class GameManager {
                 return false;
             }
         }
-        if (current.hasLanguage("C")) {
+        if (current.hasLanguage("C++") || current.hasLanguage("C#") || current.hasLanguage("C")) {
             if (nrSpaces > 3) {
                 return false;
             }

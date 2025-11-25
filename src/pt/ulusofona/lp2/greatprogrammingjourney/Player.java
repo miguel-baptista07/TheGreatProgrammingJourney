@@ -120,11 +120,13 @@ public class Player {
     public boolean hasLanguage(String lang) {
         String[] ls = linguagens.split(";");
         for (String l : ls) {
-            if (l.trim().equalsIgnoreCase(lang)) {
+            String clean = l.trim().toLowerCase();
+            if (clean.equals(lang.toLowerCase())) {
                 return true;
             }
         }
         return false;
     }
+
 
 }
