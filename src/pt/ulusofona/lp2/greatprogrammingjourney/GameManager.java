@@ -47,6 +47,8 @@ public class GameManager {
         return createInitialBoard(playerInfo, worldSize, null);
     }
 
+
+
     public boolean createInitialBoard(String[][] playerInfo, int worldSize, String[][] abyssesAndTools) {
         resetGame();
 
@@ -54,8 +56,8 @@ public class GameManager {
             return false;
         }
 
-
-        if (playerInfo.length < 1 || playerInfo.length > 4) {
+        // CORRETO: Exigir MÍNIMO 2 jogadores, máximo 4
+        if (playerInfo.length < 2 || playerInfo.length > 4) {
             return false;
         }
 
@@ -124,12 +126,25 @@ public class GameManager {
                     return false;
                 }
 
+                // VALIDAR SUBTIPOs INVÁLIDOS
+                if (type == 0) {  // Abyss
+                    // Subtipos válidos de abismo: 0-9
+                    if (subtype < 0 || subtype > 9) {
+                        return false;
+                    }
+                } else if (type == 1) {  // Tool
+                    // Subtipos válidos de ferramenta: 0-5
+                    if (subtype < 0 || subtype > 5) {
+                        return false;
+                    }
+                }
+
                 if (position < 1 || position > worldSize) {
                     return false;
                 }
 
-                BoardElement e = ElementsIOAdapter.toElement(type, subtype, position);
-                board.addElement(e);
+                BoardElement elem = ElementsIOAdapter.toElement(type, subtype, position);
+                board.addElement(elem);
             }
         }
 
@@ -264,6 +279,7 @@ public class GameManager {
             return null;
         }
 
+        // Índice 0: IDs dos jogadores separados por vírgula
         List<String> ids = new ArrayList<>();
         for (Player p : players) {
             if (p.getPosicao() == position) {
@@ -272,7 +288,14 @@ public class GameManager {
         }
         String joined = ids.isEmpty() ? "" : String.join(",", ids);
 
+        // Índice 1: NOME do abismo ou ferramenta
+        String elementName = "";
         BoardElement e = board.getElementAt(position);
+        if (e != null) {
+            elementName = e.getName();  // Método getName() da classe BoardElement
+        }
+
+        // Índice 2: Tipo do elemento (A:id ou T:id)
         String type = "";
         if (e != null) {
             if (e.isAbyss()) {
@@ -282,7 +305,7 @@ public class GameManager {
             }
         }
 
-        return new String[]{joined, "", type};
+        return new String[]{joined, elementName, type};
     }
 
     public int getCurrentPlayerID() {
