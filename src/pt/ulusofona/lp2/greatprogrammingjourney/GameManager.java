@@ -332,10 +332,9 @@ public class GameManager {
             }
         }
 
-
         current.prepararMovimento();
-
         int novaPos = current.getPosicao() + nrSpaces;
+
         if (novaPos > board.getTamanhoTabuleiro()) {
             int excesso = novaPos - board.getTamanhoTabuleiro();
             novaPos = board.getTamanhoTabuleiro() - excesso;
@@ -346,6 +345,7 @@ public class GameManager {
 
         current.setLastMoveSpaces(nrSpaces);
         current.setPosicao(novaPos);
+
         return true;
     }
 
