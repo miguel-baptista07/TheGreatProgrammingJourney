@@ -35,16 +35,23 @@ public class Player {
     }
 
     private String formatarLinguagens(String linguagens) {
-        if (linguagens == null || linguagens.trim().isEmpty()) {
-            return "";
-        }
+        if (linguagens == null || linguagens.trim().isEmpty()) return "";
+
         String[] langs = linguagens.split(";");
-        for (int i = 0; i < langs.length; i++) {
-            langs[i] = langs[i].trim();
+        List<String> clean = new ArrayList<>();
+
+        for (String l : langs) {
+            l = l.trim();
+            if (!l.isEmpty()) {
+                clean.add(l);
+            }
         }
-        Arrays.sort(langs);
-        return String.join("; ", langs);
+
+        clean.sort(String::compareToIgnoreCase);
+
+        return String.join(";", clean);
     }
+
 
     public String getId() { return id; }
     public String getNome() { return nome; }
@@ -118,15 +125,17 @@ public class Player {
         return posicaoHistorico.get(idx);
     }
     public boolean hasLanguage(String lang) {
+        lang = lang.trim().toLowerCase();
         String[] ls = linguagens.split(";");
+
         for (String l : ls) {
-            String clean = l.trim().toLowerCase();
-            if (clean.equals(lang.toLowerCase())) {
+            if (l.trim().toLowerCase().equals(lang)) {
                 return true;
             }
         }
         return false;
     }
+
 
 
 }

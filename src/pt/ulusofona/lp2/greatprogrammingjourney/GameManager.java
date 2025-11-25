@@ -301,15 +301,9 @@ public class GameManager {
     }
 
     public boolean moveCurrentPlayer(int nrSpaces) {
-        if (gameOver) {
-            return false;
-        }
-        if (nrSpaces < 1 || nrSpaces > 6) {
-            return false;
-        }
-        if (players.isEmpty()) {
-            return false;
-        }
+        if (gameOver) return false;
+        if (nrSpaces < 1 || nrSpaces > 6) return false;
+        if (players.isEmpty()) return false;
 
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
@@ -322,32 +316,28 @@ public class GameManager {
         }
 
         if (current.hasLanguage("Assembly")) {
-            if (nrSpaces > 2) {
-                return false;
-            }
+            if (nrSpaces > 2) return false;
         }
-        if (current.hasLanguage("C++") || current.hasLanguage("C#") || current.hasLanguage("C")) {
-            if (nrSpaces > 3) {
-                return false;
-            }
-        }
+
+        boolean isCFamily = current.hasLanguage("C") ||
+                current.hasLanguage("C++") ||
+                current.hasLanguage("C#");
+        if (isCFamily && nrSpaces > 3) return false;
 
         current.prepararMovimento();
-        int novaPos = current.getPosicao() + nrSpaces;
 
+        int novaPos = current.getPosicao() + nrSpaces;
         if (novaPos > board.getTamanhoTabuleiro()) {
             int excesso = novaPos - board.getTamanhoTabuleiro();
             novaPos = board.getTamanhoTabuleiro() - excesso;
-            if (novaPos < 1) {
-                novaPos = 1;
-            }
+            if (novaPos < 1) novaPos = 1;
         }
 
         current.setLastMoveSpaces(nrSpaces);
         current.setPosicao(novaPos);
-
         return true;
     }
+
 
     public String reactToAbyssOrTool() {
         if (gameOver || players.isEmpty()) {
