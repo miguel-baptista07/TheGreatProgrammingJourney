@@ -132,4 +132,15 @@ public class Player {
         }
         return false;
     }
+
+
+
+    @Override
+    public String toString() {
+        String ferramentasStr = ferramentas.isEmpty() ? "No tools" : getFerramentasAsString();
+        String estadoStr = eliminado ? "Derrotado" : preso ? "Preso" : "Em Jogo";
+
+        return id + " | " + nome + " | " + posicao + " | " +
+                ferramentasStr + " | " + linguagens + " | " + estadoStr;
+    }
 }

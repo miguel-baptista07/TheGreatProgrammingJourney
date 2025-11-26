@@ -22,6 +22,7 @@ public class Report {
         results.add("NR. DE TURNOS");
         results.add(String.valueOf(nrTurnos));
         results.add("");
+
         String vencedor = "Nenhum";
         int maxPos = 0;
         for (Player p : players) {
@@ -30,20 +31,29 @@ public class Report {
                 vencedor = p.getNome();
             }
         }
+
         results.add("VENCEDOR");
         results.add(vencedor);
         results.add("");
+
         List<Player> restantes = new ArrayList<>();
         for (Player p : players) {
             if (!p.isEliminado() && p.getPosicao() < boardSize) {
                 restantes.add(p);
             }
         }
-        restantes.sort(Comparator.comparingInt(Player::getPosicao).reversed());
+
+
+        restantes.sort(Comparator
+                .comparingInt(Player::getPosicao).reversed()
+                .thenComparingInt(p -> Integer.parseInt(p.getId()))
+        );
+
         results.add("RESTANTES");
         for (Player p : restantes) {
             results.add(p.getNome() + " " + p.getPosicao());
         }
+
         return results;
     }
 }
