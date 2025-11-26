@@ -10,9 +10,11 @@ public class AbyssSyntaxError extends AbyssBase {
     public String applyEffect(Player player, GameManager manager) {
         if (playerHasTool(player, 4)) {
             consumeTool(player, 4);
+
             return "Erro de sintaxe anulado por " + toolName(4);
         }
+
         player.setPosicao(player.getPosicaoAnteriorMovimento());
-        return "Caiu no abismo Syntax Error: recuou para a casa onde estava antes.";
+        return "Caiu no abismo Erro de sintaxe: recuou para a casa onde estava antes.";
     }
 }
