@@ -11,11 +11,11 @@ public abstract class AbyssBase extends BoardElement {
     }
 
     protected boolean playerHasTool(Player p, int toolId) {
-        return p.getFerramentas().contains(toolId);
+        return p.hasTool(toolId);
     }
 
     protected void consumeTool(Player p, int toolId) {
-        p.getFerramentas().removeIf(t -> t == toolId);
+        p.removeTool(toolId);
     }
 
     protected String toolName(int toolId) {

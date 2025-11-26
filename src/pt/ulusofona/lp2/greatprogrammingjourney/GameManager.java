@@ -279,7 +279,7 @@ public class GameManager {
             return null;
         }
 
-        // Índice 0: IDs dos jogadores separados por vírgula
+
         List<String> ids = new ArrayList<>();
         for (Player p : players) {
             if (p.getPosicao() == position) {
@@ -288,14 +288,14 @@ public class GameManager {
         }
         String joined = ids.isEmpty() ? "" : String.join(",", ids);
 
-        // Índice 1: NOME do abismo ou ferramenta
+
         String elementName = "";
         BoardElement e = board.getElementAt(position);
         if (e != null) {
-            elementName = e.getName();  // Método getName() da classe BoardElement
+            elementName = e.getName();
         }
 
-        // Índice 2: Tipo do elemento (A:id ou T:id)
+
         String type = "";
         if (e != null) {
             if (e.isAbyss()) {
@@ -405,8 +405,10 @@ public class GameManager {
         }
 
         checkGameOverCondition();
-        advanceToNextAlive();
+
+
         turnCounter++;
+        advanceToNextAlive();
 
         if (message != null && message.contains("anulado por")) {
             current.setFerramentaAtiva(null);

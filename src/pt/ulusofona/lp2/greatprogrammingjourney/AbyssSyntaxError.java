@@ -4,7 +4,7 @@ public class AbyssSyntaxError extends AbyssBase {
     public AbyssSyntaxError(int position) { super(0, position); }
 
     @Override
-    public String getName() { return "Syntax Error"; }
+    public String getName() { return "Erro de sintaxe"; }
 
     @Override
     public String applyEffect(Player player, GameManager manager) {

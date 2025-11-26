@@ -78,6 +78,11 @@ public class Player {
         }
     }
 
+    // NOVO MÉTODO: Remover ferramenta
+    public void removeTool(int toolId) {
+        ferramentas.remove(Integer.valueOf(toolId));
+    }
+
     public List<Integer> getFerramentas() { return new ArrayList<>(ferramentas); }
 
     public Integer getFerramentaAtiva() { return ferramentaAtiva; }
