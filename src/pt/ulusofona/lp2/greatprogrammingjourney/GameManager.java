@@ -332,17 +332,14 @@ public class GameManager {
 
     public boolean moveCurrentPlayer(int nrSpaces) {
         if (gameOver) {
-            System.err.println("DEBUG: Movimento bloqueado - gameOver = true");
             return false;
         }
 
         if (nrSpaces < 1 || nrSpaces > 6) {
-            System.err.println("DEBUG: Movimento bloqueado - nrSpaces inválido: " + nrSpaces);
             return false;
         }
 
         if (players.isEmpty()) {
-            System.err.println("DEBUG: Movimento bloqueado - players vazio");
             return false;
         }
 
@@ -350,7 +347,6 @@ public class GameManager {
         Player current = players.get(currentPlayerIndex);
 
         if (current.isPreso()) {
-            System.err.println("DEBUG: Jogador estava preso, libertando");
             current.setPreso(false);
             return false;
         }
@@ -359,17 +355,13 @@ public class GameManager {
 
         if (current.hasLanguage("Assembly")) {
             maxMovement = Math.min(maxMovement, 2);
-            System.err.println("DEBUG: Jogador tem Assembly, max = 2");
         }
 
         if (current.hasLanguage("C")) {
             maxMovement = Math.min(maxMovement, 3);
-            System.err.println("DEBUG: Jogador tem C, max = 3");
         }
 
         if (nrSpaces > maxMovement) {
-            System.err.println("DEBUG: Movimento bloqueado - nrSpaces (" + nrSpaces + ") > maxMovement (" + maxMovement + ")");
-            System.err.println("DEBUG: Linguagens: " + current.getLinguagens());
             return false;
         }
 
