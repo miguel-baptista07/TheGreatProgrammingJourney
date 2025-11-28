@@ -389,29 +389,19 @@ public class GameManager {
 
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
-
-
-        List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
+        BoardElement el = board.getElementAt(current.getPosicao());
 
         String message = null;
 
-
-        for (BoardElement el : elements) {
+        // Se houver elemento na posição atual
+        if (el != null) {
+            // Se for FERRAMENTA, processar primeiro
             if (!el.isAbyss()) {
-                String msg = el.applyEffect(current, this);
-                if (message == null) {
-                    message = msg;
-                }
+                message = el.applyEffect(current, this);
             }
-        }
-
-
-        for (BoardElement el : elements) {
-            if (el.isAbyss()) {
-                String msg = el.applyEffect(current, this);
-                if (message == null || msg != null) {
-                    message = msg;
-                }
+            // Se for ABISMO, processar depois
+            else {
+                message = el.applyEffect(current, this);
             }
         }
 

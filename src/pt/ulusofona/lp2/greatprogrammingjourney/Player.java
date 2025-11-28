@@ -140,7 +140,9 @@ public class Player {
         String ferramentasStr = ferramentas.isEmpty() ? "No tools" : getFerramentasAsString();
         String estadoStr = eliminado ? "Derrotado" : preso ? "Preso" : "Em Jogo";
 
-        return id + " | " + nome + " | " + posicao + " | " +
-                ferramentasStr + " | " + linguagens + " | " + estadoStr;
+        // CORREÇÃO: Adicionar os labels
+        return "ID: " + id + " | Nome: " + nome + " | Posição: " + posicao +
+                " | Ferramentas: " + ferramentasStr + " | Linguagens: " + linguagens +
+                " | Estado: " + estadoStr;
     }
 }
