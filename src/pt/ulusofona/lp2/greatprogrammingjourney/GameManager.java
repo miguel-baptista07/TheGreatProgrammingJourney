@@ -393,31 +393,13 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
-
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
 
         String message = null;
 
-
-        for (BoardElement el : elements) {
-            if (!el.isAbyss()) {
-                String msg = el.applyEffect(current, this);
-                if (message == null) {
-                    message = msg;
-                } else {
-                    message = message + " " + msg;
-                }
-            }
-        }
-
-        for (BoardElement el : elements) {
-            if (el.isAbyss()) {
-                String msg = el.applyEffect(current, this);
-
-                if (msg != null) {
-                    message = msg;
-                }
-            }
+        if (!elements.isEmpty()) {
+            BoardElement firstElement = elements.get(0);
+            message = firstElement.applyEffect(current, this);
         }
 
         checkGameOverCondition();
