@@ -349,7 +349,7 @@ public class GameManager {
 
         if (current.isPreso()) {
             current.setPreso(false);
-
+            return false;
         }
 
         int maxMovement = 6;
