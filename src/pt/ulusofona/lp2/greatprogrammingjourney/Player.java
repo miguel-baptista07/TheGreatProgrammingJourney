@@ -8,6 +8,7 @@ public class Player {
     private final String id;
     private String nome;
     private String linguagens;
+    private String primeiraLinguagem;
     private String cor;
     private int posicao;
     private int posicaoAnteriorMovimento;
@@ -21,6 +22,15 @@ public class Player {
     public Player(String id, String nome, String linguagens, String cor) {
         this.id = id;
         this.nome = nome;
+
+        // IMPORTANTE: Guardar primeira linguagem ANTES de ordenar
+        if (linguagens != null && !linguagens.trim().isEmpty()) {
+            String[] langs = linguagens.split(";");
+            this.primeiraLinguagem = langs[0].trim();
+        } else {
+            this.primeiraLinguagem = "";
+        }
+
         this.linguagens = formatarLinguagens(linguagens);
         this.cor = cor;
         this.posicao = 1;
@@ -42,13 +52,14 @@ public class Player {
         for (int i = 0; i < langs.length; i++) {
             langs[i] = langs[i].trim();
         }
-        Arrays.sort(langs);
+        Arrays.sort(langs);  // Ordena alfabeticamente para EXIBIÇÃO
         return String.join("; ", langs);
     }
 
     public String getId() { return id; }
     public String getNome() { return nome; }
     public String getLinguagens() { return linguagens; }
+    public String getPrimeiraLinguagem() { return primeiraLinguagem; }  // NOVO
     public String getCor() { return cor; }
     public int getPosicao() { return posicao; }
 
@@ -78,7 +89,6 @@ public class Player {
         }
     }
 
-    // NOVO MÉTODO: Remover ferramenta
     public void removeTool(int toolId) {
         ferramentas.remove(Integer.valueOf(toolId));
     }
@@ -133,14 +143,11 @@ public class Player {
         return false;
     }
 
-
-
     @Override
     public String toString() {
         String ferramentasStr = ferramentas.isEmpty() ? "No tools" : getFerramentasAsString();
         String estadoStr = eliminado ? "Derrotado" : preso ? "Preso" : "Em Jogo";
 
-        // CORREÇÃO: Adicionar os labels
         return "ID: " + id + " | Nome: " + nome + " | Posição: " + posicao +
                 " | Ferramentas: " + ferramentasStr + " | Linguagens: " + linguagens +
                 " | Estado: " + estadoStr;

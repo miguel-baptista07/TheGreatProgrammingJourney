@@ -353,12 +353,13 @@ public class GameManager {
 
         int maxMovement = 6;
 
-        if (current.hasLanguage("Assembly")) {
-            maxMovement = Math.min(maxMovement, 2);
-        }
 
-        if (current.hasLanguage("C")) {
-            maxMovement = Math.min(maxMovement, 3);
+        String firstLang = current.getPrimeiraLinguagem();
+
+        if (firstLang.equalsIgnoreCase("Assembly")) {
+            maxMovement = 2;
+        } else if (firstLang.equalsIgnoreCase("C")) {
+            maxMovement = 3;
         }
 
         if (nrSpaces > maxMovement) {
@@ -382,6 +383,8 @@ public class GameManager {
         return true;
     }
 
+
+
     public String reactToAbyssOrTool() {
         if (gameOver || players.isEmpty()) {
             return null;
@@ -393,13 +396,12 @@ public class GameManager {
 
         String message = null;
 
-        // Se houver elemento na posição atual
         if (el != null) {
-            // Se for FERRAMENTA, processar primeiro
+
             if (!el.isAbyss()) {
                 message = el.applyEffect(current, this);
             }
-            // Se for ABISMO, processar depois
+
             else {
                 message = el.applyEffect(current, this);
             }
