@@ -19,11 +19,12 @@ public class Board {
         this.tamanhoTabuleiro = tamanhoTabuleiro;
     }
 
-    public Map<Integer, BoardElement> getElementos() {
 
+    public Map<Integer, BoardElement> getElementos() {
         Map<Integer, BoardElement> flat = new HashMap<>();
         for (Map.Entry<Integer, List<BoardElement>> entry : elementos.entrySet()) {
             if (!entry.getValue().isEmpty()) {
+
                 flat.put(entry.getKey(), entry.getValue().get(0));
             }
         }
@@ -33,6 +34,7 @@ public class Board {
     public void addElement(BoardElement e) {
         elementos.computeIfAbsent(e.getPosition(), k -> new ArrayList<>()).add(e);
     }
+
 
     public BoardElement getElementAt(int pos) {
         List<BoardElement> elems = elementos.get(pos);

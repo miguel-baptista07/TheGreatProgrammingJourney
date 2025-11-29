@@ -346,13 +346,13 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
+
         if (current.isPreso()) {
             current.setPreso(false);
-            return false;
+
         }
 
         int maxMovement = 6;
-
 
         String firstLang = current.getPrimeiraLinguagem();
 
@@ -392,18 +392,31 @@ public class GameManager {
 
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
-        BoardElement el = board.getElementAt(current.getPosicao());
+
+
+        List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
 
         String message = null;
 
-        if (el != null) {
 
+        for (BoardElement el : elements) {
             if (!el.isAbyss()) {
-                message = el.applyEffect(current, this);
+                String msg = el.applyEffect(current, this);
+                if (message == null) {
+                    message = msg;
+                } else {
+                    message = message + " " + msg;
+                }
             }
+        }
 
-            else {
-                message = el.applyEffect(current, this);
+        for (BoardElement el : elements) {
+            if (el.isAbyss()) {
+                String msg = el.applyEffect(current, this);
+
+                if (msg != null) {
+                    message = msg;
+                }
             }
         }
 
