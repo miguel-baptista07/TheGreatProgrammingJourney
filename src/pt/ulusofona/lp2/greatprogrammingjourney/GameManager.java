@@ -397,9 +397,24 @@ public class GameManager {
 
         String message = null;
 
-        if (!elements.isEmpty()) {
-            BoardElement firstElement = elements.get(0);
-            message = firstElement.applyEffect(current, this);
+        for (BoardElement el : elements) {
+            if (!el.isAbyss()) {
+                String msg = el.applyEffect(current, this);
+                if (message == null) {
+                    message = msg;
+                } else {
+                    message = message + " " + msg;
+                }
+            }
+        }
+
+        for (BoardElement el : elements) {
+            if (el.isAbyss()) {
+                String msg = el.applyEffect(current, this);
+                if (msg != null) {
+                    message = msg;
+                }
+            }
         }
 
         checkGameOverCondition();
