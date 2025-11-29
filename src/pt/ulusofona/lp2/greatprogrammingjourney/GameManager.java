@@ -237,14 +237,13 @@ public class GameManager {
             try {
                 if (Integer.parseInt(pid) == id) {
                     found = p;
+                    break;
                 }
             } catch (NumberFormatException ignored) {
                 if (pid.equals(String.valueOf(id))) {
                     found = p;
+                    break;
                 }
-            }
-            if (found != null) {
-                break;
             }
         }
 
@@ -252,11 +251,7 @@ public class GameManager {
             return null;
         }
 
-        String toolStr = found.getFerramentas().isEmpty() ? "No tools" : found.getFerramentasAsString();
-        String estado = found.isEliminado() ? "Derrotado" : found.isPreso() ? "Preso" : "Em Jogo";
-
-        return found.getId() + " | " + found.getNome() + " | " + found.getPosicao() + " | " +
-                toolStr + " | " + found.getLinguagens() + " | " + estado;
+        return found.toString();
     }
 
     public String getProgrammersInfo() {
@@ -393,11 +388,9 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
-
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
 
         String message = null;
-
 
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
@@ -413,7 +406,6 @@ public class GameManager {
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
-
                 if (msg != null) {
                     message = msg;
                 }
