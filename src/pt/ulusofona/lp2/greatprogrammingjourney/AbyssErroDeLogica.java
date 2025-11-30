@@ -1,7 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-public class AbyssErroDeLógica extends AbyssBase {
-    public AbyssErroDeLógica(int position) { super(1, position); }
+public class AbyssErroDeLogica extends AbyssBase {
+    public AbyssErroDeLogica(int position) { super(1, position); }
 
     @Override
     public String getName() { return "Logic Error"; }
@@ -13,7 +13,8 @@ public class AbyssErroDeLógica extends AbyssBase {
             return "Logic Error anulado por " + toolName(1);
         }
         int move = player.getLastMoveSpaces() / 2;
-        player.setPosicao(Math.max(1, player.getPosicao() - move));
+        int novaPosicao = Math.max(1, player.getPosicao() - move);
+        player.setPosicaoSemGuardarHistorico(novaPosicao);
         return "Caiu no abismo Logic Error: recuou " + move + " casas.";
     }
 }

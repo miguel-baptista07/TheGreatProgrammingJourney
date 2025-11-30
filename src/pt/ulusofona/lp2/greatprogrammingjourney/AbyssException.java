@@ -12,7 +12,8 @@ public class AbyssException extends AbyssBase {
             consumeTool(player, 3);
             return "Exception anulado por " + toolName(3);
         }
-        player.setPosicao(Math.max(1, player.getPosicao() - 2));
+        int novaPosicao = Math.max(1, player.getPosicao() - 2);
+        player.setPosicaoSemGuardarHistorico(novaPosicao);
         return "Caiu no abismo Exception: recuou 2 casas.";
     }
 }

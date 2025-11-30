@@ -1,7 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-public class ToolTratamentoDeExcepções extends ToolBase {
-    public ToolTratamentoDeExcepções(int position) { super(3, position); }
+public class ToolTratamentoDeExcepcoes extends ToolBase {
+    public ToolTratamentoDeExcepcoes(int position) { super(3, position); }
 
     @Override
     public String getName() { return "Tratamento de Excepções"; }

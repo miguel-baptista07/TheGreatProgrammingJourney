@@ -15,18 +15,16 @@ public class AbyssSegmentationFault extends AbyssBase {
             return "Segmentation Fault anulado por " + toolName(0);
         }
 
-
         List<Player> playersHere = manager.getPlayersAtPosition(position);
 
         if (playersHere.size() < 2) {
-
             return "Caiu no abismo Segmentation Fault, mas está sozinho (nada acontece).";
         }
 
-
         for (Player p : playersHere) {
             if (!p.isEliminado()) {
-                p.setPosicao(Math.max(1, p.getPosicao() - 3));
+                int novaPosicao = Math.max(1, p.getPosicao() - 3);
+                p.setPosicaoSemGuardarHistorico(novaPosicao);
             }
         }
         return "Caiu no abismo Segmentation Fault: todos na casa recuaram 3 casas.";
