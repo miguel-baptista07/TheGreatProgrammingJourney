@@ -346,7 +346,6 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
-
         if (current.isPreso()) {
             current.setPreso(false);
             return false;
@@ -366,9 +365,9 @@ public class GameManager {
             return false;
         }
 
-        current.prepararMovimento();
+        int posicaoAtual = current.getPosicao();
 
-        int novaPos = current.getPosicao() + nrSpaces;
+        int novaPos = posicaoAtual + nrSpaces;
         if (novaPos > board.getTamanhoTabuleiro()) {
             int excesso = novaPos - board.getTamanhoTabuleiro();
             novaPos = board.getTamanhoTabuleiro() - excesso;
@@ -378,7 +377,8 @@ public class GameManager {
         }
 
         current.setLastMoveSpaces(nrSpaces);
-        current.setPosicao(novaPos);
+        current.prepararMovimento();
+        current.setPosicaoSemGuardarHistorico(novaPos);
 
         return true;
     }
