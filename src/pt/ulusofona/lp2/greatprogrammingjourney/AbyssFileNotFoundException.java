@@ -1,7 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-public class AbyssFileNotFound extends AbyssBase {
-    public AbyssFileNotFound(int position) { super(3, position); }
+public class AbyssFileNotFoundException extends AbyssBase {
+    public AbyssFileNotFoundException(int position) { super(3, position); }
 
     @Override
     public String getName() { return "File Not Found"; }

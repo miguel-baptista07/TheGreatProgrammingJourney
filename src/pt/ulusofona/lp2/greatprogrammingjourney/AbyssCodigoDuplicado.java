@@ -1,7 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-public class AbyssDuplicatedCode extends AbyssBase {
-    public AbyssDuplicatedCode(int position) { super(5, position); }
+public class AbyssCodigoDuplicado extends AbyssBase {
+    public AbyssCodigoDuplicado(int position) { super(5, position); }
 
     @Override
     public String getName() { return "Duplicated Code"; }
@@ -12,7 +12,7 @@ public class AbyssDuplicatedCode extends AbyssBase {
             consumeTool(player, 4);
             return "Duplicated Code anulado por " + toolName(4);
         }
-        player.setPosicao(player.getPosicaoAnteriorMovimento());
+        player.setPosicaoSemGuardarHistorico(player.getPosicaoAnteriorMovimento());
         return "Caiu no abismo Duplicated Code: recuou para a casa anterior.";
     }
 }

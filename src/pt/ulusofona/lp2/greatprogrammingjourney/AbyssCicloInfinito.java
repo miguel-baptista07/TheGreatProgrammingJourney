@@ -1,7 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-public class AbyssInfiniteLoop extends AbyssBase {
-    public AbyssInfiniteLoop(int position) { super(8, position); }
+public class AbyssCicloInfinito extends AbyssBase {
+    public AbyssCicloInfinito(int position) { super(8, position); }
 
     @Override
     public String getName() { return "Infinite Loop"; }

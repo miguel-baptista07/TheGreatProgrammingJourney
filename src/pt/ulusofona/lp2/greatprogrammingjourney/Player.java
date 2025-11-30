@@ -23,7 +23,7 @@ public class Player {
         this.id = id;
         this.nome = nome;
 
-        // IMPORTANTE: Guardar primeira linguagem ANTES de ordenar
+
         if (linguagens != null && !linguagens.trim().isEmpty()) {
             String[] langs = linguagens.split(";");
             this.primeiraLinguagem = langs[0].trim();
@@ -52,7 +52,7 @@ public class Player {
         for (int i = 0; i < langs.length; i++) {
             langs[i] = langs[i].trim();
         }
-        Arrays.sort(langs);  // Ordena alfabeticamente para EXIBIÇÃO
+        Arrays.sort(langs);
         return String.join("; ", langs);
     }
 
@@ -62,6 +62,20 @@ public class Player {
     public String getPrimeiraLinguagem() { return primeiraLinguagem; }  // NOVO
     public String getCor() { return cor; }
     public int getPosicao() { return posicao; }
+
+
+
+    public void setPosicaoSemGuardarHistorico(int posicao) {
+        if (posicao < 1) {
+            posicao = 1;
+        }
+        this.posicao = posicao;
+        this.posicaoHistorico.add(this.posicao);
+        if (this.posicaoHistorico.size() > 10) {
+            this.posicaoHistorico.remove(0);
+        }
+    }
+
 
     public void setPosicao(int posicao) {
         if (posicao < 1) {

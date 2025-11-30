@@ -1,7 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-public class AbyssSyntaxError extends AbyssBase {
-    public AbyssSyntaxError(int position) { super(0, position); }
+public class AbyssErroDeSintaxe extends AbyssBase {
+    public AbyssErroDeSintaxe(int position) { super(0, position); }
 
     @Override
     public String getName() { return "Erro de sintaxe"; }
@@ -10,11 +10,9 @@ public class AbyssSyntaxError extends AbyssBase {
     public String applyEffect(Player player, GameManager manager) {
         if (playerHasTool(player, 4)) {
             consumeTool(player, 4);
-
             return "Erro de sintaxe anulado por " + toolName(4);
         }
-
-        player.setPosicao(player.getPosicaoAnteriorMovimento());
+        player.setPosicaoSemGuardarHistorico(player.getPosicaoAnteriorMovimento());
         return "Caiu no abismo Erro de sintaxe: recuou para a casa onde estava antes.";
     }
 }

@@ -1,7 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-public class ToolTutorHelp extends ToolBase {
-    public ToolTutorHelp(int position) { super(5, position); }
+public class ToolAjudaDoProfessor extends ToolBase {
+    public ToolAjudaDoProfessor(int position) { super(5, position); }
 
     @Override
     public String getName() { return "Ajuda do Professor"; }

@@ -1,7 +1,7 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-public class AbyssSideEffects extends AbyssBase {
-    public AbyssSideEffects(int position) { super(6, position); }
+public class AbyssEfeitosSecundários extends AbyssBase {
+    public AbyssEfeitosSecundários(int position) { super(6, position); }
 
     @Override
     public String getName() { return "Side Effects"; }
