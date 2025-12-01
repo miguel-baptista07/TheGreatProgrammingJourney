@@ -56,7 +56,7 @@ public class GameManager {
             return false;
         }
 
-        // CORRETO: Exigir MÍNIMO 2 jogadores, máximo 4
+
         if (playerInfo.length < 2 || playerInfo.length > 4) {
             return false;
         }
@@ -94,7 +94,6 @@ public class GameManager {
             }
 
             Player newPlayer = new Player(id, nome, linguagens, cor);
-            newPlayer.setPosicao(1);
             newPlayer.setEliminado(false);
             newPlayer.setPreso(false);
             newPlayer.setFerramentaAtiva(null);
@@ -352,7 +351,6 @@ public class GameManager {
         }
 
         int maxMovement = 6;
-
         String firstLang = current.getPrimeiraLinguagem();
 
         if (firstLang.equalsIgnoreCase("Assembly")) {
@@ -365,9 +363,9 @@ public class GameManager {
             return false;
         }
 
-        int posicaoAtual = current.getPosicao();
+        current.prepararMovimento();
 
-        int novaPos = posicaoAtual + nrSpaces;
+        int novaPos = current.getPosicao() + nrSpaces;
         if (novaPos > board.getTamanhoTabuleiro()) {
             int excesso = novaPos - board.getTamanhoTabuleiro();
             novaPos = board.getTamanhoTabuleiro() - excesso;
@@ -377,7 +375,6 @@ public class GameManager {
         }
 
         current.setLastMoveSpaces(nrSpaces);
-        current.prepararMovimento();
         current.setPosicaoSemGuardarHistorico(novaPos);
 
         return true;
