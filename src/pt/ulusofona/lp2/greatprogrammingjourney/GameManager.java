@@ -592,7 +592,7 @@ public class GameManager {
             boolean elim = Boolean.parseBoolean(parts[5]);
 
             Player p = new Player(id, name, langs, color);
-            p.setPosicao(pos);
+            p.setPosicaoSemGuardarHistorico(pos);
             p.setEliminado(elim);
 
             if (parts.length >= 7 && !parts[6].isEmpty()) {
