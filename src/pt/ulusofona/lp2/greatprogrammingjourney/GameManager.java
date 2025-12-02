@@ -104,17 +104,6 @@ public class GameManager {
 
         allPlayers.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
 
-        int maxId = -1;
-        int maxIdIndex = 0;
-        for (int i = 0; i < players.size(); i++) {
-            int playerId = Integer.parseInt(players.get(i).getId());
-            if (playerId > maxId) {
-                maxId = playerId;
-                maxIdIndex = i;
-            }
-        }
-        currentPlayerIndex = maxIdIndex;
-
         board.setTamanhoTabuleiro(worldSize);
 
         if (abyssesAndTools != null) {
