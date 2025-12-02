@@ -33,13 +33,13 @@ public class GameManager {
 
     public static String toolName(int id) {
         switch (id) {
-            case 0: return "HeranÃ§a";
-            case 1: return "ProgramaÃ§Ã£o Funcional";
-            case 2: return "Testes UnitÃ¡rios";
-            case 3: return "Tratamento de ExcepÃ§Ãµes";
+            case 0: return "Herança";
+            case 1: return "Programação Funcional";
+            case 2: return "Testes Unitários";
+            case 3: return "Tratamento de Excepções";
             case 4: return "IDE";
             case 5: return "Ajuda do Professor";
-            default: return "T" + id;
+            default: return "Desconhecida";
         }
     }
 
