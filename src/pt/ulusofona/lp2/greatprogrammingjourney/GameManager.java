@@ -49,13 +49,14 @@ public class GameManager {
 
 
 
+
+
     public boolean createInitialBoard(String[][] playerInfo, int worldSize, String[][] abyssesAndTools) {
         resetGame();
 
         if (playerInfo == null || worldSize < 2) {
             return false;
         }
-
 
         if (playerInfo.length < 2 || playerInfo.length > 4) {
             return false;
@@ -101,8 +102,18 @@ public class GameManager {
             allPlayers.add(newPlayer);
         }
 
-        players.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
         allPlayers.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
+
+        int maxId = -1;
+        int maxIdIndex = 0;
+        for (int i = 0; i < players.size(); i++) {
+            int playerId = Integer.parseInt(players.get(i).getId());
+            if (playerId > maxId) {
+                maxId = playerId;
+                maxIdIndex = i;
+            }
+        }
+        currentPlayerIndex = maxIdIndex;
 
         board.setTamanhoTabuleiro(worldSize);
 
@@ -125,14 +136,11 @@ public class GameManager {
                     return false;
                 }
 
-                // VALIDAR SUBTIPOs INVÁLIDOS
-                if (type == 0) {  // Abyss
-                    // Subtipos válidos de abismo: 0-9
+                if (type == 0) {
                     if (subtype < 0 || subtype > 9) {
                         return false;
                     }
-                } else if (type == 1) {  // Tool
-                    // Subtipos válidos de ferramenta: 0-5
+                } else if (type == 1) {
                     if (subtype < 0 || subtype > 5) {
                         return false;
                     }
@@ -309,13 +317,19 @@ public class GameManager {
 
     public int getCurrentPlayerID() {
         if (players.isEmpty()) {
+
             return -1;
         }
         normalizeCurrentIndex();
+
         Player cur = players.get(currentPlayerIndex);
+
         try {
-            return Integer.parseInt(cur.getId());
+            int id = Integer.parseInt(cur.getId());
+
+            return id;
         } catch (NumberFormatException e) {
+
             return -1;
         }
     }
