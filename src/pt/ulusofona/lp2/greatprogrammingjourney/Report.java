@@ -23,12 +23,30 @@ public class Report {
         results.add(String.valueOf(nrTurnos));
         results.add("");
 
+
         String vencedor = "Nenhum";
         int maxPos = 0;
+        Player winner = null;
+
         for (Player p : players) {
-            if (!p.isEliminado() && p.getPosicao() > maxPos) {
-                maxPos = p.getPosicao();
-                vencedor = p.getNome();
+            if (!p.isEliminado() && p.getPosicao() >= boardSize) {
+                if (winner == null || p.getPosicao() > maxPos) {
+                    maxPos = p.getPosicao();
+                    vencedor = p.getNome();
+                    winner = p;
+                } else if (p.getPosicao() == maxPos) {
+
+                    try {
+                        int currentId = Integer.parseInt(p.getId());
+                        int winnerId = Integer.parseInt(winner.getId());
+                        if (currentId < winnerId) {
+                            vencedor = p.getNome();
+                            winner = p;
+                        }
+                    } catch (NumberFormatException e) {
+
+                    }
+                }
             }
         }
 
@@ -46,7 +64,13 @@ public class Report {
 
         restantes.sort(Comparator
                 .comparingInt(Player::getPosicao).reversed()
-                .thenComparingInt(p -> Integer.parseInt(p.getId()))
+                .thenComparingInt(p -> {
+                    try {
+                        return Integer.parseInt(p.getId());
+                    } catch (NumberFormatException e) {
+                        return 0;
+                    }
+                })
         );
 
         results.add("RESTANTES");

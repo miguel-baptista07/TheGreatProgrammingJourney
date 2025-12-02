@@ -350,8 +350,9 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
+
         if (current.isPreso()) {
-            return true;
+            return false;
         }
 
         int maxMovement = 6;
@@ -379,7 +380,7 @@ public class GameManager {
         }
 
         current.setLastMoveSpaces(nrSpaces);
-        current.setPosicaoSemGuardarHistorico(novaPos);
+        current.setPosicao(novaPos);
 
         return true;
     }
@@ -394,16 +395,17 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
+
         if (current.isPreso()) {
             current.setPreso(false);
-            turnCounter++;
             advanceToNextAlive();
-            return "Jogador libertado do loop infinito";
+            return null;
         }
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
 
         String message = null;
+
 
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
@@ -416,11 +418,13 @@ public class GameManager {
             }
         }
 
+
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
                 if (msg != null) {
                     message = msg;
+                    break;
                 }
             }
         }
@@ -428,10 +432,6 @@ public class GameManager {
         checkGameOverCondition();
         turnCounter++;
         advanceToNextAlive();
-
-        if (message != null && message.contains("anulado por")) {
-            current.setFerramentaAtiva(null);
-        }
 
         if (players.isEmpty()) {
             gameOver = true;

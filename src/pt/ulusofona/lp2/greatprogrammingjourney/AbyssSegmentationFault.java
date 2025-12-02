@@ -17,9 +17,11 @@ public class AbyssSegmentationFault extends AbyssBase {
 
         List<Player> playersHere = manager.getPlayersAtPosition(position);
 
+
         if (playersHere.size() < 2) {
             return "Caiu no abismo Segmentation Fault, mas está sozinho (nada acontece).";
         }
+
 
         for (Player p : playersHere) {
             if (!p.isEliminado()) {
