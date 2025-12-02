@@ -348,9 +348,10 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
+
         if (current.isPreso()) {
             current.setPreso(false);
-            return false;
+            return true;
         }
 
         int maxMovement = 6;
