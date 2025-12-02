@@ -82,7 +82,7 @@ public class Player {
         if (posicao < 1) {
             posicao = 1;
         }
-        this.posicaoAnteriorMovimento = this.posicao;  // ✅ Guarda posição anterior
+        this.posicaoAnteriorMovimento = this.posicao;
         this.posicao = posicao;
         this.posicaoHistorico.add(this.posicao);
         if (this.posicaoHistorico.size() > 10) {

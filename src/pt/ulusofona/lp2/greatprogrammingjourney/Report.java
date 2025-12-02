@@ -23,54 +23,41 @@ public class Report {
         results.add(String.valueOf(nrTurnos));
         results.add("");
 
-
-        String vencedor = "Nenhum";
+        Player vencedor = null;
         int maxPos = 0;
-        Player winner = null;
-
         for (Player p : players) {
             if (!p.isEliminado() && p.getPosicao() >= boardSize) {
-                if (winner == null || p.getPosicao() > maxPos) {
+                if (p.getPosicao() > maxPos) {
                     maxPos = p.getPosicao();
-                    vencedor = p.getNome();
-                    winner = p;
-                } else if (p.getPosicao() == maxPos) {
+                    vencedor = p;
+                }
+            }
+        }
 
-                    try {
-                        int currentId = Integer.parseInt(p.getId());
-                        int winnerId = Integer.parseInt(winner.getId());
-                        if (currentId < winnerId) {
-                            vencedor = p.getNome();
-                            winner = p;
-                        }
-                    } catch (NumberFormatException e) {
-
-                    }
+        if (vencedor == null) {
+            for (Player p : players) {
+                if (!p.isEliminado() && p.getPosicao() > maxPos) {
+                    maxPos = p.getPosicao();
+                    vencedor = p;
                 }
             }
         }
 
         results.add("VENCEDOR");
-        results.add(vencedor);
+        results.add(vencedor != null ? vencedor.getNome() : "Nenhum");
         results.add("");
 
         List<Player> restantes = new ArrayList<>();
         for (Player p : players) {
-            if (!p.isEliminado() && p.getPosicao() < boardSize) {
+            if (p != vencedor) {
                 restantes.add(p);
             }
         }
 
-
         restantes.sort(Comparator
-                .comparingInt(Player::getPosicao).reversed()
-                .thenComparingInt(p -> {
-                    try {
-                        return Integer.parseInt(p.getId());
-                    } catch (NumberFormatException e) {
-                        return 0;
-                    }
-                })
+                .comparing(Player::isEliminado).reversed()
+                .thenComparingInt(Player::getPosicao).reversed()
+                .thenComparingInt(p -> Integer.parseInt(p.getId()))
         );
 
         results.add("RESTANTES");

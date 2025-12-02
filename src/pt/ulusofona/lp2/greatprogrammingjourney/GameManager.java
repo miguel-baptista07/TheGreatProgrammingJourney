@@ -350,8 +350,8 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
-
         if (current.isPreso()) {
+            current.setPreso(false);
             return false;
         }
 
@@ -380,7 +380,7 @@ public class GameManager {
         }
 
         current.setLastMoveSpaces(nrSpaces);
-        current.setPosicao(novaPos);
+        current.setPosicaoSemGuardarHistorico(novaPos);
 
         return true;
     }
@@ -395,17 +395,9 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
-
-        if (current.isPreso()) {
-            current.setPreso(false);
-            advanceToNextAlive();
-            return null;
-        }
-
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
 
         String message = null;
-
 
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
@@ -418,13 +410,11 @@ public class GameManager {
             }
         }
 
-
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
                 if (msg != null) {
                     message = msg;
-                    break;
                 }
             }
         }
@@ -454,6 +444,10 @@ public class GameManager {
                 gameOver = true;
                 return;
             }
+        }
+
+        if (players.size() <= 1) {
+            gameOver = true;
         }
     }
 
@@ -649,7 +643,7 @@ public class GameManager {
 
     public JPanel getAuthorsPanel() {
         JPanel panel = new JPanel();
-        panel.add(new JLabel("Desenvolvido por: Miguel Baptista e GonÃ§alo Almeida"));
+        panel.add(new JLabel("Desenvolvido por: Miguel Baptista e Goncalo Almeida"));
         return panel;
     }
 
