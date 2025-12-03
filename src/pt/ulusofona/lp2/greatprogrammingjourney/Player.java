@@ -43,6 +43,9 @@ public class Player {
         this.posicaoHistorico = new ArrayList<>();
         this.posicaoHistorico.add(1);
     }
+    public void setPosicaoAnteriorMovimento(int posicao) {
+        this.posicaoAnteriorMovimento = posicao;
+    }
 
     private String formatarLinguagens(String linguagens) {
         if (linguagens == null || linguagens.trim().isEmpty()) {

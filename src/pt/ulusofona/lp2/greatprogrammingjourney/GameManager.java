@@ -335,15 +335,7 @@ public class GameManager {
 
 
     public boolean moveCurrentPlayer(int nrSpaces) {
-        if (gameOver) {
-            return false;
-        }
-
-        if (nrSpaces < 1 || nrSpaces > 6) {
-            return false;
-        }
-
-        if (players.isEmpty()) {
+        if (gameOver || players.isEmpty() || nrSpaces < 1 || nrSpaces > 6) {
             return false;
         }
 
@@ -351,35 +343,37 @@ public class GameManager {
         Player current = players.get(currentPlayerIndex);
 
         if (current.isPreso()) {
+            turnCounter++;
+            advanceToNextAlive();
             return false;
         }
 
-        int maxMovement = 6;
         String firstLang = current.getPrimeiraLinguagem();
+        int maxMove = firstLang.equalsIgnoreCase("Assembly") ? 2 :
+                firstLang.equalsIgnoreCase("C") ? 3 : 6;
 
-        if (firstLang.equalsIgnoreCase("Assembly")) {
-            maxMovement = 2;
-        } else if (firstLang.equalsIgnoreCase("C")) {
-            maxMovement = 3;
-        }
-
-        if (nrSpaces > maxMovement) {
+        if (nrSpaces > maxMove) {
+            turnCounter++;
+            advanceToNextAlive();
             return false;
         }
 
-        current.prepararMovimento();
+        int oldPos = current.getPosicao();
 
-        int novaPos = current.getPosicao() + nrSpaces;
+        current.setPosicaoAnteriorMovimento(oldPos);
+
+        int novaPos = oldPos + nrSpaces;
         if (novaPos > board.getTamanhoTabuleiro()) {
-            int excesso = novaPos - board.getTamanhoTabuleiro();
-            novaPos = board.getTamanhoTabuleiro() - excesso;
-            if (novaPos < 1) {
-                novaPos = 1;
-            }
+            novaPos = board.getTamanhoTabuleiro();  // Para na meta, não rebate
         }
 
         current.setLastMoveSpaces(nrSpaces);
-        current.setPosicaoSemGuardarHistorico(novaPos);
+        current.setPosicao(novaPos);
+
+        reactToAbyssOrTool();
+
+        checkGameOverCondition();
+        advanceToNextAlive();
 
         return true;
     }
@@ -391,46 +385,40 @@ public class GameManager {
 
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
+        int pos = current.getPosicao();
 
-        if (current.isPreso()) {
-            current.setPreso(false);
-            turnCounter++;
-            advanceToNextAlive();
-            return null;
+
+        for (Player p : getPlayersAtPosition(pos)) {
+            if (p != current && p.isPreso()) {
+                p.setPreso(false);
+            }
         }
 
-        List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
-
+        List<BoardElement> elements = board.getAllElementsAt(pos);
         String message = null;
+
 
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
-                if (message == null) {
-                    message = msg;
-                } else {
-                    message = message + " " + msg;
-                }
+                if (message == null) message = msg;
+                else if (msg != null && !msg.isEmpty()) message += " " + msg;
             }
         }
 
-        for (BoardElement el : elements) {
-            if (el.isAbyss()) {
-                String msg = el.applyEffect(current, this);
-                if (msg != null) {
-                    message = msg;
+
+        if (!current.isEliminado()) {
+            for (BoardElement el : elements) {
+                if (el.isAbyss()) {
+                    String msg = el.applyEffect(current, this);
+                    if (msg != null) {
+                        message = msg;
+                    }
                 }
             }
         }
 
         turnCounter++;
-        checkGameOverCondition();
-        advanceToNextAlive();
-
-        if (players.isEmpty()) {
-            gameOver = true;
-        }
-
         return message;
     }
 
@@ -449,7 +437,6 @@ public class GameManager {
                 return;
             }
         }
-
         if (players.size() <= 1) {
             gameOver = true;
         }
@@ -655,9 +642,10 @@ public class GameManager {
         return new HashMap<>();
     }
 
+
     public List<Player> getPlayersAtPosition(int pos) {
         List<Player> res = new ArrayList<>();
-        for (Player p : players) {
+        for (Player p : allPlayers) {
             if (p.getPosicao() == pos) {
                 res.add(p);
             }
