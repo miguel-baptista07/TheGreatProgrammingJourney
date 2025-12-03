@@ -12,8 +12,6 @@ public class AbyssBSOD extends AbyssBase {
             consumeTool(player, 5);
             return "BSOD anulado por " + toolName(5);
         }
-
-
         manager.eliminatePlayer(player);
         return "Caiu no abismo BSOD: jogador derrotado.";
     }

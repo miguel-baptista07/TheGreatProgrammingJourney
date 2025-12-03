@@ -351,7 +351,6 @@ public class GameManager {
         Player current = players.get(currentPlayerIndex);
 
         if (current.isPreso()) {
-            current.setPreso(false);
             return false;
         }
 
@@ -385,8 +384,6 @@ public class GameManager {
         return true;
     }
 
-
-
     public String reactToAbyssOrTool() {
         if (gameOver || players.isEmpty()) {
             return null;
@@ -394,6 +391,13 @@ public class GameManager {
 
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
+
+        if (current.isPreso()) {
+            current.setPreso(false);
+            turnCounter++;
+            advanceToNextAlive();
+            return null;
+        }
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
 
@@ -419,8 +423,8 @@ public class GameManager {
             }
         }
 
-        checkGameOverCondition();
         turnCounter++;
+        checkGameOverCondition();
         advanceToNextAlive();
 
         if (players.isEmpty()) {
