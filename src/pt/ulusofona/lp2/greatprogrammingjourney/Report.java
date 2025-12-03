@@ -24,12 +24,13 @@ public class Report {
         results.add("");
 
         Player vencedor = null;
-        int maxPos = -1;
-
+        int maxPos = 0;
         for (Player p : players) {
-            if (!p.isEliminado() && p.getPosicao() >= boardSize && p.getPosicao() > maxPos) {
-                maxPos = p.getPosicao();
-                vencedor = p;
+            if (!p.isEliminado() && p.getPosicao() >= boardSize) {
+                if (p.getPosicao() > maxPos) {
+                    maxPos = p.getPosicao();
+                    vencedor = p;
+                }
             }
         }
 
@@ -46,12 +47,17 @@ public class Report {
         results.add(vencedor != null ? vencedor.getNome() : "Nenhum");
         results.add("");
 
-        List<Player> restantes = new ArrayList<>(players);
-        if (vencedor != null) restantes.remove(vencedor);
+        List<Player> restantes = new ArrayList<>();
+        for (Player p : players) {
+            if (p != vencedor) {
+                restantes.add(p);
+            }
+        }
 
-        restantes.sort(
-                Comparator.comparingInt(Player::getPosicao).reversed()
-                        .thenComparing(Player::getNome)
+        restantes.sort(Comparator
+                .comparing(Player::isEliminado).reversed()
+                .thenComparingInt(Player::getPosicao).reversed()
+                .thenComparingInt(p -> Integer.parseInt(p.getId()))
         );
 
         results.add("RESTANTES");

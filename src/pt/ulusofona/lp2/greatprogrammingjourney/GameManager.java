@@ -275,22 +275,19 @@ public class GameManager {
             return null;
         }
 
-
         List<String> ids = new ArrayList<>();
-        for (Player p : players) {
+        for (Player p : allPlayers) {
             if (p.getPosicao() == position) {
                 ids.add(p.getId());
             }
         }
         String joined = ids.isEmpty() ? "" : String.join(",", ids);
 
-
         String elementName = "";
         BoardElement e = board.getElementAt(position);
         if (e != null) {
             elementName = e.getName();
         }
-
 
         String type = "";
         if (e != null) {
@@ -335,7 +332,15 @@ public class GameManager {
 
 
     public boolean moveCurrentPlayer(int nrSpaces) {
-        if (gameOver || players.isEmpty() || nrSpaces < 1 || nrSpaces > 6) {
+        if (gameOver) {
+            return false;
+        }
+
+        if (nrSpaces < 1 || nrSpaces > 6) {
+            return false;
+        }
+
+        if (players.isEmpty()) {
             return false;
         }
 
@@ -343,37 +348,35 @@ public class GameManager {
         Player current = players.get(currentPlayerIndex);
 
         if (current.isPreso()) {
-            turnCounter++;
-            advanceToNextAlive();
             return false;
         }
 
+        int maxMovement = 6;
         String firstLang = current.getPrimeiraLinguagem();
-        int maxMove = firstLang.equalsIgnoreCase("Assembly") ? 2 :
-                firstLang.equalsIgnoreCase("C") ? 3 : 6;
 
-        if (nrSpaces > maxMove) {
-            turnCounter++;
-            advanceToNextAlive();
+        if (firstLang.equalsIgnoreCase("Assembly")) {
+            maxMovement = 2;
+        } else if (firstLang.equalsIgnoreCase("C")) {
+            maxMovement = 3;
+        }
+
+        if (nrSpaces > maxMovement) {
             return false;
         }
 
-        int oldPos = current.getPosicao();
+        current.prepararMovimento();
 
-        current.setPosicaoAnteriorMovimento(oldPos);
-
-        int novaPos = oldPos + nrSpaces;
+        int novaPos = current.getPosicao() + nrSpaces;
         if (novaPos > board.getTamanhoTabuleiro()) {
-            novaPos = board.getTamanhoTabuleiro();  // Para na meta, não rebate
+            int excesso = novaPos - board.getTamanhoTabuleiro();
+            novaPos = board.getTamanhoTabuleiro() - excesso;
+            if (novaPos < 1) {
+                novaPos = 1;
+            }
         }
 
         current.setLastMoveSpaces(nrSpaces);
-        current.setPosicao(novaPos);
-
-        reactToAbyssOrTool();
-
-        checkGameOverCondition();
-        advanceToNextAlive();
+        current.setPosicaoSemGuardarHistorico(novaPos);
 
         return true;
     }
@@ -385,40 +388,45 @@ public class GameManager {
 
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
-        int pos = current.getPosicao();
 
-
-        for (Player p : getPlayersAtPosition(pos)) {
-            if (p != current && p.isPreso()) {
-                p.setPreso(false);
-            }
+        if (current.isPreso()) {
+            current.setPreso(false);
+            turnCounter++;
+            advanceToNextAlive();
+            return "Jogador libertado do Infinite Loop";
         }
 
-        List<BoardElement> elements = board.getAllElementsAt(pos);
+        List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
-
 
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
-                if (message == null) message = msg;
-                else if (msg != null && !msg.isEmpty()) message += " " + msg;
+                if (message == null) {
+                    message = msg;
+                } else {
+                    message = message + " " + msg;
+                }
             }
         }
 
-
-        if (!current.isEliminado()) {
-            for (BoardElement el : elements) {
-                if (el.isAbyss()) {
-                    String msg = el.applyEffect(current, this);
-                    if (msg != null) {
-                        message = msg;
-                    }
+        for (BoardElement el : elements) {
+            if (el.isAbyss()) {
+                String msg = el.applyEffect(current, this);
+                if (msg != null) {
+                    message = msg;
                 }
             }
         }
 
         turnCounter++;
+        checkGameOverCondition();
+        advanceToNextAlive();
+
+        if (players.isEmpty()) {
+            gameOver = true;
+        }
+
         return message;
     }
 
@@ -437,6 +445,7 @@ public class GameManager {
                 return;
             }
         }
+
         if (players.size() <= 1) {
             gameOver = true;
         }
@@ -642,10 +651,9 @@ public class GameManager {
         return new HashMap<>();
     }
 
-
     public List<Player> getPlayersAtPosition(int pos) {
         List<Player> res = new ArrayList<>();
-        for (Player p : allPlayers) {
+        for (Player p : players) {
             if (p.getPosicao() == pos) {
                 res.add(p);
             }
