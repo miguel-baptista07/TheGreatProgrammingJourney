@@ -421,7 +421,9 @@ public class GameManager {
 
         turnCounter++;
         checkGameOverCondition();
-        advanceToNextAlive();
+        if (!current.isEliminado() && players.contains(current)) {
+            advanceToNextAlive();
+        }
 
         if (players.isEmpty()) {
             gameOver = true;
