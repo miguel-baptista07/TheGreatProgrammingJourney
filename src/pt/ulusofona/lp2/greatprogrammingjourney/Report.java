@@ -57,7 +57,7 @@ public class Report {
         restantes.sort(Comparator
                 .comparing(Player::isEliminado).reversed()
                 .thenComparingInt(Player::getPosicao).reversed()
-                .thenComparingInt(p -> Integer.parseInt(p.getId()))
+                .thenComparing(p -> p.getNome())
         );
 
         results.add("RESTANTES");
