@@ -54,10 +54,16 @@ public class Report {
             }
         }
 
+        java.util.Map<Player, Integer> creationOrder = new java.util.HashMap<>();
+        int order = 0;
+        for (Player p : players) {
+            creationOrder.put(p, order++);
+        }
+
         restantes.sort(Comparator
                 .comparing(Player::isEliminado)
                 .thenComparingInt(Player::getPosicao).reversed()
-                .thenComparing(p -> p.getNome())
+                .thenComparing(p -> creationOrder.getOrDefault(p, Integer.MAX_VALUE))
         );
 
         results.add("RESTANTES");

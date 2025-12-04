@@ -366,10 +366,12 @@ public class GameManager {
 
         current.prepararMovimento();
 
+        int boardSize = board.getTamanhoTabuleiro();
         int novaPos = current.getPosicao() + nrSpaces;
-        if (novaPos > board.getTamanhoTabuleiro()) {
-            int excesso = novaPos - board.getTamanhoTabuleiro();
-            novaPos = board.getTamanhoTabuleiro() - excesso;
+
+        if (novaPos > boardSize) {
+            int excesso = novaPos - boardSize;
+            novaPos = boardSize - excesso;
             if (novaPos < 1) {
                 novaPos = 1;
             }
@@ -421,10 +423,6 @@ public class GameManager {
 
         turnCounter++;
         checkGameOverCondition();
-        
-        // Sempre avançamos para o próximo jogador após processar abismos/ferramentas
-        // Se o jogador foi eliminado, o eliminatePlayer já ajustou o índice,
-        // mas ainda precisamos de normalizar e avançar
         normalizeCurrentIndex();
         advanceToNextAlive();
 
@@ -675,18 +673,11 @@ public class GameManager {
 
         int idx = players.indexOf(p);
         if (idx != -1) {
-            // Se o jogador eliminado está antes ou no índice actual,
-            // precisamos ajustar o índice antes de remover
             if (idx < currentPlayerIndex) {
                 currentPlayerIndex--;
-            } else if (idx == currentPlayerIndex) {
-                // Se eliminamos o jogador actual, o próximo jogador
-                // vai ocupar esta posição após o remove, então não
-                // precisamos de ajustar (o índice já aponta para o próximo)
             }
             players.remove(idx);
-            
-            // Normalizar o índice após remover
+
             if (players.isEmpty()) {
                 currentPlayerIndex = 0;
                 gameOver = true;
