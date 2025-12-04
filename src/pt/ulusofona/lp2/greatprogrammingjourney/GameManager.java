@@ -419,14 +419,9 @@ public class GameManager {
             }
         }
 
-        if (current.isEliminado() || !players.contains(current)) {
-            turnCounter++;
-            checkGameOverCondition();
-        } else {
-            turnCounter++;
-            checkGameOverCondition();
-            advanceToNextAlive();
-        }
+        turnCounter++;
+        checkGameOverCondition();
+        advanceToNextAlive();
 
         if (players.isEmpty()) {
             gameOver = true;
@@ -672,7 +667,17 @@ public class GameManager {
         }
 
         p.setEliminado(true);
-        players.remove(p);
+
+        int idx = players.indexOf(p);
+        if (idx != -1) {
+            if (idx <= currentPlayerIndex) {
+                currentPlayerIndex--;
+                if (currentPlayerIndex < 0) {
+                    currentPlayerIndex = 0;
+                }
+            }
+            players.remove(idx);
+        }
 
         if (players.isEmpty()) {
             currentPlayerIndex = 0;
