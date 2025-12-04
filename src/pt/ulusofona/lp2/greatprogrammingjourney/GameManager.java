@@ -419,9 +419,14 @@ public class GameManager {
             }
         }
 
-        turnCounter++;
-        checkGameOverCondition();
-        advanceToNextAlive();
+        if (current.isEliminado() || !players.contains(current)) {
+            turnCounter++;
+            checkGameOverCondition();
+        } else {
+            turnCounter++;
+            checkGameOverCondition();
+            advanceToNextAlive();
+        }
 
         if (players.isEmpty()) {
             gameOver = true;
