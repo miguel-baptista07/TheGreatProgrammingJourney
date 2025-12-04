@@ -410,26 +410,23 @@ public class GameManager {
             }
         }
 
-        boolean playerWasTrapped = false;
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
                 if (msg != null) {
                     message = msg;
                 }
-                if (current.isPreso()) {
-                    playerWasTrapped = true;
-                }
             }
         }
 
         turnCounter++;
         checkGameOverCondition();
-        if (!current.isEliminado() && players.contains(current)) {
-            if (!playerWasTrapped) {
-                advanceToNextAlive();
-            }
-        }
+        
+        // Sempre avançamos para o próximo jogador após processar abismos/ferramentas
+        // Se o jogador foi eliminado, o eliminatePlayer já ajustou o índice,
+        // mas ainda precisamos de normalizar e avançar
+        normalizeCurrentIndex();
+        advanceToNextAlive();
 
         if (players.isEmpty()) {
             gameOver = true;
@@ -678,21 +675,25 @@ public class GameManager {
 
         int idx = players.indexOf(p);
         if (idx != -1) {
-            if (idx <= currentPlayerIndex) {
+            // Se o jogador eliminado está antes ou no índice actual,
+            // precisamos ajustar o índice antes de remover
+            if (idx < currentPlayerIndex) {
                 currentPlayerIndex--;
-                if (currentPlayerIndex < 0) {
-                    currentPlayerIndex = 0;
-                }
+            } else if (idx == currentPlayerIndex) {
+                // Se eliminamos o jogador actual, o próximo jogador
+                // vai ocupar esta posição após o remove, então não
+                // precisamos de ajustar (o índice já aponta para o próximo)
             }
             players.remove(idx);
-        }
-
-        if (players.isEmpty()) {
-            currentPlayerIndex = 0;
-            gameOver = true;
-        } else {
-            if (currentPlayerIndex >= players.size()) {
+            
+            // Normalizar o índice após remover
+            if (players.isEmpty()) {
                 currentPlayerIndex = 0;
+                gameOver = true;
+            } else {
+                if (currentPlayerIndex >= players.size()) {
+                    currentPlayerIndex = 0;
+                }
             }
         }
     }
