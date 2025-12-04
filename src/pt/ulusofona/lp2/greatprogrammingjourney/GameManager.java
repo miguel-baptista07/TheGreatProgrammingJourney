@@ -410,11 +410,15 @@ public class GameManager {
             }
         }
 
+        boolean playerWasTrapped = false;
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
                 if (msg != null) {
                     message = msg;
+                }
+                if (current.isPreso()) {
+                    playerWasTrapped = true;
                 }
             }
         }
@@ -422,7 +426,9 @@ public class GameManager {
         turnCounter++;
         checkGameOverCondition();
         if (!current.isEliminado() && players.contains(current)) {
-            advanceToNextAlive();
+            if (!playerWasTrapped) {
+                advanceToNextAlive();
+            }
         }
 
         if (players.isEmpty()) {
