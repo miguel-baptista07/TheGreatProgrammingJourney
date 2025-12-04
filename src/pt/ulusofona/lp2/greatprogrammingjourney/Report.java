@@ -60,6 +60,7 @@ public class Report {
             creationOrder.put(p, order++);
         }
 
+
         restantes.sort(Comparator
                 .comparing(Player::isEliminado)
                 .thenComparingInt(Player::getPosicao).reversed()

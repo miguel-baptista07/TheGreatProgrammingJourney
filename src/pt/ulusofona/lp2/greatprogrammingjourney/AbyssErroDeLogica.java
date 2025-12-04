@@ -12,6 +12,8 @@ public class AbyssErroDeLogica extends AbyssBase {
             consumeTool(player, 1);
             return "Logic Error anulado por " + toolName(1);
         }
+
+
         int move = player.getLastMoveSpaces() / 2;
         int novaPosicao = Math.max(1, player.getPosicao() - move);
         player.setPosicaoSemGuardarHistorico(novaPosicao);

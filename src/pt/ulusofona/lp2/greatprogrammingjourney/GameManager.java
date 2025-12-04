@@ -347,6 +347,7 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
+
         if (current.isPreso()) {
             return false;
         }
@@ -391,6 +392,7 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
+
         if (current.isPreso()) {
             current.setPreso(false);
             turnCounter++;
@@ -398,8 +400,10 @@ public class GameManager {
             return "Jogador libertado do Infinite Loop";
         }
 
+
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
+
 
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
@@ -412,6 +416,7 @@ public class GameManager {
             }
         }
 
+
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
@@ -421,10 +426,20 @@ public class GameManager {
             }
         }
 
+
         turnCounter++;
+
+
         checkGameOverCondition();
-        normalizeCurrentIndex();
+
+
+        if (currentPlayerIndex >= players.size()) {
+            currentPlayerIndex = 0;
+        }
+
+
         advanceToNextAlive();
+
 
         if (players.isEmpty()) {
             gameOver = true;
@@ -673,18 +688,21 @@ public class GameManager {
 
         int idx = players.indexOf(p);
         if (idx != -1) {
+
             if (idx < currentPlayerIndex) {
                 currentPlayerIndex--;
+            } else if (idx == currentPlayerIndex) {
+
+                if (currentPlayerIndex >= players.size() - 1) {
+                    currentPlayerIndex = 0;
+                }
             }
+
             players.remove(idx);
 
             if (players.isEmpty()) {
                 currentPlayerIndex = 0;
                 gameOver = true;
-            } else {
-                if (currentPlayerIndex >= players.size()) {
-                    currentPlayerIndex = 0;
-                }
             }
         }
     }

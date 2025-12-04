@@ -12,7 +12,10 @@ public class AbyssCicloInfinito extends AbyssBase {
             consumeTool(player, 1);
             return "Infinite Loop anulado por " + toolName(1);
         }
+
+        
         player.setPreso(true);
+
         return "Caiu no abismo Infinite Loop: jogador preso.";
     }
 }
