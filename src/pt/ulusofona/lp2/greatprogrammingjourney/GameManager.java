@@ -361,7 +361,6 @@ public class GameManager {
         if (firstLang == null) {
             firstLang = "";
         } else {
-            // Normalize: take the first token if multiple languages are present and trim whitespace
             firstLang = firstLang.split(";")[0].trim();
         }
 
@@ -381,7 +380,6 @@ public class GameManager {
         int novaPos = current.getPosicao() + nrSpaces;
 
         if (novaPos > boardSize) {
-            // Clamp to final square instead of bouncing back
             novaPos = boardSize;
         }
 
@@ -423,12 +421,9 @@ public class GameManager {
         }
         int boardSize = board.getTamanhoTabuleiro();
         int novaPos = current.getPosicao() + nrSpaces;
+
         if (novaPos > boardSize) {
-            int excesso = novaPos - boardSize;
-            novaPos = boardSize - excesso;
-            if (novaPos < 1) {
-                novaPos = 1;
-            }
+            novaPos = boardSize;
         }
         if (novaPos < 1 || novaPos > boardSize) {
             return "Resulting position out of bounds";
@@ -471,6 +466,12 @@ public class GameManager {
 
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
+                boolean isInfiniteLoop = el.getId() == 8;
+                boolean hadFunctionalTool = false;
+                if (isInfiniteLoop) {
+                    hadFunctionalTool = current.hasTool(1);
+                }
+
                 String msg = el.applyEffect(current, this);
                 if (msg != null) {
                     if (message == null) {
@@ -479,10 +480,22 @@ public class GameManager {
                         message = message + " " + msg;
                     }
                 }
+
+                if (isInfiniteLoop) {
+                    if (hadFunctionalTool) {
+                        if (!current.hasTool(1)) {
+                            current.setPreso(false);
+                        }
+                    } else {
+                        if (!current.isPreso()) {
+                            current.setPreso(true);
+                        }
+                    }
+                }
             }
         }
 
-        boolean currentEliminated = current.isEliminado() || !players.contains(current);
+         boolean currentEliminated = current.isEliminado() || !players.contains(current);
 
         turnCounter++;
 
@@ -679,16 +692,13 @@ public class GameManager {
             int toolsIndex = -1;
 
             if (parts.length >= 8) {
-                // current format
                 preso = Boolean.parseBoolean(parts[5]);
                 elim = Boolean.parseBoolean(parts[6]);
                 toolsIndex = 7;
             } else if (parts.length == 7) {
-                // older format: no preso, has eliminado and tools
                 elim = Boolean.parseBoolean(parts[5]);
                 toolsIndex = 6;
-            } else {
-                // minimal format: nothing else
+
             }
 
             Player p = new Player(id, name, langs, color);
