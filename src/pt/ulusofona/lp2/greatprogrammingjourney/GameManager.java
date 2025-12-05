@@ -17,7 +17,7 @@ public class GameManager {
         players = new ArrayList<>();
         allPlayers = new ArrayList<>();
         board = new Board();
-        currentPlayerIndex = 0;
+        currentPlayerIndex = -1;
         turnCounter = 0;
         gameOver = false;
     }
@@ -26,7 +26,7 @@ public class GameManager {
         players.clear();
         allPlayers.clear();
         board.clearElements();
-        currentPlayerIndex = 0;
+        currentPlayerIndex = -1;
         turnCounter = 0;
         gameOver = false;
     }
@@ -323,6 +323,10 @@ public class GameManager {
     private void normalizeCurrentIndex() {
         if (players.isEmpty()) {
             currentPlayerIndex = 0;
+            return;
+        }
+        if (currentPlayerIndex < 0) {
+            currentPlayerIndex = 0;
         }
         if (currentPlayerIndex >= players.size()) {
             currentPlayerIndex = 0;
@@ -421,15 +425,10 @@ public class GameManager {
             }
         }
 
-        boolean currentEliminated = current.isEliminado() || !players.contains(current);
-
         turnCounter++;
         checkGameOverCondition();
         normalizeCurrentIndex();
-
-        if (!currentEliminated) {
-            advanceToNextAlive();
-        }
+        advanceToNextAlive();
 
         if (players.isEmpty()) {
             gameOver = true;
