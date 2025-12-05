@@ -525,6 +525,7 @@ public class GameManager {
                         p.getLinguagens(),
                         p.getCor(),
                         String.valueOf(p.getPosicao()),
+                        String.valueOf(p.isPreso()),
                         String.valueOf(p.isEliminado()),
                         tools
                 )));
@@ -609,7 +610,7 @@ public class GameManager {
             }
 
             String[] parts = line.split(";", -1);
-            if (parts.length < 6) {
+            if (parts.length < 7) {
                 throw new InvalidFileException("Invalid player line");
             }
 
@@ -625,14 +626,16 @@ public class GameManager {
                 throw new InvalidFileException("Invalid player position");
             }
 
-            boolean elim = Boolean.parseBoolean(parts[5]);
+            boolean preso = Boolean.parseBoolean(parts[5]);
+            boolean elim = Boolean.parseBoolean(parts[6]);
 
             Player p = new Player(id, name, langs, color);
             p.setPosicaoSemGuardarHistorico(pos);
+            p.setPreso(preso);
             p.setEliminado(elim);
 
-            if (parts.length >= 7 && !parts[6].isEmpty()) {
-                for (String t : parts[6].split(",")) {
+            if (parts.length >= 8 && !parts[7].isEmpty()) {
+                for (String t : parts[7].split(",")) {
                     p.addTool(Integer.parseInt(t));
                 }
             }
