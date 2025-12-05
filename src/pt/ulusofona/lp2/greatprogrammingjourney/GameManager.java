@@ -427,8 +427,6 @@ public class GameManager {
         checkGameOverCondition();
         normalizeCurrentIndex();
 
-        // Avançamos apenas se o jogador actual se mantiver em jogo.
-        // Se foi eliminado (ex: BSOD), eliminatePlayer já ajustou o índice.
         if (!currentEliminated) {
             advanceToNextAlive();
         }
