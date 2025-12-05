@@ -104,6 +104,11 @@ public class GameManager {
 
         allPlayers.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
 
+        // Ensure the active players list follows the same sorted order and set the first current player
+        players.clear();
+        players.addAll(allPlayers);
+        currentPlayerIndex = 0;
+
         board.setTamanhoTabuleiro(worldSize);
 
         if (abyssesAndTools != null) {
@@ -303,7 +308,6 @@ public class GameManager {
 
     public int getCurrentPlayerID() {
         if (players.isEmpty()) {
-
             return -1;
         }
         normalizeCurrentIndex();
@@ -312,10 +316,8 @@ public class GameManager {
 
         try {
             int id = Integer.parseInt(cur.getId());
-
             return id;
         } catch (NumberFormatException e) {
-
             return -1;
         }
     }
@@ -393,42 +395,79 @@ public class GameManager {
         }
 
         normalizeCurrentIndex();
-        Player current = players.get(currentPlayerIndex);
+        // Capture initial index and player reference to make deterministic decisions
+        int initialIndex = currentPlayerIndex;
+        Player current = players.get(initialIndex);
 
+        // If player is in jail (Infinite Loop) they lose this turn: free them, advance and count the turn
         if (current.isPreso()) {
             current.setPreso(false);
+            // Count this player's turn as consumed
             turnCounter++;
-            advanceToNextAlive();
+            // Advance to next alive player (wrap safely)
+            if (!players.isEmpty()) {
+                currentPlayerIndex = (initialIndex + 1) % players.size();
+            }
+            checkGameOverCondition();
             return "Jogador libertado do Infinite Loop";
         }
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
 
+        // First apply non-abyss effects (tools)
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
                 if (message == null) {
                     message = msg;
-                } else {
+                } else if (msg != null) {
                     message = message + " " + msg;
                 }
             }
         }
 
+        // Then apply abyss effects
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
                 if (msg != null) {
-                    message = msg;
+                    if (message == null) {
+                        message = msg;
+                    } else {
+                        message = message + " " + msg;
+                    }
                 }
             }
         }
 
+        // Determine if current player was eliminated by any effect
+        boolean currentEliminated = current.isEliminado() || !players.contains(current);
+
+        // A turn is completed now: increment turnCounter exactly once
         turnCounter++;
+
+        if (currentEliminated) {
+            // If eliminated, the eliminated player should have been removed by eliminatePlayer(...)
+            // After removal, the next player lives at the same index where the eliminated player was
+            if (players.isEmpty()) {
+                gameOver = true;
+            } else {
+                if (initialIndex >= players.size()) {
+                    currentPlayerIndex = 0;
+                } else {
+                    currentPlayerIndex = initialIndex;
+                }
+            }
+        } else {
+            // Not eliminated: next player's turn
+            if (!players.isEmpty()) {
+                currentPlayerIndex = (initialIndex + 1) % players.size();
+            }
+        }
+
         checkGameOverCondition();
         normalizeCurrentIndex();
-        advanceToNextAlive();
 
         if (players.isEmpty()) {
             gameOver = true;
