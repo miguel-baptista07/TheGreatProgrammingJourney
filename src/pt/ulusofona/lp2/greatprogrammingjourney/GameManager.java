@@ -358,6 +358,12 @@ public class GameManager {
 
         int maxMovement = 6;
         String firstLang = current.getPrimeiraLinguagem();
+        if (firstLang == null) {
+            firstLang = "";
+        } else {
+            // Normalize: take the first token if multiple languages are present and trim whitespace
+            firstLang = firstLang.split(";")[0].trim();
+        }
 
         if (firstLang.equalsIgnoreCase("Assembly")) {
             maxMovement = 2;
@@ -386,6 +392,51 @@ public class GameManager {
         current.setPosicaoSemGuardarHistorico(novaPos);
 
         return true;
+    }
+
+    public String canCurrentPlayerMove(int nrSpaces) {
+        if (gameOver) {
+            return "Game over";
+        }
+        if (nrSpaces < 1 || nrSpaces > 6) {
+            return "Número inválido de espaços";
+        }
+        if (players.isEmpty()) {
+            return "Sem Jogadores";
+        }
+        normalizeCurrentIndex();
+        Player current = players.get(currentPlayerIndex);
+        if (current.isPreso()) {
+            return "Jogador está preso";
+        }
+        String firstLang = current.getPrimeiraLinguagem();
+        if (firstLang == null) {
+            firstLang = "";
+        } else {
+            firstLang = firstLang.split(";")[0].trim();
+        }
+        int maxMovement = 6;
+        if (firstLang.equalsIgnoreCase("Assembly")) {
+            maxMovement = 2;
+        } else if (firstLang.equalsIgnoreCase("C")) {
+            maxMovement = 3;
+        }
+        if (nrSpaces > maxMovement) {
+            return "Exceeds max movement for language (max=" + maxMovement + ")";
+        }
+        int boardSize = board.getTamanhoTabuleiro();
+        int novaPos = current.getPosicao() + nrSpaces;
+        if (novaPos > boardSize) {
+            int excesso = novaPos - boardSize;
+            novaPos = boardSize - excesso;
+            if (novaPos < 1) {
+                novaPos = 1;
+            }
+        }
+        if (novaPos < 1 || novaPos > boardSize) {
+            return "Resulting position out of bounds";
+        }
+        return "OK";
     }
 
     public String reactToAbyssOrTool() {
