@@ -687,19 +687,28 @@ public class GameManager {
                 throw new InvalidFileException("Invalid player position");
             }
 
+            // Support multiple save formats:
+            // - legacy minimal: id;name;langs;color;pos
+            // - older with eliminado and tools: id;name;langs;color;pos;eliminado;tools (7 fields)
+            // - current with preso, eliminado, tools: id;name;langs;color;pos;preso;eliminado;tools (8 fields)
             boolean preso = false;
             boolean elim = false;
             int toolsIndex = -1;
 
             if (parts.length >= 8) {
+                // current format with preso field
                 preso = Boolean.parseBoolean(parts[5]);
                 elim = Boolean.parseBoolean(parts[6]);
                 toolsIndex = 7;
             } else if (parts.length == 7) {
+                // older format: has eliminado and tools, no preso
                 elim = Boolean.parseBoolean(parts[5]);
                 toolsIndex = 6;
-
+            } else if (parts.length == 6) {
+                // another older format: id;name;langs;color;pos;eliminado
+                elim = Boolean.parseBoolean(parts[5]);
             }
+            // else: parts.length == 5 is minimal format with no extra fields
 
             Player p = new Player(id, name, langs, color);
             p.setPosicaoSemGuardarHistorico(pos);

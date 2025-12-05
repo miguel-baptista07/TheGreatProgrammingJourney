@@ -64,7 +64,6 @@ public class Player {
     public int getPosicao() { return posicao; }
 
 
-
     public void setPosicaoSemGuardarHistorico(int posicao) {
         if (posicao < 1) {
             posicao = 1;
