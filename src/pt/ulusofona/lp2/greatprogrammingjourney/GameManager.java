@@ -381,11 +381,8 @@ public class GameManager {
         int novaPos = current.getPosicao() + nrSpaces;
 
         if (novaPos > boardSize) {
-            int excesso = novaPos - boardSize;
-            novaPos = boardSize - excesso;
-            if (novaPos < 1) {
-                novaPos = 1;
-            }
+            // Clamp to final square instead of bouncing back
+            novaPos = boardSize;
         }
 
         current.setLastMoveSpaces(nrSpaces);
@@ -661,7 +658,7 @@ public class GameManager {
             }
 
             String[] parts = line.split(";", -1);
-            if (parts.length < 7) {
+            if (parts.length < 5) {
                 throw new InvalidFileException("Invalid player line");
             }
 
@@ -677,17 +674,35 @@ public class GameManager {
                 throw new InvalidFileException("Invalid player position");
             }
 
-            boolean preso = Boolean.parseBoolean(parts[5]);
-            boolean elim = Boolean.parseBoolean(parts[6]);
+            boolean preso = false;
+            boolean elim = false;
+            int toolsIndex = -1;
+
+            if (parts.length >= 8) {
+                // current format
+                preso = Boolean.parseBoolean(parts[5]);
+                elim = Boolean.parseBoolean(parts[6]);
+                toolsIndex = 7;
+            } else if (parts.length == 7) {
+                // older format: no preso, has eliminado and tools
+                elim = Boolean.parseBoolean(parts[5]);
+                toolsIndex = 6;
+            } else {
+                // minimal format: nothing else
+            }
 
             Player p = new Player(id, name, langs, color);
             p.setPosicaoSemGuardarHistorico(pos);
             p.setPreso(preso);
             p.setEliminado(elim);
 
-            if (parts.length >= 8 && !parts[7].isEmpty()) {
-                for (String t : parts[7].split(",")) {
-                    p.addTool(Integer.parseInt(t));
+            if (toolsIndex != -1 && parts.length > toolsIndex && !parts[toolsIndex].isEmpty()) {
+                for (String t : parts[toolsIndex].split(",")) {
+                    try {
+                        p.addTool(Integer.parseInt(t));
+                    } catch (NumberFormatException ignored) {
+                        // skip invalid tool ids
+                    }
                 }
             }
 
