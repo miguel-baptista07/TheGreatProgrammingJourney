@@ -380,7 +380,11 @@ public class GameManager {
         int novaPos = current.getPosicao() + nrSpaces;
 
         if (novaPos > boardSize) {
-            novaPos = boardSize;
+            int excesso = novaPos - boardSize;
+            novaPos = boardSize - excesso;
+            if (novaPos < 1) {
+                novaPos = 1;
+            }
         }
 
         current.setLastMoveSpaces(nrSpaces);
@@ -447,7 +451,7 @@ public class GameManager {
                 currentPlayerIndex = (initialIndex + 1) % players.size();
             }
             checkGameOverCondition();
-            return "Jogador libertado do Infinite Loop";
+            return null;
         }
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
@@ -466,12 +470,6 @@ public class GameManager {
 
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
-                boolean isInfiniteLoop = el.getId() == 8;
-                boolean hadFunctionalTool = false;
-                if (isInfiniteLoop) {
-                    hadFunctionalTool = current.hasTool(1);
-                }
-
                 String msg = el.applyEffect(current, this);
                 if (msg != null) {
                     if (message == null) {
@@ -480,22 +478,11 @@ public class GameManager {
                         message = message + " " + msg;
                     }
                 }
-
-                if (isInfiniteLoop) {
-                    if (hadFunctionalTool) {
-                        if (!current.hasTool(1)) {
-                            current.setPreso(false);
-                        }
-                    } else {
-                        if (!current.isPreso()) {
-                            current.setPreso(true);
-                        }
-                    }
-                }
+                break;
             }
         }
 
-         boolean currentEliminated = current.isEliminado() || !players.contains(current);
+        boolean currentEliminated = current.isEliminado() || !players.contains(current);
 
         turnCounter++;
 
@@ -586,9 +573,8 @@ public class GameManager {
                         p.getLinguagens(),
                         p.getCor(),
                         String.valueOf(p.getPosicao()),
-                        String.valueOf(p.isPreso()),
                         String.valueOf(p.isEliminado()),
-                        tools
+                        tools.isEmpty() ? "" : tools
                 )));
                 bw.newLine();
             }
@@ -671,7 +657,7 @@ public class GameManager {
             }
 
             String[] parts = line.split(";", -1);
-            if (parts.length < 5) {
+            if (parts.length < 6) {
                 throw new InvalidFileException("Invalid player line");
             }
 
@@ -687,40 +673,17 @@ public class GameManager {
                 throw new InvalidFileException("Invalid player position");
             }
 
-            // Support multiple save formats:
-            // - legacy minimal: id;name;langs;color;pos
-            // - older with eliminado and tools: id;name;langs;color;pos;eliminado;tools (7 fields)
-            // - current with preso, eliminado, tools: id;name;langs;color;pos;preso;eliminado;tools (8 fields)
-            boolean preso = false;
-            boolean elim = false;
-            int toolsIndex = -1;
-
-            if (parts.length >= 8) {
-                // current format with preso field
-                preso = Boolean.parseBoolean(parts[5]);
-                elim = Boolean.parseBoolean(parts[6]);
-                toolsIndex = 7;
-            } else if (parts.length == 7) {
-                // older format: has eliminado and tools, no preso
-                elim = Boolean.parseBoolean(parts[5]);
-                toolsIndex = 6;
-            } else if (parts.length == 6) {
-                // another older format: id;name;langs;color;pos;eliminado
-                elim = Boolean.parseBoolean(parts[5]);
-            }
-            // else: parts.length == 5 is minimal format with no extra fields
+            boolean elim = Boolean.parseBoolean(parts[5]);
 
             Player p = new Player(id, name, langs, color);
             p.setPosicaoSemGuardarHistorico(pos);
-            p.setPreso(preso);
             p.setEliminado(elim);
 
-            if (toolsIndex != -1 && parts.length > toolsIndex && !parts[toolsIndex].isEmpty()) {
-                for (String t : parts[toolsIndex].split(",")) {
+            if (parts.length >= 7 && !parts[6].isEmpty()) {
+                for (String t : parts[6].split(",")) {
                     try {
                         p.addTool(Integer.parseInt(t));
                     } catch (NumberFormatException ignored) {
-                        // skip invalid tool ids
                     }
                 }
             }
