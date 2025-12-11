@@ -47,10 +47,6 @@ public class GameManager {
         return createInitialBoard(playerInfo, worldSize, null);
     }
 
-
-
-
-
     public boolean createInitialBoard(String[][] playerInfo, int worldSize, String[][] abyssesAndTools) {
         resetGame();
 
@@ -143,6 +139,10 @@ public class GameManager {
                     return false;
                 }
 
+                if (board.getElementAt(position) != null) {
+                    return false;
+                }
+
                 BoardElement elem = ElementsIOAdapter.toElement(type, subtype, position);
                 board.addElement(elem);
             }
@@ -150,6 +150,7 @@ public class GameManager {
 
         return true;
     }
+
 
     private boolean isValidColor(String cor) {
         return cor.equalsIgnoreCase("Purple") ||
@@ -749,11 +750,16 @@ public class GameManager {
                 throw new InvalidFileException("Element position out of bounds");
             }
 
+            if (elems.containsKey(pos)) {
+                throw new InvalidFileException("Duplicate element position");
+            }
+
             BoardElement be = ElementsIOAdapter.toElement(type, subtype, pos);
             elems.put(pos, be);
         }
         return elems;
     }
+
 
     public JPanel getAuthorsPanel() {
         JPanel panel = new JPanel();
