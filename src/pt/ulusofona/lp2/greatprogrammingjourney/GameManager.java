@@ -334,8 +334,6 @@ public class GameManager {
         }
     }
 
-
-
     public boolean moveCurrentPlayer(int nrSpaces) {
         if (gameOver) {
             return false;
