@@ -33,10 +33,10 @@ public class GameManager {
 
     public static String toolName(int id) {
         switch (id) {
-            case 0: return "HeranÃ§a";
-            case 1: return "ProgramaÃ§Ã£o Funcional";
-            case 2: return "Testes UnitÃ¡rios";
-            case 3: return "Tratamento de ExcepÃ§Ãµes";
+            case 0: return "Herança";
+            case 1: return "Programação Funcional";
+            case 2: return "Testes Unitários";
+            case 3: return "Tratamento de Excepções";
             case 4: return "IDE";
             case 5: return "Ajuda do Professor";
             default: return "Desconhecida";
@@ -334,6 +334,8 @@ public class GameManager {
         }
     }
 
+
+
     public boolean moveCurrentPlayer(int nrSpaces) {
         if (gameOver) {
             return false;
@@ -392,7 +394,7 @@ public class GameManager {
             return "Game over";
         }
         if (nrSpaces < 1 || nrSpaces > 6) {
-            return "NÃºmero invÃ¡lido de espaÃ§os";
+            return "Número inválido de espaços";
         }
         if (players.isEmpty()) {
             return "Sem Jogadores";
@@ -400,7 +402,7 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
         if (current.isPreso()) {
-            return "Jogador estÃ¡ preso";
+            return "Jogador está preso";
         }
         String firstLang = current.getPrimeiraLinguagem();
         if (firstLang == null) {
@@ -685,28 +687,20 @@ public class GameManager {
                 throw new InvalidFileException("Invalid player position");
             }
 
-            // Support multiple save formats:
-            // - legacy minimal: id;name;langs;color;pos
-            // - older with eliminado and tools: id;name;langs;color;pos;eliminado;tools (7 fields)
-            // - current with preso, eliminado, tools: id;name;langs;color;pos;preso;eliminado;tools (8 fields)
             boolean preso = false;
             boolean elim = false;
             int toolsIndex = -1;
 
             if (parts.length >= 8) {
-                // current format with preso field
                 preso = Boolean.parseBoolean(parts[5]);
                 elim = Boolean.parseBoolean(parts[6]);
                 toolsIndex = 7;
             } else if (parts.length == 7) {
-                // older format: has eliminado and tools, no preso
                 elim = Boolean.parseBoolean(parts[5]);
                 toolsIndex = 6;
             } else if (parts.length == 6) {
-                // another older format: id;name;langs;color;pos;eliminado
                 elim = Boolean.parseBoolean(parts[5]);
             }
-            // else: parts.length == 5 is minimal format with no extra fields
 
             Player p = new Player(id, name, langs, color);
             p.setPosicaoSemGuardarHistorico(pos);
