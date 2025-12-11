@@ -33,10 +33,10 @@ public class GameManager {
 
     public static String toolName(int id) {
         switch (id) {
-            case 0: return "Herança";
-            case 1: return "Programação Funcional";
-            case 2: return "Testes Unitários";
-            case 3: return "Tratamento de Excepções";
+            case 0: return "HeranÃ§a";
+            case 1: return "ProgramaÃ§Ã£o Funcional";
+            case 2: return "Testes UnitÃ¡rios";
+            case 3: return "Tratamento de ExcepÃ§Ãµes";
             case 4: return "IDE";
             case 5: return "Ajuda do Professor";
             default: return "Desconhecida";
@@ -392,7 +392,7 @@ public class GameManager {
             return "Game over";
         }
         if (nrSpaces < 1 || nrSpaces > 6) {
-            return "Número inválido de espaços";
+            return "NÃºmero invÃ¡lido de espaÃ§os";
         }
         if (players.isEmpty()) {
             return "Sem Jogadores";
@@ -400,7 +400,7 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
         if (current.isPreso()) {
-            return "Jogador está preso";
+            return "Jogador estÃ¡ preso";
         }
         String firstLang = current.getPrimeiraLinguagem();
         if (firstLang == null) {
@@ -493,7 +493,7 @@ public class GameManager {
             }
         }
 
-         boolean currentEliminated = current.isEliminado() || !players.contains(current);
+        boolean currentEliminated = current.isEliminado() || !players.contains(current);
 
         turnCounter++;
 
