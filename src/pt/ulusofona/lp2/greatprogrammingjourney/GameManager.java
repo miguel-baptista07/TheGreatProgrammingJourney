@@ -208,7 +208,10 @@ public class GameManager {
                             p.getNome(),
                             p.getLinguagens(),
                             formatColor(p.getCor()),
-                            String.valueOf(p.getPosicao())
+                            String.valueOf(p.getPosicao()),
+                            p.getFerramentasAsString(),
+                            p.isEliminado() ? "Derrotado" :
+                                    p.isPreso() ? "Preso" : "Em Jogo"
                     };
                 }
             } catch (NumberFormatException e) {
@@ -218,7 +221,10 @@ public class GameManager {
                             p.getNome(),
                             p.getLinguagens(),
                             formatColor(p.getCor()),
-                            String.valueOf(p.getPosicao())
+                            String.valueOf(p.getPosicao()),
+                            p.getFerramentasAsString(),
+                            p.isEliminado() ? "Derrotado" :
+                                    p.isPreso() ? "Preso" : "Em Jogo"
                     };
                 }
             }
