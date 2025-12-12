@@ -199,7 +199,7 @@ public class GameManager {
             }
         }
     }
-
+// novo
     public String[] getProgrammerInfo(int id) {
         for (Player p : allPlayers) {
             try {
