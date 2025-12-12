@@ -140,7 +140,7 @@ public class GameManager {
                 }
 
                 if (board.getElementAt(position) != null) {
-                    return false;
+
                 }
 
                 BoardElement elem = ElementsIOAdapter.toElement(type, subtype, position);
@@ -386,8 +386,13 @@ public class GameManager {
         int boardSize = board.getTamanhoTabuleiro();
         int novaPos = current.getPosicao() + nrSpaces;
 
+
         if (novaPos > boardSize) {
-            novaPos = boardSize;
+            int excesso = novaPos - boardSize;
+            novaPos = boardSize - excesso;
+            if (novaPos < 1) {
+                novaPos = 1;
+            }
         }
 
         current.setLastMoveSpaces(nrSpaces);
@@ -454,11 +459,12 @@ public class GameManager {
                 currentPlayerIndex = (initialIndex + 1) % players.size();
             }
             checkGameOverCondition();
-            return "Jogador libertado do Infinite Loop";
+            return null;
         }
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
+
 
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
@@ -471,14 +477,9 @@ public class GameManager {
             }
         }
 
+
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
-                boolean isInfiniteLoop = el.getId() == 8;
-                boolean hadFunctionalTool = false;
-                if (isInfiniteLoop) {
-                    hadFunctionalTool = current.hasTool(1);
-                }
-
                 String msg = el.applyEffect(current, this);
                 if (msg != null) {
                     if (message == null) {
@@ -487,18 +488,7 @@ public class GameManager {
                         message = message + " " + msg;
                     }
                 }
-
-                if (isInfiniteLoop) {
-                    if (hadFunctionalTool) {
-                        if (!current.hasTool(1)) {
-                            current.setPreso(false);
-                        }
-                    } else {
-                        if (!current.isPreso()) {
-                            current.setPreso(true);
-                        }
-                    }
-                }
+                break;
             }
         }
 
