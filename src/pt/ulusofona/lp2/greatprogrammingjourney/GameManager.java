@@ -452,6 +452,8 @@ public class GameManager {
         int initialIndex = currentPlayerIndex;
         Player current = players.get(initialIndex);
 
+        // Se o jogador está preso, liberta-o mas NÃO processa elementos
+        // (porque ele não se moveu para uma nova casa)
         if (current.isPreso()) {
             current.setPreso(false);
             turnCounter++;
@@ -459,27 +461,24 @@ public class GameManager {
                 currentPlayerIndex = (initialIndex + 1) % players.size();
             }
             checkGameOverCondition();
-            return null;
+            return null;  // OK retornar null aqui porque não há nova interação
         }
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
-        String message = null;
 
-
-        for (BoardElement el : elements) {
-            if (!el.isAbyss()) {
-                String msg = el.applyEffect(current, this);
-                if (message == null) {
-                    message = msg;
-                } else if (msg != null) {
-                    message = message + " " + msg;
-                }
-            }
+        // ✅ PROTEÇÃO: Se não há elementos, não incrementa turno aqui
+        // (isso significa que moveCurrentPlayer não foi chamado corretamente)
+        if (elements.isEmpty()) {
+            // NÃO incrementa turnCounter aqui!
+            // NÃO avança jogador aqui!
+            return null;
         }
 
+        String message = null;
 
+        // Primeiro: Apanha TODAS as ferramentas
         for (BoardElement el : elements) {
-            if (el.isAbyss()) {
+            if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
                 if (msg != null) {
                     if (message == null) {
@@ -488,7 +487,24 @@ public class GameManager {
                         message = message + " " + msg;
                     }
                 }
-                break;
+            }
+        }
+
+        // Depois: Processa o PRIMEIRO abismo
+        for (BoardElement el : elements) {
+            if (el.isAbyss()) {
+                String msg = el.applyEffect(current, this);
+                if (msg != null) {
+                    // ✅ IMPORTANTE: Quando há abismo, a mensagem do abismo
+                    // SUBSTITUI ou COMPLEMENTA a da ferramenta
+                    if (message == null) {
+                        message = msg;
+                    } else {
+                        // Se já há mensagem de ferramenta, adiciona a do abismo
+                        message = message + " " + msg;
+                    }
+                }
+                break;  // Só processa o primeiro abismo
             }
         }
 
@@ -519,7 +535,7 @@ public class GameManager {
             gameOver = true;
         }
 
-        return message;
+        return message;  // ✅ Sempre retorna mensagem quando há elementos
     }
 
     private void advanceToNextAlive() {
