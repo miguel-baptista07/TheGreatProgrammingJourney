@@ -452,20 +452,31 @@ public class GameManager {
         int initialIndex = currentPlayerIndex;
         Player current = players.get(initialIndex);
 
-        if (current.isPreso()) {
-            current.setPreso(false);
-            turnCounter++;
-            if (!players.isEmpty()) {
-                currentPlayerIndex = (initialIndex + 1) % players.size();
+        // Obter elementos na casa atual
+        List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
+
+        // Se a casa está vazia, retorna null
+        if (elements.isEmpty()) {
+            // Se o jogador está preso, liberta-o e avança turno
+            if (current.isPreso()) {
+                current.setPreso(false);
+                turnCounter++;
+                if (!players.isEmpty()) {
+                    currentPlayerIndex = (initialIndex + 1) % players.size();
+                }
+                checkGameOverCondition();
             }
-            checkGameOverCondition();
             return null;
         }
 
-        List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
+        // Se o jogador está preso, liberta-o mas CONTINUA a processar os elementos
+        if (current.isPreso()) {
+            current.setPreso(false);
+        }
+
         String message = null;
 
-
+        // Primeiro aplica ferramentas
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
@@ -477,7 +488,7 @@ public class GameManager {
             }
         }
 
-
+        // Depois aplica abismos (apenas o primeiro)
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
