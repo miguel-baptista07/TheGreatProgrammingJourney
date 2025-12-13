@@ -21,11 +21,8 @@ public class AbyssCicloInfinito extends AbyssBase {
             return "Infinite Loop anulado por " + toolName(1);
         }
 
-        // Count how many IDE tools (id 4) the player has
         int ideCount = Collections.frequency(player.getFerramentas(), 4);
-        
-        // If player has IDE tools, imprison for that many turns
-        // Otherwise, imprison for 3 turns
+
         int turnos = ideCount > 0 ? ideCount : 3;
         player.prender(turnos);
 

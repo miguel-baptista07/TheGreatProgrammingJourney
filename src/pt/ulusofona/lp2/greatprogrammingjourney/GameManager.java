@@ -357,9 +357,18 @@ public class GameManager {
         Player current = players.get(currentPlayerIndex);
 
         if (current.isPreso()) {
+            int turnsBefore = current.getPresoTurns();
             current.consumirTurnoPreso();
-            return false;
+            // If player had exactly 1 turn left, after consuming it they can move
+            if (turnsBefore == 1) {
+                // Continue with movement - player is no longer imprisoned
+            } else {
+                // Player still has turns left, cannot move but consumes turn
+                current.setLastMoveSpaces(0);
+                return true;
+            }
         }
+
 
         int maxMovement = 6;
         String firstLang = current.getPrimeiraLinguagem();
