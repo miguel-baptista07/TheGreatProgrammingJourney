@@ -515,8 +515,10 @@ public class GameManager {
         if (elements.isEmpty()) {
             return null;
         }
-
-        return message;
+        
+        // If there are elements, always return a string (even if empty)
+        // This is required even when abyss returns null (e.g., Infinite Loop)
+        return message == null ? "" : message;
     }
 
     private void advanceToNextAlive() {
