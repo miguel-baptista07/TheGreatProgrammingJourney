@@ -198,7 +198,7 @@ public class GameManager {
             }
         }
     }
-    // novo
+
     public String[] getProgrammerInfo(int id) {
         for (Player p : allPlayers) {
             try {
@@ -358,7 +358,9 @@ public class GameManager {
 
         if (current.isPreso()) {
             current.consumirTurnoPreso();
-            return false;
+            if (current.isPreso()) {
+                return false;
+            }
         }
 
         int maxMovement = 6;
@@ -383,7 +385,6 @@ public class GameManager {
 
         int boardSize = board.getTamanhoTabuleiro();
         int novaPos = current.getPosicao() + nrSpaces;
-
 
         if (novaPos > boardSize) {
             int excesso = novaPos - boardSize;
@@ -411,6 +412,7 @@ public class GameManager {
         }
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
+        
         String firstLang = current.getPrimeiraLinguagem();
         if (firstLang == null) {
             firstLang = "";
@@ -430,7 +432,11 @@ public class GameManager {
         int novaPos = current.getPosicao() + nrSpaces;
 
         if (novaPos > boardSize) {
-            novaPos = boardSize;
+            int excesso = novaPos - boardSize;
+            novaPos = boardSize - excesso;
+            if (novaPos < 1) {
+                novaPos = 1;
+            }
         }
         if (novaPos < 1 || novaPos > boardSize) {
             return "Resulting position out of bounds";
