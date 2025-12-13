@@ -80,13 +80,17 @@ public class Player {
     }
 
     public void setPosicaoSemGuardarHistorico(int posicao) {
-        if (posicao < 1) posicao = 1;
+        if (posicao < 1){
+            posicao = 1;
+        }
         this.posicao = posicao;
         guardarHistorico();
     }
 
     public void setPosicao(int posicao) {
-        if (posicao < 1) posicao = 1;
+        if (posicao < 1) {
+            posicao = 1;
+        }
         this.posicaoAnteriorMovimento = this.posicao;
         this.posicao = posicao;
         guardarHistorico();
@@ -158,7 +162,9 @@ public class Player {
 
     public int getHistoricalPosition(int movesBack) {
         int idx = posicaoHistorico.size() - 1 - movesBack;
-        if (idx < 0) return posicaoHistorico.get(0);
+        if (idx < 0) {
+            return posicaoHistorico.get(0);
+        }
         return posicaoHistorico.get(idx);
     }
 
@@ -193,7 +199,9 @@ public class Player {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < ferramentas.size(); i++) {
             sb.append(GameManager.toolName(ferramentas.get(i)));
-            if (i < ferramentas.size() - 1) sb.append(",");
+            if (i < ferramentas.size() - 1) {
+                sb.append(",");
+            }
         }
         return sb.toString();
     }
