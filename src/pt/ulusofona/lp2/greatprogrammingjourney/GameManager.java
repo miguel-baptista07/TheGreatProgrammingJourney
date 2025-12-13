@@ -465,7 +465,6 @@ public class GameManager {
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
 
-
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
