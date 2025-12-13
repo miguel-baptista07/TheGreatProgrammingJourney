@@ -142,6 +142,10 @@ public class Player {
         return presoTurns > 0;
     }
 
+    public int getPresoTurns() {
+        return presoTurns;
+    }
+
     public void prender(int turnos) {
         this.presoTurns = Math.max(this.presoTurns, turnos);
     }

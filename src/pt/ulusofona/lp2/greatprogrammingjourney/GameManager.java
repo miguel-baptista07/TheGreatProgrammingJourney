@@ -413,6 +413,12 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
         
+        // If player is imprisoned with more than 1 turn, they cannot move
+        // If imprisoned with exactly 1 turn, they can move after consuming it
+        if (current.isPreso() && current.getPresoTurns() > 1) {
+            return "Player is imprisoned";
+        }
+        
         String firstLang = current.getPrimeiraLinguagem();
         if (firstLang == null) {
             firstLang = "";
