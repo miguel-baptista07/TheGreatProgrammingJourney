@@ -92,7 +92,6 @@ public class GameManager {
 
             Player newPlayer = new Player(id, nome, linguagens, cor);
             newPlayer.setEliminado(false);
-            newPlayer.setPreso(false);
             newPlayer.setFerramentaAtiva(null);
             players.add(newPlayer);
             allPlayers.add(newPlayer);
@@ -358,9 +357,12 @@ public class GameManager {
         Player current = players.get(currentPlayerIndex);
 
         if (current.isPreso()) {
-            current.setPreso(false);
-            return false;
+            current.consumirTurnoPreso();
+            current.prepararMovimento();
+            current.setLastMoveSpaces(nrSpaces);
+            return true;
         }
+
 
         int maxMovement = 6;
         String firstLang = current.getPrimeiraLinguagem();
@@ -412,9 +414,6 @@ public class GameManager {
         }
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
-        if (current.isPreso()) {
-            return "Jogador estÃ¡ preso";
-        }
         String firstLang = current.getPrimeiraLinguagem();
         if (firstLang == null) {
             firstLang = "";
@@ -450,21 +449,6 @@ public class GameManager {
         normalizeCurrentIndex();
         int initialIndex = currentPlayerIndex;
         Player current = players.get(initialIndex);
-
-        boolean wasPresoAtStart = current.isPreso();
-
-        if (wasPresoAtStart) {
-            current.setPreso(false);
-            turnCounter++;
-
-            if (!players.isEmpty()) {
-                currentPlayerIndex = (initialIndex + 1) % players.size();
-            }
-
-            checkGameOverCondition();
-            return "Jogador estava preso e perdeu a vez";
-        }
-
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
@@ -586,7 +570,7 @@ public class GameManager {
                         p.getLinguagens(),
                         p.getCor(),
                         String.valueOf(p.getPosicao()),
-                        String.valueOf(p.isPreso()),
+                        String.valueOf(p.isPreso() ? 1 : 0),
                         String.valueOf(p.isEliminado()),
                         tools
                 )));
@@ -704,8 +688,10 @@ public class GameManager {
 
             Player p = new Player(id, name, langs, color);
             p.setPosicaoSemGuardarHistorico(pos);
-            p.setPreso(preso);
-            p.setEliminado(elim);
+            int presoTurns = Boolean.parseBoolean(parts[5]) ? 1 : 0;
+            if (presoTurns > 0) {
+                p.prender(presoTurns);
+            }
 
             if (toolsIndex != -1 && parts.length > toolsIndex && !parts[toolsIndex].isEmpty()) {
                 for (String t : parts[toolsIndex].split(",")) {
