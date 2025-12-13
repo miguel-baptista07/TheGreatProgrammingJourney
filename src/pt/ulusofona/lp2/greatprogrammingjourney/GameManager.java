@@ -515,7 +515,8 @@ public class GameManager {
         if (elements.isEmpty()) {
             return null;
         }
-        return message;
+        // If there are elements, always return a string (even if empty)
+        return message == null ? "" : message;
     }
 
     private void advanceToNextAlive() {
