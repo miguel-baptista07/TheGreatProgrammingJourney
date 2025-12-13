@@ -459,7 +459,7 @@ public class GameManager {
                 currentPlayerIndex = (initialIndex + 1) % players.size();
             }
             checkGameOverCondition();
-            return null;
+            return "Jogador estava preso e perdeu a vez";
         }
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
