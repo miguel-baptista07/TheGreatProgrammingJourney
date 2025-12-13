@@ -358,11 +358,8 @@ public class GameManager {
 
         if (current.isPreso()) {
             current.consumirTurnoPreso();
-            current.prepararMovimento();
-            current.setLastMoveSpaces(nrSpaces);
-            return true;
+            return false;
         }
-
 
         int maxMovement = 6;
         String firstLang = current.getPrimeiraLinguagem();

@@ -21,6 +21,6 @@ public class AbyssCicloInfinito extends AbyssBase {
 
         player.prender(3);
 
-        return "Caiu no abismo Infinite Loop: jogador preso por 3 turnos.";
+        return null;
     }
 }
