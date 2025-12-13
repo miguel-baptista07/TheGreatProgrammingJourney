@@ -450,7 +450,8 @@ public class GameManager {
         int initialIndex = currentPlayerIndex;
         Player current = players.get(initialIndex);
 
-        if (current.isPreso()) {
+        if (current.isPreso() && board.getAllElementsAt(current.getPosicao()).isEmpty()) {
+            current.setPreso(false);
             turnCounter++;
             if (!players.isEmpty()) {
                 currentPlayerIndex = (initialIndex + 1) % players.size();
@@ -458,7 +459,6 @@ public class GameManager {
             checkGameOverCondition();
             return "Jogador estava preso e perdeu a vez";
         }
-
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
