@@ -503,7 +503,7 @@ public class GameManager {
             gameOver = true;
         }
 
-        return message;
+        return elements.isEmpty() ? null : (message == null ? "" : message);
     }
 
     private void advanceToNextAlive() {
