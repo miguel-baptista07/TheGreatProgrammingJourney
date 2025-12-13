@@ -369,7 +369,6 @@ public class GameManager {
             }
         }
 
-
         int maxMovement = 6;
         String firstLang = current.getPrimeiraLinguagem();
         if (firstLang == null) {
