@@ -360,7 +360,7 @@ public class GameManager {
             current.consumirTurnoPreso();
             current.prepararMovimento();
             current.setLastMoveSpaces(nrSpaces);
-            return true;
+            return false;
         }
 
 
@@ -506,7 +506,7 @@ public class GameManager {
             gameOver = true;
         }
 
-        return elements.isEmpty() ? null : (message == null ? "" : message);
+        return elements.isEmpty() ? null : message;
     }
 
     private void advanceToNextAlive() {
