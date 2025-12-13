@@ -461,7 +461,6 @@ public class GameManager {
             }
         }
 
-
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
@@ -503,7 +502,7 @@ public class GameManager {
             gameOver = true;
         }
 
-        return message;
+        return elements.isEmpty() ? null : (message == null ? "" : message);
     }
 
     private void advanceToNextAlive() {
