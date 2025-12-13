@@ -357,16 +357,9 @@ public class GameManager {
         Player current = players.get(currentPlayerIndex);
 
         if (current.isPreso()) {
-            int turnsBefore = current.getPresoTurns();
             current.consumirTurnoPreso();
-            // If player had exactly 1 turn left, after consuming it they can move
-            if (turnsBefore == 1) {
-                // Continue with movement - player is no longer imprisoned
-            } else {
-                // Player still has turns left, cannot move but consumes turn
-                current.setLastMoveSpaces(0);
-                return true;
-            }
+            current.setLastMoveSpaces(0);
+            return true;
         }
 
         int maxMovement = 6;
@@ -419,9 +412,8 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
         
-        // If player is imprisoned with more than 1 turn, they cannot move
-        // If imprisoned with exactly 1 turn, they can move after consuming it
-        if (current.isPreso() && current.getPresoTurns() > 1) {
+        // If player is imprisoned, they cannot move
+        if (current.isPreso()) {
             return "Player is imprisoned";
         }
         
@@ -520,7 +512,10 @@ public class GameManager {
             gameOver = true;
         }
 
-        return elements.isEmpty() ? null : (message == null ? "" : message);
+        if (elements.isEmpty()) {
+            return null;
+        }
+        return message;
     }
 
     private void advanceToNextAlive() {
