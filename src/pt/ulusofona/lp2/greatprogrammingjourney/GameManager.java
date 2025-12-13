@@ -358,10 +358,8 @@ public class GameManager {
         Player current = players.get(currentPlayerIndex);
 
         if (current.isPreso()) {
-            current.prepararMovimento();
-            return true;
+            return false;
         }
-
 
         int maxMovement = 6;
         String firstLang = current.getPrimeiraLinguagem();
