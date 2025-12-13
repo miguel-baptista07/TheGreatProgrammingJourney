@@ -341,8 +341,6 @@ public class GameManager {
         }
     }
 
-
-
     public boolean moveCurrentPlayer(int nrSpaces) {
         if (gameOver) {
             return false;
@@ -360,8 +358,10 @@ public class GameManager {
         Player current = players.get(currentPlayerIndex);
 
         if (current.isPreso()) {
-            return false;
+            current.prepararMovimento();
+            return true;
         }
+
 
         int maxMovement = 6;
         String firstLang = current.getPrimeiraLinguagem();
@@ -453,7 +453,6 @@ public class GameManager {
         Player current = players.get(initialIndex);
 
         if (current.isPreso()) {
-            current.setPreso(false);
             turnCounter++;
             if (!players.isEmpty()) {
                 currentPlayerIndex = (initialIndex + 1) % players.size();
@@ -461,6 +460,7 @@ public class GameManager {
             checkGameOverCondition();
             return "Jogador estava preso e perdeu a vez";
         }
+
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
