@@ -359,7 +359,7 @@ public class GameManager {
         if (current.isPreso()) {
             current.consumirTurnoPreso();
             current.setLastMoveSpaces(0);
-            return true;
+            return false;
         }
 
         int maxMovement = 6;
@@ -515,8 +515,8 @@ public class GameManager {
         if (elements.isEmpty()) {
             return null;
         }
-        // If there are elements, always return a string (even if empty)
-        return message == null ? "" : message;
+
+        return message;
     }
 
     private void advanceToNextAlive() {
