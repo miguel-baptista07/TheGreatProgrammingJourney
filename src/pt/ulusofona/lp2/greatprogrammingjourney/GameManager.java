@@ -358,6 +358,7 @@ public class GameManager {
         Player current = players.get(currentPlayerIndex);
 
         if (current.isPreso()) {
+            current.setPreso(false);
             return false;
         }
 
