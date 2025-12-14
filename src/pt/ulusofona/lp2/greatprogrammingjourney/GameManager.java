@@ -364,10 +364,9 @@ public class GameManager {
             return false;
         }
 
-        // ✅ Jogador preso consome turno
+        // ✅ Jogador preso não pode mover
+        // NOTA: O consumo do turno acontece no reactToAbyssOrTool()
         if (current.isPreso()) {
-            current.consumirTurnoPreso();
-            current.setLastMoveSpaces(0);
             return false;
         }
 
@@ -468,6 +467,20 @@ public class GameManager {
         if (current.isEliminado()) {
             advanceToNextAlive();
             return null;
+        }
+
+        // ✅ Se preso, consome turno e avança (jogador fica parado)
+        if (current.isPreso()) {
+            current.consumirTurnoPreso();
+            turnCounter++;
+            advanceToNextAlive();
+            checkGameOverCondition();
+
+            if (current.isPreso()) {
+                return "Jogador continua preso.";
+            } else {
+                return "Jogador libertado.";
+            }
         }
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
