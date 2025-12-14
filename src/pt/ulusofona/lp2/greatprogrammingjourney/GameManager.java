@@ -199,7 +199,7 @@ public class GameManager {
             }
         }
     }
-
+    // novo
     public String[] getProgrammerInfo(int id) {
         for (Player p : allPlayers) {
             try {
@@ -341,6 +341,8 @@ public class GameManager {
         }
     }
 
+
+
     public boolean moveCurrentPlayer(int nrSpaces) {
         if (gameOver) {
             return false;
@@ -384,6 +386,7 @@ public class GameManager {
         int boardSize = board.getTamanhoTabuleiro();
         int novaPos = current.getPosicao() + nrSpaces;
 
+
         if (novaPos > boardSize) {
             int excesso = novaPos - boardSize;
             novaPos = boardSize - excesso;
@@ -403,7 +406,7 @@ public class GameManager {
             return "Game over";
         }
         if (nrSpaces < 1 || nrSpaces > 6) {
-            return "Número inválido de espaços";
+            return "NÃºmero invÃ¡lido de espaÃ§os";
         }
         if (players.isEmpty()) {
             return "Sem Jogadores";
@@ -411,7 +414,7 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
         if (current.isPreso()) {
-            return "Jogador está preso";
+            return "Jogador estÃ¡ preso";
         }
         String firstLang = current.getPrimeiraLinguagem();
         if (firstLang == null) {
@@ -449,29 +452,20 @@ public class GameManager {
         int initialIndex = currentPlayerIndex;
         Player current = players.get(initialIndex);
 
-        // Obter elementos na casa atual
-        List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
-
-        // Se a casa está vazia, retorna null
-        if (elements.isEmpty()) {
-            // Se o jogador está preso, liberta-o e avança turno
-            if (current.isPreso()) {
-                current.setPreso(false);
-                turnCounter++;
-                advanceToNextNonEliminatedPlayer();
-                checkGameOverCondition();
+        if (current.isPreso()) {
+            current.setPreso(false);
+            turnCounter++;
+            if (!players.isEmpty()) {
+                currentPlayerIndex = (initialIndex + 1) % players.size();
             }
+            checkGameOverCondition();
             return null;
         }
 
-        // Se o jogador está preso, liberta-o mas CONTINUA a processar os elementos
-        if (current.isPreso()) {
-            current.setPreso(false);
-        }
-
+        List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
 
-        // Primeiro aplica ferramentas
+
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
@@ -483,7 +477,7 @@ public class GameManager {
             }
         }
 
-        // Depois aplica abismos (apenas o primeiro)
+
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
@@ -498,54 +492,53 @@ public class GameManager {
             }
         }
 
+        boolean currentEliminated = current.isEliminado() || !players.contains(current);
+
         turnCounter++;
 
-        // Avança para o próximo jogador não eliminado
-        advanceToNextNonEliminatedPlayer();
+        if (currentEliminated) {
+            if (players.isEmpty()) {
+                gameOver = true;
+            } else {
+                if (initialIndex >= players.size()) {
+                    currentPlayerIndex = 0;
+                } else {
+                    currentPlayerIndex = initialIndex;
+                }
+            }
+        } else {
+            if (!players.isEmpty()) {
+                currentPlayerIndex = (initialIndex + 1) % players.size();
+            }
+        }
 
         checkGameOverCondition();
         normalizeCurrentIndex();
 
+        if (players.isEmpty()) {
+            gameOver = true;
+        }
+
         return message;
     }
 
-    private void advanceToNextNonEliminatedPlayer() {
+    private void advanceToNextAlive() {
         if (players.isEmpty()) {
             currentPlayerIndex = 0;
             return;
         }
-
-        int attempts = 0;
-        int maxAttempts = players.size();
-
-        do {
-            currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-            attempts++;
-
-            // Se já tentou todos e todos estão eliminados
-            if (attempts >= maxAttempts) {
-                gameOver = true;
-                return;
-            }
-
-        } while (players.get(currentPlayerIndex).isEliminado());
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
     }
 
     private void checkGameOverCondition() {
-        // Conta quantos jogadores ainda estão vivos
-        int playersAlive = 0;
         for (Player p : players) {
-            if (!p.isEliminado()) {
-                if (p.getPosicao() >= board.getTamanhoTabuleiro()) {
-                    gameOver = true;
-                    return;
-                }
-                playersAlive++;
+            if (p.getPosicao() >= board.getTamanhoTabuleiro()) {
+                gameOver = true;
+                return;
             }
         }
 
-        // Se só resta 1 ou nenhum jogador vivo, game over
-        if (playersAlive <= 1) {
+        if (players.size() <= 1) {
             gameOver = true;
         }
     }
@@ -632,8 +625,11 @@ public class GameManager {
             allPlayers.clear();
             allPlayers.addAll(loadedPlayers);
 
-            // Adiciona TODOS os jogadores (incluindo eliminados)
-            players.addAll(loadedPlayers);
+            for (Player p : loadedPlayers) {
+                if (!p.isEliminado()) {
+                    players.add(p);
+                }
+            }
 
             board.clearElements();
             for (BoardElement be : loadedElements.values()) {
@@ -760,6 +756,7 @@ public class GameManager {
         return elems;
     }
 
+
     public JPanel getAuthorsPanel() {
         JPanel panel = new JPanel();
         panel.add(new JLabel("Desenvolvido por: Miguel Baptista e Goncalo Almeida"));
@@ -773,7 +770,6 @@ public class GameManager {
     public List<Player> getPlayersAtPosition(int pos) {
         List<Player> res = new ArrayList<>();
         for (Player p : players) {
-            // Inclui TODOS os jogadores na posição (eliminados ou não)
             if (p.getPosicao() == pos) {
                 res.add(p);
             }
@@ -786,11 +782,24 @@ public class GameManager {
             return;
         }
 
-        // Apenas marca como eliminado, NÃO remove da lista!
         p.setEliminado(true);
 
-        // Verifica se todos estão eliminados para game over
-        checkGameOverCondition();
+        int idx = players.indexOf(p);
+        if (idx != -1) {
+            if (idx < currentPlayerIndex) {
+                currentPlayerIndex--;
+            }
+            players.remove(idx);
+
+            if (players.isEmpty()) {
+                currentPlayerIndex = 0;
+                gameOver = true;
+            } else {
+                if (currentPlayerIndex >= players.size()) {
+                    currentPlayerIndex = 0;
+                }
+            }
+        }
     }
 
     public List<Player> getPlayers() {
