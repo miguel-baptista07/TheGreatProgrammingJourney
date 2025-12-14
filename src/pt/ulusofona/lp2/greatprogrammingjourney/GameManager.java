@@ -364,10 +364,11 @@ public class GameManager {
             return false;
         }
 
-        // ✅ Jogador preso não pode mover
-        // NOTA: O consumo do turno acontece no reactToAbyssOrTool()
+        // ✅ Se está preso, LIBERTA-O no início do turno
+        // Depois PODE JOGAR NORMALMENTE
         if (current.isPreso()) {
-            return false;
+            current.consumirTurnoPreso(); // Decrementa para 0
+            // NÃO retorna false! Ele joga normalmente agora
         }
 
         int maxMovement = 6;
@@ -404,7 +405,7 @@ public class GameManager {
         current.setLastMoveSpaces(nrSpaces);
         current.setPosicaoSemGuardarHistorico(novaPos);
 
-        return true;
+        return true; // ✅ Retorna TRUE (joga normalmente)
     }
 
     public String canCurrentPlayerMove(int nrSpaces) {
@@ -469,19 +470,7 @@ public class GameManager {
             return null;
         }
 
-        // ✅ Se preso, consome turno e avança (jogador fica parado)
-        if (current.isPreso()) {
-            current.consumirTurnoPreso();
-            turnCounter++;
-            advanceToNextAlive();
-            checkGameOverCondition();
-
-            if (current.isPreso()) {
-                return "Jogador continua preso.";
-            } else {
-                return "Jogador libertado.";
-            }
-        }
+        // ✅ REMOVIDO: A lógica de prisão está agora no moveCurrentPlayer()
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
