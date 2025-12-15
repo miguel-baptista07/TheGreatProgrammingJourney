@@ -364,10 +364,10 @@ public class GameManager {
             return false;
         }
 
-        // ✅ Se está preso: liberta, avança turno, e retorna false
+        // ✅ Se está preso: liberta e retorna false (perde turno)
+        // NOTA: NÃO avança turno aqui! Isso é feito no reactToAbyssOrTool()
         if (current.isPreso()) {
-            current.consumirTurnoPreso(); // Liberta (presoTurns vai a 0)
-            advanceToNextAlive(); // ✅ IMPORTANTE: Avança turno AQUI
+            current.consumirTurnoPreso(); // Liberta
             return false; // Perde este turno
         }
 
@@ -523,11 +523,13 @@ public class GameManager {
 
         checkGameOverCondition();
 
+        // ✅ NUNCA retornar null quando há elementos!
         if (elements.isEmpty()) {
             return null;
         }
 
-        return message == null ? "" : message;
+        // Se message ainda é null, retornar string vazia
+        return message != null ? message : "";
     }
 
     // ✅ NOVO MÉTODO: Retorna o ID da ferramenta que anula cada abismo
@@ -836,10 +838,10 @@ public class GameManager {
             return;
         }
 
-
+        // ✅ APENAS marca como eliminado - NÃO remove da lista!
         p.setEliminado(true);
 
-
+        // ✅ Verifica se ficou sem jogadores vivos
         boolean temVivos = false;
         for (Player player : players) {
             if (!player.isEliminado()) {
