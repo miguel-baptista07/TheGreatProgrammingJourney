@@ -1,7 +1,6 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
 public class AbyssCicloInfinito extends AbyssBase {
-
     public AbyssCicloInfinito(int position) {
         super(8, position);
     }
@@ -13,7 +12,7 @@ public class AbyssCicloInfinito extends AbyssBase {
 
     @Override
     public String applyEffect(Player player, GameManager manager) {
-        player.prender(1);
-        return player.getNome() + " ficou preso num Infinite Loop!";
+        player.setPreso(true);
+        return "Caiu no abismo Infinite Loop: jogador preso.";
     }
 }

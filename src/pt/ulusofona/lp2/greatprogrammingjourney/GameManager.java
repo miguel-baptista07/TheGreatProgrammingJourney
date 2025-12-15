@@ -343,6 +343,8 @@ public class GameManager {
         }
     }
 
+
+
     public boolean moveCurrentPlayer(int nrSpaces) {
         if (gameOver) {
             return false;
@@ -359,16 +361,13 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
-        // ✅ Jogador eliminado não pode mover
         if (current.isEliminado()) {
             return false;
         }
 
-        // ✅ Se está preso: liberta e retorna false (perde turno)
-        // NOTA: NÃO avança turno aqui! Isso é feito no reactToAbyssOrTool()
+
         if (current.isPreso()) {
-            current.consumirTurnoPreso(); // Liberta
-            return false; // Perde este turno
+            return false;
         }
 
         int maxMovement = 6;
@@ -464,12 +463,22 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
+        // ✅ Se eliminado, avança e sai
         if (current.isEliminado()) {
             advanceToNextAlive();
             return null;
         }
 
-        // ✅ NOVO: LIBERTAR jogadores presos na mesma casa (ANTES de apanhar ferramentas)
+        // ✅ Se estava preso, liberta AGORA, avança turno e sai
+        if (current.isPreso()) {
+            current.setPreso(false);
+            turnCounter++;
+            advanceToNextAlive();
+            checkGameOverCondition();
+            return null;
+        }
+
+        // ✅ Libertar outros jogadores presos na mesma casa (ANTES de apanhar ferramentas)
         List<Player> playersNaPosicao = getPlayersAtPosition(current.getPosicao());
         for (Player p : playersNaPosicao) {
             if (!p.getId().equals(current.getId()) && p.isPreso()) {
@@ -480,7 +489,7 @@ public class GameManager {
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
 
-        // 1. Apanhar ferramentas primeiro
+        // ✅ 1. Apanhar TODAS as ferramentas primeiro
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
@@ -492,11 +501,12 @@ public class GameManager {
             }
         }
 
-        // 2. Processar abismo com verificação de ferramenta
+        // ✅ 2. Processar APENAS o PRIMEIRO abismo (com verificação de ferramenta)
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
                 Integer counterToolId = getCounterToolForAbyss(el.getId());
 
+                // Se tem ferramenta que protege, consome e anula
                 if (counterToolId != null && current.hasTool(counterToolId)) {
                     current.removeTool(counterToolId);
                     String msg = el.getName() + " anulado por " + toolName(counterToolId);
@@ -506,6 +516,7 @@ public class GameManager {
                         message = message + " " + msg;
                     }
                 } else {
+                    // Não tem proteção, aplica efeito do abismo
                     String msg = el.applyEffect(current, this);
                     if (msg != null) {
                         if (message == null) {
@@ -515,34 +526,37 @@ public class GameManager {
                         }
                     }
                 }
-                break;
+                break; // Só processa UM abismo
             }
         }
 
+        // ✅ 3. SEMPRE incrementar turno e avançar jogador no final
         turnCounter++;
         advanceToNextAlive();
         checkGameOverCondition();
 
+        // ✅ Se não havia elementos, retorna null
         if (elements.isEmpty()) {
             return null;
         }
 
+        // ✅ Se havia elementos mas message é null, retorna string vazia
         return message != null ? message : "";
     }
 
 
     private Integer getCounterToolForAbyss(int abyssId) {
         switch (abyssId) {
-            case 0: return 4; // Erro de sintaxe → IDE
-            case 1: return 2; // Logic Error → Testes Unitários
-            case 2: return 3; // Exception → Tratamento de Excepções
-            case 3: return 3; // File Not Found → Tratamento de Excepções
-            case 4: return 5; // Crash → Ajuda do Professor
-            case 5: return 4; // Duplicated Code → IDE
-            case 6: return 1; // Side Effects → Programação Funcional
-            case 7: return 5; // BSOD → Ajuda do Professor
-            case 8: return 1; // Infinite Loop → Programação Funcional
-            case 9: return 0; // Segmentation Fault → Herança
+            case 0: return 4;  // Erro de sintaxe → IDE
+            case 1: return 2;  // Logic Error → Testes Unitários
+            case 2: return 3;  // Exception → Tratamento de Excepções
+            case 3: return 3;  // File Not Found → Tratamento de Excepções
+            case 4: return 5;  // Crash → Ajuda do Professor
+            case 5: return 4;  // Duplicated Code → IDE
+            case 6: return 1;  // Side Effects → Programação Funcional
+            case 7: return 5;  // BSOD → Ajuda do Professor
+            case 8: return 1;  // Infinite Loop → Programação Funcional
+            case 9: return 0;  // Segmentation Fault → Herança
             default: return null;
         }
     }
