@@ -142,7 +142,7 @@ public class Player {
         this.eliminado = eliminado;
     }
 
-    // 🔑 Prisão por turnos
+
     public boolean isPreso() {
         return presoTurns > 0;
     }
@@ -158,6 +158,7 @@ public class Player {
     public void consumirTurnoPreso() {
         this.preso = false;
     }
+
     public void setPreso(boolean preso) {
         this.preso = preso;
         if (!preso) {

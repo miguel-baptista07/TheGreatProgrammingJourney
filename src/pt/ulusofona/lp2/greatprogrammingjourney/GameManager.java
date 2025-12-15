@@ -464,25 +464,23 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
-        // ✅ Se o jogador atual está eliminado, avança
         if (current.isEliminado()) {
             advanceToNextAlive();
             return null;
         }
 
-        // ✅ IMPORTANTE: Se está preso, liberta mas não faz nada
-        if (current.isPreso()) {
-            current.setPreso(false);
-            turnCounter++;
-            advanceToNextAlive();
-            checkGameOverCondition();
-            return null;  // Não processa elementos porque não se moveu
+        // ✅ NOVO: LIBERTAR jogadores presos na mesma casa (ANTES de apanhar ferramentas)
+        List<Player> playersNaPosicao = getPlayersAtPosition(current.getPosicao());
+        for (Player p : playersNaPosicao) {
+            if (!p.getId().equals(current.getId()) && p.isPreso()) {
+                p.setPreso(false);
+            }
         }
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
 
-        // ✅ 1. Apanha TODAS as ferramentas primeiro
+        // 1. Apanhar ferramentas primeiro
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
@@ -494,33 +492,42 @@ public class GameManager {
             }
         }
 
-        // ✅ 2. Processa o PRIMEIRO abismo (verifica ferramenta dentro do applyEffect)
+        // 2. Processar abismo com verificação de ferramenta
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
-                String msg = el.applyEffect(current, this);
-                if (msg != null) {
+                Integer counterToolId = getCounterToolForAbyss(el.getId());
+
+                if (counterToolId != null && current.hasTool(counterToolId)) {
+                    current.removeTool(counterToolId);
+                    String msg = el.getName() + " anulado por " + toolName(counterToolId);
                     if (message == null) {
                         message = msg;
                     } else {
                         message = message + " " + msg;
                     }
+                } else {
+                    String msg = el.applyEffect(current, this);
+                    if (msg != null) {
+                        if (message == null) {
+                            message = msg;
+                        } else {
+                            message = message + " " + msg;
+                        }
+                    }
                 }
-                break;  // Só processa 1 abismo
+                break;
             }
         }
 
-        // ✅ 3. Incrementa turno e avança jogador
         turnCounter++;
-
-        // ✅ Se o jogador foi eliminado, não avança o índice
-        boolean currentEliminated = current.isEliminado();
-        if (!currentEliminated) {
-            advanceToNextAlive();
-        }
-
+        advanceToNextAlive();
         checkGameOverCondition();
 
-        return message;
+        if (elements.isEmpty()) {
+            return null;
+        }
+
+        return message != null ? message : "";
     }
 
 
@@ -829,10 +836,10 @@ public class GameManager {
             return;
         }
 
-        // ✅ Marca como eliminado
+        // ✅ APENAS marca como eliminado - NÃO remove da lista!
         p.setEliminado(true);
 
-        // ✅ Verifica se ainda há jogadores vivos
+        // ✅ Verifica se ficou sem jogadores vivos
         boolean temVivos = false;
         for (Player player : players) {
             if (!player.isEliminado()) {
@@ -841,7 +848,6 @@ public class GameManager {
             }
         }
 
-        // ✅ Se não há vivos, game over
         if (!temVivos) {
             gameOver = true;
         }
