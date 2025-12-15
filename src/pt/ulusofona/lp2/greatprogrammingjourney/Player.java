@@ -23,6 +23,7 @@ public class Player {
 
     private int lastMoveSpaces;
     private final List<Integer> posicaoHistorico;
+    private boolean preso;
 
     public Player(String id, String nome, String linguagens, String cor) {
         this.id = id;
@@ -78,6 +79,10 @@ public class Player {
     public int getPosicaoAnteriorMovimento() {
         return posicaoAnteriorMovimento;
     }
+
+
+
+
 
     public void setPosicaoSemGuardarHistorico(int posicao) {
         if (posicao < 1){
@@ -147,14 +152,19 @@ public class Player {
     }
 
     public void prender(int turnos) {
-        this.presoTurns = Math.max(this.presoTurns, turnos);
+        this.preso = true;
     }
 
     public void consumirTurnoPreso() {
-        if (presoTurns > 0) {
-            presoTurns--;
+        this.preso = false;
+    }
+    public void setPreso(boolean preso) {
+        this.preso = preso;
+        if (!preso) {
+            this.presoTurns = 0;
         }
     }
+
 
     public void setLastMoveSpaces(int lastMoveSpaces) {
         this.lastMoveSpaces = lastMoveSpaces;

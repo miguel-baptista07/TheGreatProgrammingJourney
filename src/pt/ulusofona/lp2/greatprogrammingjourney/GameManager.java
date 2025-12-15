@@ -464,16 +464,25 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
-        // ✅ Se eliminado, avança para o próximo vivo
+        // ✅ Se o jogador atual está eliminado, avança
         if (current.isEliminado()) {
             advanceToNextAlive();
             return null;
         }
 
+        // ✅ IMPORTANTE: Se está preso, liberta mas não faz nada
+        if (current.isPreso()) {
+            current.setPreso(false);
+            turnCounter++;
+            advanceToNextAlive();
+            checkGameOverCondition();
+            return null;  // Não processa elementos porque não se moveu
+        }
+
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
 
-        // Processar ferramentas primeiro
+        // ✅ 1. Apanha TODAS as ferramentas primeiro
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
@@ -485,54 +494,36 @@ public class GameManager {
             }
         }
 
-        // Processar abismos - COM VERIFICAÇÃO DE FERRAMENTA PROTETORA
+        // ✅ 2. Processa o PRIMEIRO abismo (verifica ferramenta dentro do applyEffect)
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
-                // ✅ VERIFICAR se jogador tem ferramenta que anula este abismo
-                Integer counterToolId = getCounterToolForAbyss(el.getId());
-
-                if (counterToolId != null && current.hasTool(counterToolId)) {
-                    // TEM ferramenta → anula → NÃO chama applyEffect()
-                    current.removeTool(counterToolId);
-                    String msg = el.getName() + " anulado por " + toolName(counterToolId);
+                String msg = el.applyEffect(current, this);
+                if (msg != null) {
                     if (message == null) {
                         message = msg;
                     } else {
                         message = message + " " + msg;
                     }
-                } else {
-                    // NÃO tem ferramenta → chama applyEffect()
-                    String msg = el.applyEffect(current, this);
-                    if (msg != null) {
-                        if (message == null) {
-                            message = msg;
-                        } else {
-                            message = message + " " + msg;
-                        }
-                    }
                 }
-                break;
+                break;  // Só processa 1 abismo
             }
         }
 
-        // ✅ Incrementar turno
+        // ✅ 3. Incrementa turno e avança jogador
         turnCounter++;
 
-        // ✅ Avançar para o próximo jogador vivo
-        advanceToNextAlive();
+        // ✅ Se o jogador foi eliminado, não avança o índice
+        boolean currentEliminated = current.isEliminado();
+        if (!currentEliminated) {
+            advanceToNextAlive();
+        }
 
         checkGameOverCondition();
 
-        // ✅ NUNCA retornar null quando há elementos!
-        if (elements.isEmpty()) {
-            return null;
-        }
-
-        // Se message ainda é null, retornar string vazia
-        return message != null ? message : "";
+        return message;
     }
 
-    // ✅ NOVO MÉTODO: Retorna o ID da ferramenta que anula cada abismo
+
     private Integer getCounterToolForAbyss(int abyssId) {
         switch (abyssId) {
             case 0: return 4; // Erro de sintaxe → IDE
@@ -838,10 +829,10 @@ public class GameManager {
             return;
         }
 
-        // ✅ APENAS marca como eliminado - NÃO remove da lista!
+        // ✅ Marca como eliminado
         p.setEliminado(true);
 
-        // ✅ Verifica se ficou sem jogadores vivos
+        // ✅ Verifica se ainda há jogadores vivos
         boolean temVivos = false;
         for (Player player : players) {
             if (!player.isEliminado()) {
@@ -850,6 +841,7 @@ public class GameManager {
             }
         }
 
+        // ✅ Se não há vivos, game over
         if (!temVivos) {
             gameOver = true;
         }
