@@ -463,22 +463,20 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
-        // ✅ Se eliminado, avança e sai
         if (current.isEliminado()) {
             advanceToNextAlive();
             return null;
         }
 
-        // ✅ Se estava preso, liberta AGORA, avança turno e sai
+        // ✅ Se estava preso, liberta e retorna MENSAGEM (não null!)
         if (current.isPreso()) {
             current.setPreso(false);
             turnCounter++;
             advanceToNextAlive();
             checkGameOverCondition();
-            return null;
+            return "Jogador libertado do Infinite Loop";  // ✅ Retorna mensagem!
         }
 
-        // ✅ Libertar outros jogadores presos na mesma casa (ANTES de apanhar ferramentas)
         List<Player> playersNaPosicao = getPlayersAtPosition(current.getPosicao());
         for (Player p : playersNaPosicao) {
             if (!p.getId().equals(current.getId()) && p.isPreso()) {
@@ -489,7 +487,6 @@ public class GameManager {
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
 
-        // ✅ 1. Apanhar TODAS as ferramentas primeiro
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
@@ -501,12 +498,10 @@ public class GameManager {
             }
         }
 
-        // ✅ 2. Processar APENAS o PRIMEIRO abismo (com verificação de ferramenta)
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
                 Integer counterToolId = getCounterToolForAbyss(el.getId());
 
-                // Se tem ferramenta que protege, consome e anula
                 if (counterToolId != null && current.hasTool(counterToolId)) {
                     current.removeTool(counterToolId);
                     String msg = el.getName() + " anulado por " + toolName(counterToolId);
@@ -516,7 +511,6 @@ public class GameManager {
                         message = message + " " + msg;
                     }
                 } else {
-                    // Não tem proteção, aplica efeito do abismo
                     String msg = el.applyEffect(current, this);
                     if (msg != null) {
                         if (message == null) {
@@ -526,22 +520,17 @@ public class GameManager {
                         }
                     }
                 }
-                break; // Só processa UM abismo
+                break;
             }
         }
 
-        // ✅ 3. SEMPRE incrementar turno e avançar jogador no final
         turnCounter++;
         advanceToNextAlive();
         checkGameOverCondition();
 
-        // ✅ Se não havia elementos, retorna null
-        if (elements.isEmpty()) {
-            return null;
-        }
-
-        // ✅ Se havia elementos mas message é null, retorna string vazia
-        return message != null ? message : "";
+        // ✅ NUNCA retorna null quando processa elementos
+        // Se não tinha elementos E não estava preso, aí sim retorna null
+        return message;
     }
 
 
