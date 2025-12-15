@@ -8,10 +8,6 @@ public class AbyssCrash extends AbyssBase {
 
     @Override
     public String applyEffect(Player player, GameManager manager) {
-        if (playerHasTool(player, 5)) {
-            consumeTool(player, 5);
-            return "Crash anulado por " + toolName(5);
-        }
         player.setPosicaoSemGuardarHistorico(1);
         return "Caiu no abismo Crash: voltou à primeira casa.";
     }

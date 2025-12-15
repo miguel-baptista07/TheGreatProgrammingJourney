@@ -8,10 +8,6 @@ public class AbyssBSOD extends AbyssBase {
 
     @Override
     public String applyEffect(Player player, GameManager manager) {
-        if (playerHasTool(player, 5)) {
-            consumeTool(player, 5);
-            return "BSOD anulado por " + toolName(5);
-        }
         manager.eliminatePlayer(player);
         return "Caiu no abismo BSOD: jogador derrotado.";
     }

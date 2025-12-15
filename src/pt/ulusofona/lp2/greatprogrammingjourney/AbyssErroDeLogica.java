@@ -8,12 +8,6 @@ public class AbyssErroDeLogica extends AbyssBase {
 
     @Override
     public String applyEffect(Player player, GameManager manager) {
-
-        if (playerHasTool(player, 2)) {
-            consumeTool(player, 2);
-            return "Logic Error anulado por " + toolName(2);
-        }
-
         int move = player.getLastMoveSpaces() / 2;
         int novaPosicao = Math.max(1, player.getPosicao() - move);
         player.setPosicaoSemGuardarHistorico(novaPosicao);

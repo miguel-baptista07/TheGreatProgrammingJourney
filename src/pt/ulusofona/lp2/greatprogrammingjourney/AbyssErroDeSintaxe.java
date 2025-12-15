@@ -8,16 +8,9 @@ public class AbyssErroDeSintaxe extends AbyssBase {
 
     @Override
     public String applyEffect(Player player, GameManager manager) {
-        if (playerHasTool(player, 4)) {
-            consumeTool(player, 4);
-            return "Erro de sintaxe anulado por " + toolName(4);
-        }
-        // Sem IDE, o jogador recua 1 casa a partir da posição atual
-        int novaPosicao = player.getPosicao() - 1;
-        if (novaPosicao < 1) {
-            novaPosicao = 1;
-        }
+        int novaPosicao = Math.max(1, player.getPosicao() - 1);
         player.setPosicaoSemGuardarHistorico(novaPosicao);
         return "Caiu no abismo Erro de sintaxe: recuou 1 casa.";
     }
+
 }

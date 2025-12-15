@@ -364,11 +364,11 @@ public class GameManager {
             return false;
         }
 
-        // ✅ Se está preso, LIBERTA-O no início do turno
-        // Depois PODE JOGAR NORMALMENTE
+        // ✅ Se está preso: liberta, avança turno, e retorna false
         if (current.isPreso()) {
-            current.consumirTurnoPreso(); // Decrementa para 0
-            // NÃO retorna false! Ele joga normalmente agora
+            current.consumirTurnoPreso(); // Liberta (presoTurns vai a 0)
+            advanceToNextAlive(); // ✅ IMPORTANTE: Avança turno AQUI
+            return false; // Perde este turno
         }
 
         int maxMovement = 6;
@@ -405,7 +405,7 @@ public class GameManager {
         current.setLastMoveSpaces(nrSpaces);
         current.setPosicaoSemGuardarHistorico(novaPos);
 
-        return true; // ✅ Retorna TRUE (joga normalmente)
+        return true;
     }
 
     public String canCurrentPlayerMove(int nrSpaces) {
@@ -470,8 +470,6 @@ public class GameManager {
             return null;
         }
 
-        // ✅ REMOVIDO: A lógica de prisão está agora no moveCurrentPlayer()
-
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
 
@@ -487,15 +485,30 @@ public class GameManager {
             }
         }
 
-        // Processar abismos depois
+        // Processar abismos - COM VERIFICAÇÃO DE FERRAMENTA PROTETORA
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
-                String msg = el.applyEffect(current, this);
-                if (msg != null) {
+                // ✅ VERIFICAR se jogador tem ferramenta que anula este abismo
+                Integer counterToolId = getCounterToolForAbyss(el.getId());
+
+                if (counterToolId != null && current.hasTool(counterToolId)) {
+                    // TEM ferramenta → anula → NÃO chama applyEffect()
+                    current.removeTool(counterToolId);
+                    String msg = el.getName() + " anulado por " + toolName(counterToolId);
                     if (message == null) {
                         message = msg;
                     } else {
                         message = message + " " + msg;
+                    }
+                } else {
+                    // NÃO tem ferramenta → chama applyEffect()
+                    String msg = el.applyEffect(current, this);
+                    if (msg != null) {
+                        if (message == null) {
+                            message = msg;
+                        } else {
+                            message = message + " " + msg;
+                        }
                     }
                 }
                 break;
@@ -515,6 +528,23 @@ public class GameManager {
         }
 
         return message == null ? "" : message;
+    }
+
+    // ✅ NOVO MÉTODO: Retorna o ID da ferramenta que anula cada abismo
+    private Integer getCounterToolForAbyss(int abyssId) {
+        switch (abyssId) {
+            case 0: return 4; // Erro de sintaxe → IDE
+            case 1: return 2; // Logic Error → Testes Unitários
+            case 2: return 3; // Exception → Tratamento de Excepções
+            case 3: return 3; // File Not Found → Tratamento de Excepções
+            case 4: return 5; // Crash → Ajuda do Professor
+            case 5: return 4; // Duplicated Code → IDE
+            case 6: return 1; // Side Effects → Programação Funcional
+            case 7: return 5; // BSOD → Ajuda do Professor
+            case 8: return 1; // Infinite Loop → Programação Funcional
+            case 9: return 0; // Segmentation Fault → Herança
+            default: return null;
+        }
     }
 
     private void advanceToNextAlive() {
@@ -806,10 +836,10 @@ public class GameManager {
             return;
         }
 
-        // ✅ APENAS marca como eliminado - NÃO remove da lista!
+
         p.setEliminado(true);
 
-        // ✅ Verifica se ficou sem jogadores vivos
+
         boolean temVivos = false;
         for (Player player : players) {
             if (!player.isEliminado()) {
