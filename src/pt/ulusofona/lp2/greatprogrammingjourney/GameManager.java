@@ -365,7 +365,7 @@ public class GameManager {
             return false;
         }
 
-
+        // ✅ Se está preso: retorna false (não move, não liberta)
         if (current.isPreso()) {
             return false;
         }
@@ -468,15 +468,21 @@ public class GameManager {
             return null;
         }
 
-        // ✅ Se estava preso, liberta e retorna MENSAGEM (não null!)
+        // ✅ CRÍTICO: Se estava preso:
+        // - Liberta
+        // - Incrementa turno
+        // - Avança
+        // - Retorna mensagem
+        // O estado só muda AQUI, não no moveCurrentPlayer
         if (current.isPreso()) {
             current.setPreso(false);
             turnCounter++;
             advanceToNextAlive();
             checkGameOverCondition();
-            return "Jogador libertado do Infinite Loop";  // ✅ Retorna mensagem!
+            return "Jogador foi libertado";
         }
 
+        // Libertar outros jogadores presos na mesma casa
         List<Player> playersNaPosicao = getPlayersAtPosition(current.getPosicao());
         for (Player p : playersNaPosicao) {
             if (!p.getId().equals(current.getId()) && p.isPreso()) {
@@ -487,6 +493,7 @@ public class GameManager {
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
 
+        // Apanhar ferramentas
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
@@ -498,6 +505,7 @@ public class GameManager {
             }
         }
 
+        // Processar abismo
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
                 Integer counterToolId = getCounterToolForAbyss(el.getId());
@@ -528,11 +536,8 @@ public class GameManager {
         advanceToNextAlive();
         checkGameOverCondition();
 
-        // ✅ NUNCA retorna null quando processa elementos
-        // Se não tinha elementos E não estava preso, aí sim retorna null
         return message;
     }
-
 
     private Integer getCounterToolForAbyss(int abyssId) {
         switch (abyssId) {
@@ -745,21 +750,26 @@ public class GameManager {
             int toolsIndex = -1;
 
             if (parts.length >= 8) {
-                preso = Boolean.parseBoolean(parts[5]);
+                // Formato: id;nome;langs;cor;pos;preso;elim;tools
+                preso = parts[5].equals("1") || parts[5].equalsIgnoreCase("true");
                 elim = Boolean.parseBoolean(parts[6]);
                 toolsIndex = 7;
             } else if (parts.length == 7) {
+                // Formato: id;nome;langs;cor;pos;elim;tools
                 elim = Boolean.parseBoolean(parts[5]);
                 toolsIndex = 6;
             } else if (parts.length == 6) {
+                // Formato: id;nome;langs;cor;pos;elim
                 elim = Boolean.parseBoolean(parts[5]);
             }
 
             Player p = new Player(id, name, langs, color);
             p.setPosicaoSemGuardarHistorico(pos);
-            int presoTurns = Boolean.parseBoolean(parts[5]) ? 1 : 0;
-            if (presoTurns > 0) {
-                p.prender(presoTurns);
+            p.setEliminado(elim);
+
+            // ✅ Usa a variável 'preso' que foi definida acima
+            if (preso) {
+                p.setPreso(true);
             }
 
             if (toolsIndex != -1 && parts.length > toolsIndex && !parts[toolsIndex].isEmpty()) {
@@ -767,7 +777,6 @@ public class GameManager {
                     try {
                         p.addTool(Integer.parseInt(t));
                     } catch (NumberFormatException ignored) {
-                        // Skip invalid tool IDs
                     }
                 }
             }
