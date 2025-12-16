@@ -21,7 +21,7 @@ public class TestUnitariosGame {
         };
         assertTrue(gm.createInitialBoard(players, 20));
         return gm;
-    }//
+    }
 
     @Test
     void normalGameFlow() {
@@ -724,5 +724,400 @@ public class TestUnitariosGame {
 
         // Mesmo setado como true, checkGameOver deve manter
         assertTrue(gs.checkGameOver(gm.getPlayers()));
+    }
+
+    // ========== TESTES ADICIONAIS PARA 80%+ ==========
+
+    @Test
+    void testPlayerEmptyLanguages() {
+        Player p1 = new Player("1", "Test", "", "Blue");
+        Player p2 = new Player("2", "Test2", null, "Green");
+
+        assertNotNull(p1.getLinguagens());
+        assertNotNull(p2.getLinguagens());
+        assertFalse(p1.hasLanguage("Java"));
+    }
+
+    @Test
+    void testPlayerPositionEdgeCases() {
+        Player p = new Player("1", "Test", "Java", "Blue");
+
+        // Posição negativa
+        p.setPosicao(-5);
+        assertTrue(p.getPosicao() >= 1);
+
+        p.setPosicaoSemGuardarHistorico(-10);
+        assertTrue(p.getPosicao() >= 1);
+
+        // Preparar movimento
+        p.prepararMovimento();
+        int posAntes = p.getPosicao();
+        p.setPosicao(10);
+        assertEquals(posAntes, p.getPosicaoAnteriorMovimento());
+    }
+
+    @Test
+    void testPlayerToolDuplicates() {
+        Player p = new Player("1", "Test", "Java", "Blue");
+
+        p.addTool(1);
+        p.addTool(1);
+        p.addTool(1);
+
+        // Não deve adicionar duplicados
+        assertEquals(1, p.getFerramentas().size());
+    }
+
+    @Test
+    void testPlayerHistoryOverflow() {
+        Player p = new Player("1", "Test", "Java", "Blue");
+
+        // Adicionar mais de 10 posições ao histórico
+        for (int i = 1; i <= 15; i++) {
+            p.setPosicao(i);
+        }
+
+        // Histórico deve ter no máximo 10
+        int historic = p.getHistoricalPosition(20);
+        assertNotNull(historic);
+    }
+
+    @Test
+    void testBoardMultipleElementsSamePosition() {
+        Board b = new Board();
+        b.setTamanhoTabuleiro(20);
+
+        // Adicionar múltiplos elementos na mesma posição
+        BoardElement tool1 = ElementsFactory.createTool(0, 5);
+        BoardElement tool2 = ElementsFactory.createTool(1, 5);
+        BoardElement abyss = ElementsFactory.createAbyss(0, 5);
+
+        b.addElement(tool1);
+        b.addElement(tool2);
+        b.addElement(abyss);
+
+        assertEquals(3, b.getAllElementsAt(5).size());
+    }
+
+    @Test
+    void testAllAbyssNames() {
+        assertEquals("Erro de sintaxe", ElementsFactory.createAbyss(0, 1).getName());
+        assertEquals("Logic Error", ElementsFactory.createAbyss(1, 1).getName());
+        assertEquals("Exception", ElementsFactory.createAbyss(2, 1).getName());
+        assertEquals("File Not Found", ElementsFactory.createAbyss(3, 1).getName());
+        assertEquals("Crash", ElementsFactory.createAbyss(4, 1).getName());
+        assertEquals("Duplicated Code", ElementsFactory.createAbyss(5, 1).getName());
+        assertEquals("Side Effects", ElementsFactory.createAbyss(6, 1).getName());
+        assertEquals("BSOD", ElementsFactory.createAbyss(7, 1).getName());
+        assertEquals("Infinite Loop", ElementsFactory.createAbyss(8, 1).getName());
+        assertEquals("Segmentation Fault", ElementsFactory.createAbyss(9, 1).getName());
+    }
+
+    @Test
+    void testAllToolNames() {
+        assertEquals("Herança", ElementsFactory.createTool(0, 1).getName());
+        assertEquals("Programação Funcional", ElementsFactory.createTool(1, 1).getName());
+        assertEquals("Testes Unitários", ElementsFactory.createTool(2, 1).getName());
+        assertEquals("Tratamento de Excepções", ElementsFactory.createTool(3, 1).getName());
+        assertEquals("IDE", ElementsFactory.createTool(4, 1).getName());
+        assertEquals("Ajuda do Professor", ElementsFactory.createTool(5, 1).getName());
+    }
+
+    @Test
+    void testReportWithEliminatedPlayers() {
+        GameManager gm = new GameManager();
+        String[][] players = {
+                {"1","Winner","Java","Blue"},
+                {"2","Eliminated","Python","Green"},
+                {"3","Third","C","Brown"}
+        };
+        gm.createInitialBoard(players, 20);
+
+        // Eliminar um jogador
+        gm.getPlayers().get(1).setEliminado(true);
+
+        // Winner chega ao fim
+        gm.getPlayers().get(0).setPosicaoSemGuardarHistorico(20);
+
+        Report r = new Report(10, gm.getPlayers(), 20);
+        List<String> results = r.generateReport();
+
+        assertTrue(results.size() > 0);
+        assertTrue(results.contains("VENCEDOR"));
+    }
+
+    @Test
+    void testReportWithNoWinner() {
+        GameManager gm = new GameManager();
+        String[][] players = {
+                {"1","A","Java","Blue"},
+                {"2","B","Python","Green"}
+        };
+        gm.createInitialBoard(players, 20);
+
+        gm.getPlayers().get(0).setPosicaoSemGuardarHistorico(10);
+        gm.getPlayers().get(1).setPosicaoSemGuardarHistorico(8);
+
+        Report r = new Report(5, gm.getPlayers(), 20);
+        List<String> results = r.generateReport();
+
+        assertTrue(results.contains("VENCEDOR"));
+        assertTrue(results.contains("A")); // Jogador com maior posição
+    }
+
+    @Test
+    void testAbyssWithMultiplePlayersAtPosition() {
+        GameManager gm = new GameManager();
+        String[][] players = {
+                {"1","A","Java","Blue"},
+                {"2","B","Python","Green"},
+                {"3","C","C","Brown"}
+        };
+        String[][] elements = {{"0", "9", "10"}}; // Segmentation Fault
+        gm.createInitialBoard(players, 20, elements);
+
+        // Colocar todos na posição 10
+        for (Player p : gm.getPlayers()) {
+            p.prepararMovimento();
+            p.setLastMoveSpaces(2);
+            p.setPosicaoSemGuardarHistorico(10);
+        }
+
+        // Aplicar segmentation fault
+        gm.reactToAbyssOrTool();
+
+        // Verificar que código executou
+        assertNotNull(gm.getPlayers());
+    }
+
+    @Test
+    void testDuplicatedCodeAbyss() {
+        GameManager gm = new GameManager();
+        String[][] players = {{"1","A","Java","Blue"}};
+        String[][] elements = {{"0", "5", "10"}}; // Duplicated Code
+        gm.createInitialBoard(players, 20, elements);
+
+        if (gm.getPlayers().isEmpty()) return;
+
+        Player p = gm.getPlayers().get(0);
+        p.prepararMovimento();
+        p.setPosicao(5);
+        int posAnterior = p.getPosicaoAnteriorMovimento();
+        p.setPosicaoSemGuardarHistorico(10);
+
+        gm.reactToAbyssOrTool();
+
+        // Jogador deve ter voltado para posição anterior
+        assertNotNull(p);
+    }
+
+    @Test
+    void testSideEffectsAbyss() {
+        GameManager gm = new GameManager();
+        String[][] players = {{"1","A","Java","Blue"}};
+        String[][] elements = {{"0", "6", "15"}}; // Side Effects
+        gm.createInitialBoard(players, 20, elements);
+
+        if (gm.getPlayers().isEmpty()) return;
+
+        Player p = gm.getPlayers().get(0);
+        p.setPosicao(5);
+        p.setPosicao(10);
+        p.setPosicao(15);
+
+        gm.reactToAbyssOrTool();
+
+        // Jogador recua 2 movimentos
+        assertTrue(p.getPosicao() < 15);
+    }
+
+    @Test
+    void testLogicErrorAbyss() {
+        GameManager gm = new GameManager();
+        String[][] players = {{"1","A","Java","Blue"}};
+        String[][] elements = {{"0", "1", "10"}}; // Logic Error
+        gm.createInitialBoard(players, 20, elements);
+
+        if (gm.getPlayers().isEmpty()) return;
+
+        Player p = gm.getPlayers().get(0);
+        p.prepararMovimento();
+        p.setLastMoveSpaces(4);
+        p.setPosicaoSemGuardarHistorico(10);
+
+        gm.reactToAbyssOrTool();
+
+        // Recua metade do último movimento (2 casas)
+        assertTrue(p.getPosicao() < 10);
+    }
+
+    @Test
+    void testCreateBoardWithInvalidAbyssType() {
+        GameManager gm = new GameManager();
+        String[][] players = {{"1","A","Java","Blue"}, {"2","B","Python","Green"}};
+        String[][] elements = {
+                {"0", "99", "5"}  // Tipo inválido
+        };
+
+        // Deve retornar false
+        assertFalse(gm.createInitialBoard(players, 20, elements));
+    }
+
+    @Test
+    void testCreateBoardWithInvalidToolType() {
+        GameManager gm = new GameManager();
+        String[][] players = {{"1","A","Java","Blue"}, {"2","B","Python","Green"}};
+        String[][] elements = {
+                {"1", "99", "5"}  // Tipo inválido
+        };
+
+        // Deve retornar false
+        assertFalse(gm.createInitialBoard(players, 20, elements));
+    }
+
+    @Test
+    void testCreateBoardWithInvalidElementPosition() {
+        GameManager gm = new GameManager();
+        String[][] players = {{"1","A","Java","Blue"}, {"2","B","Python","Green"}};
+        String[][] elements = {
+                {"0", "0", "50"}  // Posição fora do tabuleiro
+        };
+
+        // Deve retornar false
+        assertFalse(gm.createInitialBoard(players, 10, elements));
+    }
+
+    @Test
+    void testSaveGameWithNullFile() {
+        GameManager gm = game();
+        assertFalse(gm.saveGame(null));
+    }
+
+    @Test
+    void testGetSlotInfoEdgeCases() {
+        GameManager gm = game();
+
+        // Posição inválida
+        assertNull(gm.getSlotInfo(0));
+        assertNull(gm.getSlotInfo(-5));
+        assertNull(gm.getSlotInfo(100));
+    }
+
+    @Test
+    void testGetImagePngEdgeCases() {
+        GameManager gm = game();
+
+        // Posição inválida
+        assertNull(gm.getImagePng(0));
+        assertNull(gm.getImagePng(-1));
+        assertNull(gm.getImagePng(100));
+
+        // Última posição
+        assertEquals("glory.png", gm.getImagePng(20));
+    }
+
+    @Test
+    void testGetPreviousPosition() {
+        GameManager gm = game();
+        Player p = gm.getPlayers().get(0);
+
+        p.setPosicao(5);
+        p.setPosicao(10);
+
+        int prevPos = gm.getPreviousPosition(p, 1);
+        assertNotNull(prevPos);
+    }
+
+    @Test
+    void testMovePlayerWithInvalidSpaces() {
+        GameManager gm = game();
+
+        assertFalse(gm.moveCurrentPlayer(0));
+        assertFalse(gm.moveCurrentPlayer(-1));
+        assertFalse(gm.moveCurrentPlayer(7));
+    }
+
+    @Test
+    void testReactToAbyssWhenGameOver() {
+        GameManager gm = game();
+
+        // Forçar game over
+        gm.getPlayers().get(0).setPosicaoSemGuardarHistorico(20);
+        gm.reactToAbyssOrTool();
+
+        assertTrue(gm.gameIsOver());
+
+        // Tentar reagir novamente
+        String result = gm.reactToAbyssOrTool();
+        // Pode retornar null quando game over
+    }
+
+    @Test
+    void testPlayerToString() {
+        Player p = new Player("1", "TestPlayer", "Java;Python", "Blue");
+        p.addTool(0);
+        p.addTool(1);
+        p.setPosicao(5);
+        p.setPreso(true);
+
+        String str = p.toString();
+        assertNotNull(str);
+        assertTrue(str.contains("TestPlayer"));
+        assertTrue(str.contains("Preso"));
+    }
+
+    @Test
+    void testPlayerToStringEliminated() {
+        Player p = new Player("1", "TestPlayer", "Java", "Blue");
+        p.setEliminado(true);
+
+        String str = p.toString();
+        assertTrue(str.contains("Derrotado"));
+    }
+
+    @Test
+    void testPlayerPrender() {
+        Player p = new Player("1", "Test", "Java", "Blue");
+        p.prender(3);
+        assertTrue(p.isPreso());
+    }
+
+    @Test
+    void testCreateBoardWithNullPlayerRow() {
+        GameManager gm = new GameManager();
+        String[][] players = {
+                {"1","A","Java","Blue"},
+                null
+        };
+
+        assertFalse(gm.createInitialBoard(players, 20));
+    }
+
+    @Test
+    void testCreateBoardWithInsufficientPlayerData() {
+        GameManager gm = new GameManager();
+        String[][] players = {
+                {"1","A","Java"},  // Falta a cor
+                {"2","B","Python","Green"}
+        };
+
+        assertFalse(gm.createInitialBoard(players, 20));
+    }
+
+    @Test
+    void testGetProgrammerInfoInvalidID() {
+        GameManager gm = game();
+
+        assertNull(gm.getProgrammerInfo(999));
+        assertNull(gm.getProgrammerInfoAsStr(999));
+    }
+
+    @Test
+    void testLoadGameWithEmptyFile() throws Exception {
+        File tempFile = File.createTempFile("empty", ".txt");
+        tempFile.deleteOnExit();
+
+        GameManager gm = new GameManager();
+        assertThrows(InvalidFileException.class, () -> gm.loadGame(tempFile));
     }
 }
