@@ -321,7 +321,7 @@ public class GameManager {
         normalizeCurrentIndex();
         Player cur = players.get(currentPlayerIndex);
 
-        // Se eliminado, avança para o próximo vivo
+
         if (cur.isEliminado()) {
             advanceToNextAlive();
             if (players.isEmpty() || gameOver) {
