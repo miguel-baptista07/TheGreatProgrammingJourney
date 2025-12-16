@@ -266,6 +266,11 @@ public class GameManager {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (Player p : players) {
+
+            if (p.isEliminado()) {
+                continue;
+            }
+
             if (!first) {
                 sb.append(" | ");
             }
