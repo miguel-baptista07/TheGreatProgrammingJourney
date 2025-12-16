@@ -21,7 +21,7 @@ public class TestUnitariosGame {
         };
         assertTrue(gm.createInitialBoard(players, 20));
         return gm;
-    }
+    }//
 
     @Test
     void normalGameFlow() {
