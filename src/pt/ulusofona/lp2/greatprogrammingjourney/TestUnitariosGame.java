@@ -180,22 +180,22 @@ public class TestUnitariosGame {
         }
     }
 
-
+    // ============ NOVOS TESTES PARA 80% COVERAGE ============
 
     @Test
     void testCreateInitialBoardValidations() {
         GameManager gm = new GameManager();
 
-
+        // Null playerInfo
         assertFalse(gm.createInitialBoard(null, 10));
 
-
+        // WorldSize < 2
         assertFalse(gm.createInitialBoard(new String[][]{{"1","A","Java","Blue"}}, 1));
 
-
+        // Menos de 2 jogadores
         assertFalse(gm.createInitialBoard(new String[][]{{"1","A","Java","Blue"}}, 10));
 
-
+        // Mais de 4 jogadores
         assertFalse(gm.createInitialBoard(new String[][]{
                 {"1","A","Java","Blue"},
                 {"2","B","C","Green"},
@@ -204,25 +204,25 @@ public class TestUnitariosGame {
                 {"5","E","C#","Blue"}
         }, 20));
 
-
+        // WorldSize muito pequeno para número de jogadores
         assertFalse(gm.createInitialBoard(new String[][]{
                 {"1","A","Java","Blue"},
                 {"2","B","C","Green"}
         }, 3));
 
-
+        // ID duplicado
         assertFalse(gm.createInitialBoard(new String[][]{
                 {"1","A","Java","Blue"},
                 {"1","B","C","Green"}
         }, 10));
 
-
+        // Nome vazio
         assertFalse(gm.createInitialBoard(new String[][]{
                 {"1","","Java","Blue"},
                 {"2","B","C","Green"}
         }, 10));
 
-
+        // Cor inválida
         assertFalse(gm.createInitialBoard(new String[][]{
                 {"1","A","Java","Red"},
                 {"2","B","C","Green"}
@@ -237,9 +237,9 @@ public class TestUnitariosGame {
                 {"2","B","C","Green"}
         };
         String[][] elements = {
-                {"0", "0", "5"},
-                {"1", "0", "7"},
-                {"0", "8", "10"}
+                {"0", "0", "5"},  // Abyss Syntax Error na casa 5
+                {"1", "0", "7"},  // Tool Herança na casa 7
+                {"0", "8", "10"}  // Abyss Infinite Loop na casa 10
         };
 
         assertTrue(gm.createInitialBoard(players, 20, elements));
@@ -258,17 +258,17 @@ public class TestUnitariosGame {
         };
         assertTrue(gm.createInitialBoard(players, 20));
 
-
+        // Assembly: max 2 casas
         assertTrue(gm.moveCurrentPlayer(2));
         assertFalse(gm.moveCurrentPlayer(3));
         gm.reactToAbyssOrTool();
 
-
+        // C: max 3 casas
         assertTrue(gm.moveCurrentPlayer(3));
         assertFalse(gm.moveCurrentPlayer(4));
         gm.reactToAbyssOrTool();
 
-
+        // Python: max 6 casas
         assertTrue(gm.moveCurrentPlayer(6));
     }
 
