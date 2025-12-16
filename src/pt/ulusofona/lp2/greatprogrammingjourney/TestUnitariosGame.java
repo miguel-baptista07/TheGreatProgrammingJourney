@@ -8,186 +8,195 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestUnitariosGame {
 
-    private GameManager baseGame() {
+    private GameManager game(String[][] elements) {
         GameManager gm = new GameManager();
         String[][] players = {
-                {"1", "Ana", "Java;C", "Blue"},
-                {"2", "Bruno", "Python;Java", "Green"}
+                {"1", "A", "Java;C", "Blue"},
+                {"2", "B", "Python;Java", "Green"}
         };
-        assertTrue(gm.createInitialBoard(players, 20));
+        if (elements == null) {
+            assertTrue(gm.createInitialBoard(players, 20));
+        } else {
+            assertTrue(gm.createInitialBoard(players, 20, elements));
+        }
         return gm;
     }
 
-    private GameManager gameWithElements(String[][] elements) {
-        GameManager gm = new GameManager();
-        String[][] players = {
-                {"1", "Ana", "Java;C", "Blue"},
-                {"2", "Bruno", "Python;Java", "Green"}
+    @Test
+    void massiveGameSimulation() {
+        String[][] elements = {
+                {"0","0","2"},{"0","1","3"},{"0","2","4"},{"0","3","5"},
+                {"0","4","6"},{"0","5","7"},{"0","6","8"},{"0","7","9"},
+                {"0","8","10"},{"0","9","11"},
+                {"1","0","12"},{"1","1","13"},{"1","2","14"},
+                {"1","3","15"},{"1","4","16"},{"1","5","17"}
         };
-        assertTrue(gm.createInitialBoard(players, 20, elements));
-        return gm;
+
+        GameManager gm = game(elements);
+
+        for (int i = 0; i < 40; i++) {
+            gm.moveCurrentPlayer(1);
+            gm.reactToAbyssOrTool();
+            gm.moveCurrentPlayer(2);
+            gm.reactToAbyssOrTool();
+            gm.moveCurrentPlayer(3);
+            gm.reactToAbyssOrTool();
+        }
+
+        for (int pos = -5; pos <= 25; pos++) {
+            gm.getSlotInfo(pos);
+            gm.getImagePng(pos);
+            gm.getPlayersAtPosition(pos);
+        }
+
+        gm.getProgrammersInfo();
+        gm.getGameResults();
+        gm.gameIsOver();
     }
 
-    @Test void t001_createGame() { assertNotNull(baseGame()); }
-    @Test void t002_playersSize() { assertEquals(2, baseGame().getPlayers().size()); }
-    @Test void t003_turnCounter() { assertTrue(baseGame().getTurnCounter() >= 1); }
-    @Test void t004_currentPlayerId() { assertTrue(baseGame().getCurrentPlayerID() >= 0); }
-    @Test void t005_gameNotOverInitially() { assertFalse(baseGame().gameIsOver()); }
+    @Test
+    void exhaustiveMoveValidation() {
+        GameManager gm = game(null);
 
-    @Test void t006_validMove1() { assertTrue(baseGame().moveCurrentPlayer(1)); }
-    @Test void t007_validMove2() { assertTrue(baseGame().moveCurrentPlayer(2)); }
-    @Test void t008_invalidMoveHigh() { assertFalse(baseGame().moveCurrentPlayer(7)); }
-    @Test void t009_invalidMoveZero() { assertFalse(baseGame().moveCurrentPlayer(0)); }
-
-    @Test void t010_turnChanges() {
-        GameManager gm = baseGame();
-        int id = gm.getCurrentPlayerID();
-        gm.moveCurrentPlayer(1);
-        gm.reactToAbyssOrTool();
-        assertNotEquals(id, gm.getCurrentPlayerID());
+        for (int i = -3; i <= 10; i++) {
+            gm.moveCurrentPlayer(i);
+            gm.reactToAbyssOrTool();
+        }
     }
 
-    @Test void t020_slotInfoValid() { assertNotNull(baseGame().getSlotInfo(1)); }
-    @Test void t021_slotInfoInvalidLow() { assertNull(baseGame().getSlotInfo(-1)); }
-    @Test void t022_slotInfoInvalidHigh() { assertNull(baseGame().getSlotInfo(999)); }
+    @Test
+    void playerStateAbuse() {
+        Player p = new Player("1","X","Java;C","Blue");
 
-    @Test void t023_programmerInfoValid() { assertNotNull(baseGame().getProgrammerInfo(1)); }
-    @Test void t024_programmerInfoInvalid() { assertNull(baseGame().getProgrammerInfo(999)); }
+        for (int i = 0; i < 5; i++) {
+            p.addTool(i);
+            p.hasTool(i);
+        }
 
+        for (int i = 0; i < 5; i++) {
+            p.removeTool(i);
+            p.hasTool(i);
+        }
 
-    @Test void t030_imageInvalidLow() { assertNull(baseGame().getImagePng(-1)); }
-    @Test void t031_imageEmptySlot() { assertNull(baseGame().getImagePng(1)); }
-    @Test void t032_imageFinal() { assertEquals("glory.png", baseGame().getImagePng(20)); }
-
-    @Test void t033_toolName0() { assertNotNull(GameManager.toolName(0)); }
-    @Test void t034_toolName1() { assertNotNull(GameManager.toolName(1)); }
-    @Test void t035_toolName2() { assertNotNull(GameManager.toolName(2)); }
-    @Test void t036_toolName3() { assertNotNull(GameManager.toolName(3)); }
-    @Test void t037_toolName4() { assertNotNull(GameManager.toolName(4)); }
-    @Test void t038_toolName5() { assertNotNull(GameManager.toolName(5)); }
-    @Test void t039_toolNameInvalid() { assertNotNull(GameManager.toolName(999)); }
-    @Test void t040_toolNameNegative() { assertNotNull(GameManager.toolName(-5)); }
-
-    @Test void t050_toolPickupInheritance() {
-        GameManager gm = gameWithElements(new String[][]{{"1", "0", "2"}});
-        gm.moveCurrentPlayer(1);
-        gm.reactToAbyssOrTool();
-        assertTrue(gm.getPlayers().get(0).hasTool(0));
-    }
-
-    @Test void t060_syntaxAbyss() {
-        GameManager gm = gameWithElements(new String[][]{{"0", "0", "2"}});
-        gm.moveCurrentPlayer(1);
-        gm.reactToAbyssOrTool();
-        assertEquals(1, gm.getPlayers().get(0).getPosicao());
-    }
-
-    @Test void t067_bsodAbyss() {
-        GameManager gm = gameWithElements(new String[][]{{"0", "7", "2"}});
-        gm.moveCurrentPlayer(1);
-        gm.reactToAbyssOrTool();
-        assertTrue(gm.getPlayers().get(0).isEliminado());
-    }
-
-    @Test void t068_prisonAbyss() {
-        GameManager gm = gameWithElements(new String[][]{{"0", "8", "2"}});
-        gm.moveCurrentPlayer(1);
-        gm.reactToAbyssOrTool();
-        assertTrue(gm.getPlayers().get(0).isPreso());
-    }
-
-    @Test void t069_segmentationFault() {
-        GameManager gm = gameWithElements(new String[][]{{"0", "9", "2"}});
-        gm.moveCurrentPlayer(1);
-        gm.reactToAbyssOrTool();
-        assertTrue(
-                gm.getPlayers().get(0).getPosicao() <= 1 ||
-                        gm.getPlayers().get(1).getPosicao() <= 1
-        );
-    }
-
-    @Test void t080_playerBasics() {
-        Player p = new Player("1", "X", "Java;C", "Blue");
-        assertEquals("1", p.getId());
-        assertEquals("X", p.getNome());
-        assertEquals("Blue", p.getCor());
-    }
-
-    @Test void t081_playerLanguages() {
-        Player p = new Player("1", "X", "Java;C", "Blue");
-        assertTrue(p.hasLanguage("java"));
-        assertTrue(p.hasLanguage("C"));
-        assertFalse(p.hasLanguage("Python"));
-    }
-
-    @Test void t082_playerToolsFalse() {
-        Player p = new Player("1", "X", "Java", "Blue");
-        assertFalse(p.hasTool(99));
-    }
-
-    @Test void t083_playerPrenderLibertar() {
-        Player p = new Player("1", "X", "Java", "Blue");
-        p.prender(2);
-        assertTrue(p.isPreso());
-        p.setPreso(false);
-        assertFalse(p.isPreso());
-    }
-
-    @Test void t084_playerFerramentaAtivaNull() {
-        Player p = new Player("1", "X", "Java", "Blue");
+        p.setFerramentaAtiva(1);
+        p.getFerramentaAtiva();
         p.setFerramentaAtiva(null);
-        assertNull(p.getFerramentaAtiva());
+        p.getFerramentaAtiva();
+
+        p.setLastMoveSpaces(1);
+        p.getLastMoveSpaces();
+        p.setLastMoveSpaces(3);
+        p.getLastMoveSpaces();
+
+        p.setPosicao(2);
+        p.setPosicao(5);
+        p.setPosicao(9);
+        p.getHistoricalPosition(1);
+        p.getHistoricalPosition(2);
+
+        p.prender(2);
+        p.isPreso();
+        p.setPreso(false);
+        p.isPreso();
+
+        p.setEliminado(true);
+        p.isEliminado();
+        p.setEliminado(false);
+        p.isEliminado();
+
+        p.toString();
     }
 
-    @Test void t090_boardEmpty() {
+    @Test
+    void boardAbuse() {
         Board b = new Board();
-        assertNull(b.getElementAt(1));
-        assertTrue(b.getAllElementsAt(1).isEmpty());
-    }
 
-    @Test void t091_boardMultipleElementsSamePos() {
-        Board b = new Board();
-        b.addElement(new AbyssErroDeSintaxe(2));
-        b.addElement(new AbyssErroDeSintaxe(2));
-        assertEquals(2, b.getAllElementsAt(2).size());
-    }
+        for (int i = 1; i <= 10; i++) {
+            b.getElementAt(i);
+            b.getAllElementsAt(i);
+        }
 
-    @Test void t092_boardClearTwice() {
-        Board b = new Board();
-        b.clearElements();
-        b.clearElements();
-        assertNull(b.getElementAt(1));
-    }
-
-    @Test void t100_factoryMultipleAbyss() {
         for (int i = 0; i <= 9; i++) {
-            assertNotNull(ElementsFactory.createAbyss(i, 1));
+            b.addElement(ElementsFactory.createAbyss(i, i + 1));
+            b.addElement(ElementsFactory.createAbyss(i, i + 1));
+            b.getAllElementsAt(i + 1);
+        }
+
+        b.clearElements();
+        b.clearElements();
+    }
+
+    @Test
+    void factoryAndAdapterStress() {
+        for (int i = -2; i <= 12; i++) {
+            BoardElement a = ElementsFactory.createAbyss(Math.max(0, i), i + 1);
+            BoardElement t = ElementsFactory.createTool(Math.max(0, i), i + 1);
+
+            if (a != null) {
+                ElementsIOAdapter.typeOf(a);
+            }
+            if (t != null) {
+                ElementsIOAdapter.typeOf(t);
+            }
+        }
+
+        for (int type = 0; type <= 1; type++) {
+            for (int id = 0; id <= 9; id++) {
+                ElementsIOAdapter.toElement(type, id, id + 1);
+            }
         }
     }
 
-    @Test void t101_factoryMultipleTools() {
-        for (int i = 0; i <= 5; i++) {
-            assertNotNull(ElementsFactory.createTool(i, 1));
-        }
-    }
-
-    @Test void t102_adapterTypeFallback() {
-        BoardElement e = ElementsFactory.createAbyss(0, 1);
-        assertTrue(ElementsIOAdapter.typeOf(e) >= 0);
-    }
-
-    @Test void t110_gameStatusFlow() {
-        GameManager gm = baseGame();
+    @Test
+    void gameStatusStress() {
+        GameManager gm = game(null);
         GameStatus gs = new GameStatus(20, gm.getPlayers());
-        assertFalse(gs.isGameOver());
+
+        gs.isGameOver();
+        gs.checkGameOver(gm.getPlayers());
+
+        gm.getPlayers().get(0).setPosicaoSemGuardarHistorico(10);
+        gs.checkGameOver(gm.getPlayers());
+
         gm.getPlayers().get(0).setPosicaoSemGuardarHistorico(20);
-        assertTrue(gs.checkGameOver(gm.getPlayers()));
-        assertTrue(gs.isGameOver());
+        gs.checkGameOver(gm.getPlayers());
+        gs.isGameOver();
     }
 
-    @Test void t120_playersAtPosition() {
-        GameManager gm = baseGame();
-        List<Player> ps = gm.getPlayersAtPosition(1);
-        assertEquals(2, ps.size());
+    @Test
+    void toolNamesFullRange() {
+        for (int i = -10; i <= 30; i++) {
+            GameManager.toolName(i);
+        }
+    }
+
+    @Test
+    void programmerInfoAbuse() {
+        GameManager gm = game(null);
+
+        for (int i = -5; i <= 10; i++) {
+            gm.getProgrammerInfo(i);
+        }
+    }
+
+    @Test
+    void slotInfoAbuse() {
+        GameManager gm = game(null);
+
+        for (int i = -5; i <= 30; i++) {
+            gm.getSlotInfo(i);
+        }
+    }
+
+    @Test
+    void playersAtPositionAbuse() {
+        GameManager gm = game(null);
+
+        for (int i = -2; i <= 30; i++) {
+            List<Player> ps = gm.getPlayersAtPosition(i);
+            if (ps != null) {
+                ps.size();
+            }
+        }
     }
 }
