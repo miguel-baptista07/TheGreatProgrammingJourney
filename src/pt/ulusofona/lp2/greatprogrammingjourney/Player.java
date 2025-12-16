@@ -15,7 +15,7 @@ public class Player {
     private final List<Integer> ferramentas;
     private Integer ferramentaAtiva;
     private boolean eliminado;
-    private String state;  // ✅ MUDANÇA: usa String
+    private boolean preso;
     private int lastMoveSpaces;
     private final List<Integer> posicaoHistorico;
 
@@ -37,7 +37,7 @@ public class Player {
         this.ferramentas = new ArrayList<>();
         this.ferramentaAtiva = null;
         this.eliminado = false;
-        this.state = "Em Jogo";  // ✅ INICIALIZA
+        this.preso = false;
         this.lastMoveSpaces = 0;
         this.posicaoHistorico = new ArrayList<>();
         this.posicaoHistorico.add(1);
@@ -55,53 +55,60 @@ public class Player {
         return String.join("; ", langs);
     }
 
-    // ✅ GETTERS SIMPLES
-    public String getId() { return id; }
-    public String getNome() { return nome; }
-    public String getLinguagens() { return linguagens; }
-    public String getPrimeiraLinguagem() { return primeiraLinguagem; }
-    public String getCor() { return cor; }
-    public int getPosicao() { return posicao; }
-    public int getPosicaoAnteriorMovimento() { return posicaoAnteriorMovimento; }
-    public List<Integer> getFerramentas() { return new ArrayList<>(ferramentas); }
-    public Integer getFerramentaAtiva() { return ferramentaAtiva; }
-    public boolean isEliminado() { return eliminado; }
-    public int getLastMoveSpaces() { return lastMoveSpaces; }
-
-    // ✅ ESTADO SIMPLIFICADO
-    public String getState() { return state; }
-    public void setState(String state) { this.state = state; }
-
-    public boolean isPreso() {
-        return "Preso".equals(state);
+    public String getId() {
+        return id;
     }
 
-    public void setPreso(boolean preso) {
-        this.state = preso ? "Preso" : "Em Jogo";
+    public String getNome() {
+        return nome;
     }
 
-    public void prepararMovimento() {
-        this.posicaoAnteriorMovimento = this.posicao;
+    public String getLinguagens() {
+        return linguagens;
+    }
+
+    public String getPrimeiraLinguagem() {
+        return primeiraLinguagem;
+    }
+
+    public String getCor() {
+        return cor;
+    }
+
+    public int getPosicao() {
+        return posicao;
     }
 
     public void setPosicaoSemGuardarHistorico(int posicao) {
-        if (posicao < 1) posicao = 1;
+        if (posicao < 1) {
+            posicao = 1;
+        }
         this.posicao = posicao;
         guardarHistorico();
     }
 
     public void setPosicao(int posicao) {
-        if (posicao < 1) posicao = 1;
+        if (posicao < 1) {
+            posicao = 1;
+        }
         this.posicaoAnteriorMovimento = this.posicao;
         this.posicao = posicao;
         guardarHistorico();
     }
 
     private void guardarHistorico() {
-        posicaoHistorico.add(this.posicao);
-        if (posicaoHistorico.size() > 10) {
-            posicaoHistorico.remove(0);
+        this.posicaoHistorico.add(this.posicao);
+        if (this.posicaoHistorico.size() > 10) {
+            this.posicaoHistorico.remove(0);
         }
+    }
+
+    public void prepararMovimento() {
+        this.posicaoAnteriorMovimento = this.posicao;
+    }
+
+    public int getPosicaoAnteriorMovimento() {
+        return posicaoAnteriorMovimento;
     }
 
     public boolean hasTool(int toolId) {
@@ -118,27 +125,44 @@ public class Player {
         ferramentas.remove(Integer.valueOf(toolId));
     }
 
+    public List<Integer> getFerramentas() {
+        return new ArrayList<>(ferramentas);
+    }
+
+    public Integer getFerramentaAtiva() {
+        return ferramentaAtiva;
+    }
+
     public void setFerramentaAtiva(Integer ferramentaAtiva) {
         this.ferramentaAtiva = ferramentaAtiva;
     }
 
+    public boolean isEliminado() {
+        return eliminado;
+    }
+
     public void setEliminado(boolean eliminado) {
         this.eliminado = eliminado;
-        if (eliminado) {
-            this.state = "Derrotado";
-        }
+    }
+
+    public boolean isPreso() {
+        return preso;
+    }
+
+    public void setPreso(boolean preso) {
+        this.preso = preso;
+    }
+
+    public void prender(int turnos) {
+        this.preso = true;
     }
 
     public void setLastMoveSpaces(int lastMoveSpaces) {
         this.lastMoveSpaces = lastMoveSpaces;
     }
 
-    public int getHistoricalPosition(int movesBack) {
-        int idx = posicaoHistorico.size() - 1 - movesBack;
-        if (idx < 0) {
-            return posicaoHistorico.get(0);
-        }
-        return posicaoHistorico.get(idx);
+    public int getLastMoveSpaces() {
+        return lastMoveSpaces;
     }
 
     public String getFerramentasAsString() {
@@ -155,11 +179,31 @@ public class Player {
         return sb.toString();
     }
 
+    public int getHistoricalPosition(int movesBack) {
+        int idx = posicaoHistorico.size() - 1 - movesBack;
+        if (idx < 0) {
+            return posicaoHistorico.get(0);
+        }
+        return posicaoHistorico.get(idx);
+    }
+
+    public boolean hasLanguage(String lang) {
+        String[] ls = linguagens.split(";");
+        for (String l : ls) {
+            if (l.trim().equalsIgnoreCase(lang)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
         String ferramentasStr = ferramentas.isEmpty() ? "No tools" : getFerramentasAsString();
+        String estadoStr = eliminado ? "Derrotado" : preso ? "Preso" : "Em Jogo";
+
         return "ID: " + id + " | Nome: " + nome + " | Posição: " + posicao +
                 " | Ferramentas: " + ferramentasStr + " | Linguagens: " + linguagens +
-                " | Estado: " + state;
+                " | Estado: " + estadoStr;
     }
 }
