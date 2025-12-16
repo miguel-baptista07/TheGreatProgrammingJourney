@@ -210,6 +210,7 @@ public class GameManager {
                     };
                 }
             } catch (NumberFormatException e) {
+                // ID não numérico - comparar como string
                 if (p.getId().equals(String.valueOf(id))) {
                     return new String[]{
                             p.getId(),
@@ -239,7 +240,8 @@ public class GameManager {
                 if (Integer.parseInt(pid) == id) {
                     found = p;
                 }
-            } catch (NumberFormatException ignored) {
+            } catch (NumberFormatException e) {
+                // ID não numérico - comparar como string
                 if (pid.equals(String.valueOf(id))) {
                     found = p;
                 }
@@ -314,7 +316,7 @@ public class GameManager {
         normalizeCurrentIndex();
         Player cur = players.get(currentPlayerIndex);
 
-        // ✅ Se eliminado, avança para o próximo vivo
+        // Se eliminado, avança para o próximo vivo
         if (cur.isEliminado()) {
             advanceToNextAlive();
             if (players.isEmpty() || gameOver) {
@@ -343,8 +345,6 @@ public class GameManager {
         }
     }
 
-
-
     public boolean moveCurrentPlayer(int nrSpaces) {
         if (gameOver) {
             return false;
@@ -365,7 +365,7 @@ public class GameManager {
             return false;
         }
 
-        // ✅ Se está preso: retorna false (não move, não liberta)
+        // Se está preso: retorna false (não move)
         if (current.isPreso()) {
             return false;
         }
@@ -466,20 +466,6 @@ public class GameManager {
         if (current.isEliminado()) {
             advanceToNextAlive();
             return null;
-        }
-
-        // ✅ CRÍTICO: Se estava preso:
-        // - Liberta
-        // - Incrementa turno
-        // - Avança
-        // - Retorna mensagem
-        // O estado só muda AQUI, não no moveCurrentPlayer
-        if (current.isPreso()) {
-            current.setPreso(false);
-            turnCounter++;
-            advanceToNextAlive();
-            checkGameOverCondition();
-            return "Jogador foi libertado";
         }
 
         // Libertar outros jogadores presos na mesma casa
@@ -590,7 +576,7 @@ public class GameManager {
             }
         }
 
-        // ✅ Conta quantos jogadores estão VIVOS
+        // Conta quantos jogadores estão VIVOS
         int vivos = 0;
         for (Player p : players) {
             if (!p.isEliminado()) {
@@ -598,7 +584,7 @@ public class GameManager {
             }
         }
 
-        // ✅ Se só há 1 ou menos vivos, game over
+        // Se só há 1 ou menos vivos, game over
         if (vivos <= 1) {
             gameOver = true;
         }
@@ -767,7 +753,7 @@ public class GameManager {
             p.setPosicaoSemGuardarHistorico(pos);
             p.setEliminado(elim);
 
-            // ✅ Usa a variável 'preso' que foi definida acima
+            // Usa a variável 'preso' que foi definida acima
             if (preso) {
                 p.setPreso(true);
             }
@@ -776,7 +762,8 @@ public class GameManager {
                 for (String t : parts[toolsIndex].split(",")) {
                     try {
                         p.addTool(Integer.parseInt(t));
-                    } catch (NumberFormatException ignored) {
+                    } catch (NumberFormatException e) {
+                        // Ignorar ferramentas inválidas
                     }
                 }
             }
@@ -848,10 +835,10 @@ public class GameManager {
             return;
         }
 
-        // ✅ APENAS marca como eliminado - NÃO remove da lista!
+        // APENAS marca como eliminado - NÃO remove da lista!
         p.setEliminado(true);
 
-        // ✅ Verifica se ficou sem jogadores vivos
+        // Verifica se ficou sem jogadores vivos
         boolean temVivos = false;
         for (Player player : players) {
             if (!player.isEliminado()) {
