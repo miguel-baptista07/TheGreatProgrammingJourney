@@ -210,7 +210,6 @@ public class GameManager {
                     };
                 }
             } catch (NumberFormatException e) {
-                // ID não numérico - comparar como string
                 if (p.getId().equals(String.valueOf(id))) {
                     return new String[]{
                             p.getId(),
@@ -241,7 +240,6 @@ public class GameManager {
                     found = p;
                 }
             } catch (NumberFormatException e) {
-                // ID não numérico - comparar como string
                 if (pid.equals(String.valueOf(id))) {
                     found = p;
                 }
@@ -266,7 +264,6 @@ public class GameManager {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (Player p : players) {
-
             if (p.isEliminado()) {
                 continue;
             }
@@ -321,7 +318,6 @@ public class GameManager {
         normalizeCurrentIndex();
         Player cur = players.get(currentPlayerIndex);
 
-
         if (cur.isEliminado()) {
             advanceToNextAlive();
             if (players.isEmpty() || gameOver) {
@@ -370,7 +366,6 @@ public class GameManager {
             return false;
         }
 
-        // Se está preso: retorna false (não move)
         if (current.isPreso()) {
             return false;
         }
@@ -473,7 +468,6 @@ public class GameManager {
             return null;
         }
 
-        // Libertar outros jogadores presos na mesma casa
         List<Player> playersNaPosicao = getPlayersAtPosition(current.getPosicao());
         for (Player p : playersNaPosicao) {
             if (!p.getId().equals(current.getId()) && p.isPreso()) {
@@ -484,7 +478,6 @@ public class GameManager {
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
 
-        // Apanhar ferramentas
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
@@ -496,7 +489,6 @@ public class GameManager {
             }
         }
 
-        // Processar abismo
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
                 Integer counterToolId = getCounterToolForAbyss(el.getId());
@@ -532,16 +524,16 @@ public class GameManager {
 
     private Integer getCounterToolForAbyss(int abyssId) {
         switch (abyssId) {
-            case 0: return 4;  // Erro de sintaxe → IDE
-            case 1: return 2;  // Logic Error → Testes Unitários
-            case 2: return 3;  // Exception → Tratamento de Excepções
-            case 3: return 3;  // File Not Found → Tratamento de Excepções
-            case 4: return 5;  // Crash → Ajuda do Professor
-            case 5: return 4;  // Duplicated Code → IDE
-            case 6: return 1;  // Side Effects → Programação Funcional
-            case 7: return 5;  // BSOD → Ajuda do Professor
-            case 8: return 1;  // Infinite Loop → Programação Funcional
-            case 9: return 0;  // Segmentation Fault → Herança
+            case 0: return 4;
+            case 1: return 2;
+            case 2: return 3;
+            case 3: return 3;
+            case 4: return 5;
+            case 5: return 4;
+            case 6: return 1;
+            case 7: return 5;
+            case 8: return 1;
+            case 9: return 0;
             default: return null;
         }
     }
@@ -559,12 +551,10 @@ public class GameManager {
             currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
             tentativas++;
 
-            // Se o jogador atual NÃO está eliminado, encontrámos o próximo vivo
             if (!players.get(currentPlayerIndex).isEliminado()) {
                 return;
             }
 
-            // Evitar loop infinito se todos estão eliminados
             if (tentativas >= maxTentativas) {
                 gameOver = true;
                 return;
@@ -573,7 +563,6 @@ public class GameManager {
     }
 
     private void checkGameOverCondition() {
-        // Verifica se alguém chegou ao fim
         for (Player p : players) {
             if (!p.isEliminado() && p.getPosicao() >= board.getTamanhoTabuleiro()) {
                 gameOver = true;
@@ -581,7 +570,6 @@ public class GameManager {
             }
         }
 
-        // Conta quantos jogadores estão VIVOS
         int vivos = 0;
         for (Player p : players) {
             if (!p.isEliminado()) {
@@ -589,7 +577,6 @@ public class GameManager {
             }
         }
 
-        // Se só há 1 ou menos vivos, game over
         if (vivos <= 1) {
             gameOver = true;
         }
@@ -741,16 +728,13 @@ public class GameManager {
             int toolsIndex = -1;
 
             if (parts.length >= 8) {
-                // Formato: id;nome;langs;cor;pos;preso;elim;tools
                 preso = parts[5].equals("1") || parts[5].equalsIgnoreCase("true");
                 elim = Boolean.parseBoolean(parts[6]);
                 toolsIndex = 7;
             } else if (parts.length == 7) {
-                // Formato: id;nome;langs;cor;pos;elim;tools
                 elim = Boolean.parseBoolean(parts[5]);
                 toolsIndex = 6;
             } else if (parts.length == 6) {
-                // Formato: id;nome;langs;cor;pos;elim
                 elim = Boolean.parseBoolean(parts[5]);
             }
 
@@ -758,7 +742,6 @@ public class GameManager {
             p.setPosicaoSemGuardarHistorico(pos);
             p.setEliminado(elim);
 
-            // Usa a variável 'preso' que foi definida acima
             if (preso) {
                 p.setPreso(true);
             }
@@ -768,7 +751,6 @@ public class GameManager {
                     try {
                         p.addTool(Integer.parseInt(t));
                     } catch (NumberFormatException e) {
-                        // Ignorar ferramentas inválidas
                     }
                 }
             }
@@ -840,10 +822,8 @@ public class GameManager {
             return;
         }
 
-        // APENAS marca como eliminado - NÃO remove da lista!
         p.setEliminado(true);
 
-        // Verifica se ficou sem jogadores vivos
         boolean temVivos = false;
         for (Player player : players) {
             if (!player.isEliminado()) {
