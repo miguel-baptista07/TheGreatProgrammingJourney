@@ -751,6 +751,7 @@ public class GameManager {
                     try {
                         p.addTool(Integer.parseInt(t));
                     } catch (NumberFormatException e) {
+                        // Skip invalid tool IDs during loading
                     }
                 }
             }
