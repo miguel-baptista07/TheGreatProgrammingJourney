@@ -361,27 +361,19 @@ public class GameManager {
         normalizeCurrentIndex();
         Player current = players.get(currentPlayerIndex);
 
-        if (current.isEliminado()) {
-            return false;
-        }
-
-        // ✅ Se está preso: retorna false (não move, não liberta)
-        if (current.isPreso()) {
-            return false;
+        // ✅ Se está eliminado ou preso, NÃO pode mover
+        if (current.isEliminado() || current.isPreso()) {
+            return false;  // ✅ NÃO LIBERTA AQUI!
         }
 
         int maxMovement = 6;
         String firstLang = current.getPrimeiraLinguagem();
-        if (firstLang == null) {
-            firstLang = "";
-        } else {
-            firstLang = firstLang.split(";")[0].trim();
-        }
-
-        if (firstLang.equalsIgnoreCase("Assembly")) {
-            maxMovement = 2;
-        } else if (firstLang.equalsIgnoreCase("C")) {
-            maxMovement = 3;
+        if (firstLang != null && !firstLang.isEmpty()) {
+            if (firstLang.equalsIgnoreCase("Assembly")) {
+                maxMovement = 2;
+            } else if (firstLang.equalsIgnoreCase("C")) {
+                maxMovement = 3;
+            }
         }
 
         if (nrSpaces > maxMovement) {
@@ -468,32 +460,10 @@ public class GameManager {
             return null;
         }
 
-        // ✅ CRÍTICO: Se estava preso:
-        // - Liberta
-        // - Incrementa turno
-        // - Avança
-        // - Retorna mensagem
-        // O estado só muda AQUI, não no moveCurrentPlayer
-        if (current.isPreso()) {
-            current.setPreso(false);
-            turnCounter++;
-            advanceToNextAlive();
-            checkGameOverCondition();
-            return "Jogador foi libertado";
-        }
-
-        // Libertar outros jogadores presos na mesma casa
-        List<Player> playersNaPosicao = getPlayersAtPosition(current.getPosicao());
-        for (Player p : playersNaPosicao) {
-            if (!p.getId().equals(current.getId()) && p.isPreso()) {
-                p.setPreso(false);
-            }
-        }
-
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
         String message = null;
 
-        // Apanhar ferramentas
+
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
@@ -505,32 +475,17 @@ public class GameManager {
             }
         }
 
-        // Processar abismo
+
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
-                Integer counterToolId = getCounterToolForAbyss(el.getId());
-
-                if (counterToolId != null && current.hasTool(counterToolId)) {
-                    current.removeTool(counterToolId);
-                    String msg = el.getName() + " anulado por " + toolName(counterToolId);
-                    if (message == null) {
-                        message = msg;
-                    } else {
-                        message = message + " " + msg;
-                    }
-                } else {
-                    String msg = el.applyEffect(current, this);
-                    if (msg != null) {
-                        if (message == null) {
-                            message = msg;
-                        } else {
-                            message = message + " " + msg;
-                        }
-                    }
+                String msg = el.applyEffect(current, this);
+                if (msg != null) {
+                    message = (message == null) ? msg : message + " " + msg;
                 }
                 break;
             }
         }
+
 
         turnCounter++;
         advanceToNextAlive();
