@@ -125,7 +125,7 @@ public class GameManager {
                 }
 
                 if (type == 0) {
-                    if ((subtype < 0 || subtype > 9) && subtype != 20) {
+                    if (subtype < 0 || subtype > 9) {
                         return false;
                     }
                 } else if (type == 1) {
@@ -526,10 +526,12 @@ public class GameManager {
                 } else {
                     // Aplicar efeito do abismo
                     String msg = el.applyEffect(current, this);
-                    if (message == null) {
-                        message = msg;
-                    } else if (msg != null) {
-                        message = message + " " + msg;
+                    if (msg != null && msg.isEmpty() == false) {
+                        if (message == null) {
+                            message = msg;
+                        } else {
+                            message = message + " " + msg;
+                        }
                     }
                 }
                 break; // Só processa um abismo
