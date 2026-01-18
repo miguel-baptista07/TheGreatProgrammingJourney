@@ -485,6 +485,14 @@ public class GameManager {
         }
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
+
+        // DEBUG
+        System.out.println("DEBUG: Posição do jogador: " + current.getPosicao());
+        System.out.println("DEBUG: Número de elementos: " + elements.size());
+        for (BoardElement el : elements) {
+            System.out.println("DEBUG: Elemento - isAbyss=" + el.isAbyss() + ", id=" + el.getId() + ", name=" + el.getName());
+        }
+
         String message = null;
 
         for (BoardElement el : elements) {
