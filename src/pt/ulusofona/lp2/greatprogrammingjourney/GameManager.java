@@ -477,7 +477,6 @@ public class GameManager {
             return null;
         }
 
-        // Libertar jogadores presos na mesma posição
         List<Player> playersNaPosicao = getPlayersAtPosition(current.getPosicao());
         for (Player p : playersNaPosicao) {
             if (!p.getId().equals(current.getId()) && p.isPreso()) {
@@ -486,18 +485,8 @@ public class GameManager {
         }
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
-
-        // Se não há elementos na posição
-        if (elements == null || elements.isEmpty()) {
-            turnCounter++;
-            advanceToNextAlive();
-            checkGameOverCondition();
-            return "";
-        }
-
         String message = null;
 
-        // Processar todas as ferramentas primeiro
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
@@ -509,31 +498,36 @@ public class GameManager {
             }
         }
 
-        // Processar apenas o primeiro abismo encontrado
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
-                Integer counterToolId = getCounterToolForAbyss(el.getId());
-
-                // Verificar se tem ferramenta que anula o abismo
-                if (counterToolId != null && current.hasTool(counterToolId)) {
-                    current.removeTool(counterToolId);
-                    String msg = el.getName() + " anulado por " + toolName(counterToolId);
-                    if (message == null) {
-                        message = msg;
-                    } else {
-                        message = message + " " + msg;
-                    }
-                } else {
-                    // Aplicar efeito do abismo
+                if (el.getId() == 20) {
                     String msg = el.applyEffect(current, this);
                     if (message == null) {
                         message = msg;
                     } else if (msg != null) {
                         message = message + " " + msg;
                     }
-                    // Se msg for null, message mantém o valor anterior (que pode ser null ou não-null)
+                } else {
+                    Integer counterToolId = getCounterToolForAbyss(el.getId());
+
+                    if (counterToolId != null && current.hasTool(counterToolId)) {
+                        current.removeTool(counterToolId);
+                        String msg = el.getName() + " anulado por " + toolName(counterToolId);
+                        if (message == null) {
+                            message = msg;
+                        } else {
+                            message = message + " " + msg;
+                        }
+                    } else {
+                        String msg = el.applyEffect(current, this);
+                        if (message == null) {
+                            message = msg;
+                        } else if (msg != null) {
+                            message = message + " " + msg;
+                        }
+                    }
                 }
-                break; // Só processa um abismo
+                break;
             }
         }
 
