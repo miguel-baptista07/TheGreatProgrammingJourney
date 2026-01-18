@@ -526,21 +526,15 @@ public class GameManager {
                 } else {
                     // Aplicar efeito do abismo
                     String msg = el.applyEffect(current, this);
-                    if (msg != null && msg.isEmpty() == false) {
-                        if (message == null) {
-                            message = msg;
-                        } else {
-                            message = message + " " + msg;
-                        }
+                    if (message == null) {
+                        message = msg;
+                    } else if (msg != null) {
+                        message = message + " " + msg;
                     }
+                    // Se msg for null, message mantém o valor anterior (que pode ser null ou não-null)
                 }
                 break; // Só processa um abismo
             }
-        }
-
-        // Garantir que nunca retorna null se há elementos
-        if (message == null) {
-            message = "";
         }
 
         turnCounter++;
