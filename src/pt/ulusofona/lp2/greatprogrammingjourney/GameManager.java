@@ -513,26 +513,14 @@ public class GameManager {
                     }
                 } else {
                     String msg = el.applyEffect(current, this);
-                    if (msg != null) {
-                        if (message == null) {
-                            message = msg;
-                        } else {
-                            message = message + " " + msg;
-                        }
-                    } else {
-                        // Se applyEffect retornar null, garante que há mensagem quando abismo é encontrado
-                        if (message == null) {
-                            message = "";
-                        }
+                    if (message == null) {
+                        message = msg;
+                    } else if (msg != null) {
+                        message = message + " " + msg;
                     }
                 }
                 break;
             }
-        }
-        
-        // Se há elementos na posição mas não há mensagem, garantir retorno não-nulo
-        if (!elements.isEmpty() && message == null) {
-            message = "";
         }
 
         turnCounter++;
