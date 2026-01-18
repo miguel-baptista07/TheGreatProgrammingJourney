@@ -13,6 +13,7 @@ public class ElementsFactory {
             case 7: return new AbyssBSOD(position);
             case 8: return new AbyssCicloInfinito(position);
             case 9: return new AbyssSegmentationFault(position);
+            case 20: return new AbyssLLM(position);
             default: return new AbyssException(position);
         }
     }

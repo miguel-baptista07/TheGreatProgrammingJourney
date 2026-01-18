@@ -18,6 +18,7 @@ public class Player {
     private boolean preso;
     private int lastMoveSpaces;
     private final List<Integer> posicaoHistorico;
+    private String causaDerrota;
 
     public Player(String id, String nome, String linguagens, String cor) {
         this.id = id;
@@ -169,13 +170,23 @@ public class Player {
         if (ferramentas.isEmpty()) {
             return "";
         }
+
+        List<String> nomesFerramentas = new ArrayList<>();
+
+        for (Integer ferramentaId : ferramentas) {
+            nomesFerramentas.add(GameManager.toolName(ferramentaId));
+        }
+
+        nomesFerramentas.sort(String::compareTo);
+
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < ferramentas.size(); i++) {
-            sb.append(GameManager.toolName(ferramentas.get(i)));
-            if (i < ferramentas.size() - 1) {
+        for (int i = 0; i < nomesFerramentas.size(); i++) {
+            sb.append(nomesFerramentas.get(i));
+            if (i < nomesFerramentas.size() - 1) {
                 sb.append(",");
             }
         }
+
         return sb.toString();
     }
 
@@ -196,6 +207,15 @@ public class Player {
         }
         return false;
     }
+
+    public String getCausaDerrota() {
+        return causaDerrota;
+    }
+
+    public void setCausaDerrota(String causaDerrota) {
+        this.causaDerrota = causaDerrota;
+    }
+
 
     @Override
     public String toString() {

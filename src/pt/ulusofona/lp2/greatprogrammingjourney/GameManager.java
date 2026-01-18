@@ -455,6 +455,16 @@ public class GameManager {
         return "OK";
     }
 
+    private boolean todosOsJogadoresPresos() {
+        for (Player p : players) {
+            if (!p.isPreso()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
     public String reactToAbyssOrTool() {
         if (gameOver || players.isEmpty()) {
             return null;
@@ -571,16 +581,28 @@ public class GameManager {
         }
 
         int vivos = 0;
+        boolean todosPresos = true;
+
         for (Player p : players) {
             if (!p.isEliminado()) {
                 vivos++;
+
+                if (!p.isPreso()) {
+                    todosPresos = false;
+                }
             }
+        }
+
+        if (vivos > 0 && todosPresos) {
+            gameOver = true;
+            return;
         }
 
         if (vivos <= 1) {
             gameOver = true;
         }
     }
+
 
     public boolean gameIsOver() {
         if (gameOver) {

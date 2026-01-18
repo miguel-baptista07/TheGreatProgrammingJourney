@@ -17,14 +17,17 @@ public class Report {
 
     public ArrayList<String> generateReport() {
         ArrayList<String> results = new ArrayList<>();
+
         results.add("THE GREAT PROGRAMMING JOURNEY");
         results.add("");
         results.add("NR. DE TURNOS");
         results.add(String.valueOf(nrTurnos));
         results.add("");
 
+        // Verificar se existe vencedor (alguém chegou ao fim do tabuleiro)
         Player vencedor = null;
-        int maxPos = 0;
+        int maxPos = -1;
+
         for (Player p : players) {
             if (!p.isEliminado() && p.getPosicao() >= boardSize) {
                 if (p.getPosicao() > maxPos) {
@@ -34,34 +37,35 @@ public class Report {
             }
         }
 
+        // Se não há vencedor, é empate
         if (vencedor == null) {
-            for (Player p : players) {
-                if (!p.isEliminado() && p.getPosicao() > maxPos) {
-                    maxPos = p.getPosicao();
-                    vencedor = p;
-                }
-            }
+            results.add("O jogo terminou empatado.");
+            results.add("");
+        } else {
+            results.add("VENCEDOR");
+            results.add(vencedor.getNome());
+            results.add("");
         }
 
-        results.add("VENCEDOR");
-        results.add(vencedor != null ? vencedor.getNome() : "Nenhum");
-        results.add("");
+        // Participantes / restantes
+        results.add("Participantes:");
 
-        List<Player> restantes = new ArrayList<>();
-        for (Player p : players) {
-            if (p != vencedor) {
-                restantes.add(p);
-            }
-        }
+        List<Player> participantes = new ArrayList<>(players);
 
-        restantes.sort(Comparator
-                .comparingInt(Player::getPosicao).reversed()
-                .thenComparing(p -> p.getNome().toLowerCase())
+        participantes.sort(
+                Comparator.comparingInt(Player::getPosicao).reversed()
+                        .thenComparing(p -> p.getNome().toLowerCase())
         );
 
-        results.add("RESTANTES");
-        for (Player p : restantes) {
-            results.add(p.getNome() + " " + p.getPosicao());
+        for (Player p : participantes) {
+            String causa = p.getCausaDerrota();
+            if (causa == null || causa.isEmpty()) {
+                causa = "No tools";
+            }
+
+            results.add(
+                    p.getNome() + " : " + p.getPosicao() + " : " + causa
+            );
         }
 
         return results;
