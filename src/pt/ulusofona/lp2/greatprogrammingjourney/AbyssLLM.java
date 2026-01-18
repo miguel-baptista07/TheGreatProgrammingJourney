@@ -2,7 +2,7 @@ package pt.ulusofona.lp2.greatprogrammingjourney;
 
 public class AbyssLLM extends AbyssBase {
 
-    private static final int AJUDA_DO_PROFESSOR = 5; // confirma se este é o ID correto
+    private static final int AJUDA_DO_PROFESSOR = 5;
 
     public AbyssLLM(int position) {
         super(20, position);
@@ -15,31 +15,26 @@ public class AbyssLLM extends AbyssBase {
 
     @Override
     public String applyEffect(Player player, GameManager manager) {
+        boolean temAjuda = player.hasTool(AJUDA_DO_PROFESSOR);
 
-        boolean temAjuda = playerHasTool(player, AJUDA_DO_PROFESSOR);
-
-        // Antes da 4ª ronda
-        if (manager.getTurnCounter() < 3) {
-
+        // Antes da 4ª ronda (turnCounter < 4, ou seja, rondas 1, 2, 3)
+        if (manager.getTurnCounter() < 4) {
             if (temAjuda) {
-                consumeTool(player, AJUDA_DO_PROFESSOR);
+                player.removeTool(AJUDA_DO_PROFESSOR);
                 return "Caiu no LLM mas a Ajuda do Professor anulou o efeito.";
             }
 
             int posicaoAnterior = player.getPosicaoAnteriorMovimento();
             player.setPosicaoSemGuardarHistorico(posicaoAnterior);
-
             return "Caiu no LLM! Recuas para a posição onde estavas antes";
         }
 
-        // A partir da 4ª ronda
+        // A partir da 4ª ronda (turnCounter >= 4)
         if (temAjuda) {
-            consumeTool(player, AJUDA_DO_PROFESSOR);
+            player.removeTool(AJUDA_DO_PROFESSOR);
         }
 
-        int movimentoAnterior =
-                player.getPosicao() - player.getPosicaoAnteriorMovimento();
-
+        int movimentoAnterior = player.getPosicao() - player.getPosicaoAnteriorMovimento();
         int novaPosicao = player.getPosicao() + movimentoAnterior;
         player.setPosicaoSemGuardarHistorico(novaPosicao);
 

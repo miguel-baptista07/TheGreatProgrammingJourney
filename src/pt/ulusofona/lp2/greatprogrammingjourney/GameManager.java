@@ -464,7 +464,6 @@ public class GameManager {
         return true;
     }
 
-
     public String reactToAbyssOrTool() {
         if (gameOver || players.isEmpty()) {
             return null;
@@ -501,22 +500,32 @@ public class GameManager {
 
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
-                Integer counterToolId = getCounterToolForAbyss(el.getId());
-
-                if (counterToolId != null && current.hasTool(counterToolId)) {
-                    current.removeTool(counterToolId);
-                    String msg = el.getName() + " anulado por " + toolName(counterToolId);
-                    if (message == null) {
-                        message = msg;
-                    } else {
-                        message = message + " " + msg;
-                    }
-                } else {
+                // LLM (id=20) tem lógica especial interna, não usar counter-tool do GameManager
+                if (el.getId() == 20) {
                     String msg = el.applyEffect(current, this);
                     if (message == null) {
                         message = msg;
                     } else if (msg != null) {
                         message = message + " " + msg;
+                    }
+                } else {
+                    Integer counterToolId = getCounterToolForAbyss(el.getId());
+
+                    if (counterToolId != null && current.hasTool(counterToolId)) {
+                        current.removeTool(counterToolId);
+                        String msg = el.getName() + " anulado por " + toolName(counterToolId);
+                        if (message == null) {
+                            message = msg;
+                        } else {
+                            message = message + " " + msg;
+                        }
+                    } else {
+                        String msg = el.applyEffect(current, this);
+                        if (message == null) {
+                            message = msg;
+                        } else if (msg != null) {
+                            message = message + " " + msg;
+                        }
                     }
                 }
                 break;
