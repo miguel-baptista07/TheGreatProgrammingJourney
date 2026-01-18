@@ -485,16 +485,9 @@ public class GameManager {
         }
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
-
-        // DEBUG
-        System.out.println("DEBUG: Posição do jogador: " + current.getPosicao());
-        System.out.println("DEBUG: Número de elementos: " + elements.size());
-        for (BoardElement el : elements) {
-            System.out.println("DEBUG: Elemento - isAbyss=" + el.isAbyss() + ", id=" + el.getId() + ", name=" + el.getName());
-        }
-
         String message = null;
 
+        // Processar ferramentas primeiro
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
@@ -506,9 +499,10 @@ public class GameManager {
             }
         }
 
+        // Processar abismos
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
-                // LLM (id=20) tem lógica especial interna, não usar counter-tool do GameManager
+                // LLM (id=20) tem lógica especial - sempre chamar applyEffect
                 if (el.getId() == 20) {
                     String msg = el.applyEffect(current, this);
                     if (message == null) {
@@ -517,6 +511,7 @@ public class GameManager {
                         message = message + " " + msg;
                     }
                 } else {
+                    // Outros abismos: verificar counter-tool
                     Integer counterToolId = getCounterToolForAbyss(el.getId());
 
                     if (counterToolId != null && current.hasTool(counterToolId)) {
@@ -538,6 +533,11 @@ public class GameManager {
                 }
                 break;
             }
+        }
+
+        // Garantir que não retorna null quando há elementos
+        if (!elements.isEmpty() && message == null) {
+            message = "";
         }
 
         turnCounter++;
