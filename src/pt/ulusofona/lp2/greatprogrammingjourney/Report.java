@@ -41,31 +41,48 @@ public class Report {
         if (vencedor == null) {
             results.add("O jogo terminou empatado.");
             results.add("");
+            // Em caso de empate, mostrar todos com formato completo
+            results.add("Participantes:");
+            
+            List<Player> participantes = new ArrayList<>(players);
+            participantes.sort(
+                    Comparator.comparingInt(Player::getPosicao).reversed()
+                            .thenComparing(p -> p.getNome().toLowerCase())
+            );
+
+            for (Player p : participantes) {
+                String causa = p.getCausaDerrota();
+                if (causa == null || causa.isEmpty()) {
+                    causa = "No tools";
+                }
+
+                results.add(
+                        p.getNome() + " : " + p.getPosicao() + " : " + causa
+                );
+            }
         } else {
             results.add("VENCEDOR");
             results.add(vencedor.getNome());
             results.add("");
-        }
-
-        // Participantes / restantes
-        results.add("Participantes:");
-
-        List<Player> participantes = new ArrayList<>(players);
-
-        participantes.sort(
-                Comparator.comparingInt(Player::getPosicao).reversed()
-                        .thenComparing(p -> p.getNome().toLowerCase())
-        );
-
-        for (Player p : participantes) {
-            String causa = p.getCausaDerrota();
-            if (causa == null || causa.isEmpty()) {
-                causa = "No tools";
+            
+            // Quando há vencedor, mostrar RESTANTES com formato simplificado (sem causa)
+            results.add("RESTANTES");
+            
+            List<Player> restantes = new ArrayList<>();
+            for (Player p : players) {
+                if (!p.equals(vencedor)) {
+                    restantes.add(p);
+                }
             }
-
-            results.add(
-                    p.getNome() + " : " + p.getPosicao() + " : " + causa
+            
+            restantes.sort(
+                    Comparator.comparingInt(Player::getPosicao).reversed()
+                            .thenComparing(p -> p.getNome().toLowerCase())
             );
+
+            for (Player p : restantes) {
+                results.add(p.getNome() + " " + p.getPosicao());
+            }
         }
 
         return results;

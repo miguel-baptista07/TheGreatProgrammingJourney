@@ -519,10 +519,20 @@ public class GameManager {
                         } else {
                             message = message + " " + msg;
                         }
+                    } else {
+                        // Se applyEffect retornar null, garante que há mensagem quando abismo é encontrado
+                        if (message == null) {
+                            message = "";
+                        }
                     }
                 }
                 break;
             }
+        }
+        
+        // Se há elementos na posição mas não há mensagem, garantir retorno não-nulo
+        if (!elements.isEmpty() && message == null) {
+            message = "";
         }
 
         turnCounter++;
@@ -544,6 +554,7 @@ public class GameManager {
             case 7: return 5;
             case 8: return 1;
             case 9: return 0;
+            case 20: return 5;
             default: return null;
         }
     }
