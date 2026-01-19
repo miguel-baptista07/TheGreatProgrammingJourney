@@ -524,6 +524,9 @@ public class GameManager {
                         messageBuilder.append(msg);
                     }
                 } catch (Exception e) {
+                    if (messageBuilder.length() > 0) {
+                        messageBuilder.append(" ");
+                    }
                     messageBuilder.append("Ferramenta processada");
                 }
             }
@@ -588,8 +591,13 @@ public class GameManager {
                     }
                 }
 
+                // GARANTIR que abyssMessage nunca seja null aqui
+                if (abyssMessage == null) {
+                    abyssMessage = "Caiu no abismo " + (el.getName() != null ? el.getName() : "desconhecido");
+                }
+
                 // Adiciona mensagem do abismo
-                if (abyssMessage != null && !abyssMessage.isEmpty()) {
+                if (!abyssMessage.isEmpty()) {
                     if (messageBuilder.length() > 0) {
                         messageBuilder.append(" ");
                     }
@@ -605,8 +613,12 @@ public class GameManager {
         checkGameOverCondition();
 
         String finalMessage = messageBuilder.toString();
+
+        // GARANTIR que nunca retorna null quando há elementos
         if (finalMessage.isEmpty()) {
-            return "Processado";  // Fallback se tudo falhou
+            // Se há elementos mas nenhuma mensagem foi gerada, algo está errado
+            // Mas nunca retornar null quando há elementos!
+            return "Processado";
         }
         return finalMessage;
     }
