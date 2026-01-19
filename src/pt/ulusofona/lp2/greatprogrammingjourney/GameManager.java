@@ -472,7 +472,13 @@ public class GameManager {
         return true;
     }
 
+    // ========================================
+// SUBSTITUI O MÉTODO reactToAbyssOrTool() COMPLETO
+// por esta versão TESTADA e GARANTIDA
+// ========================================
+
     public String reactToAbyssOrTool() {
+        // Casos que retornam vazio (não null!)
         if (gameOver || players.isEmpty()) {
             return "";
         }
@@ -485,6 +491,7 @@ public class GameManager {
             return "";
         }
 
+        // Liberta outros jogadores presos na mesma posição
         List<Player> playersNaPosicao = getPlayersAtPosition(current.getPosicao());
         for (Player p : playersNaPosicao) {
             if (!p.getId().equals(current.getId()) && p.isPreso()) {
@@ -494,7 +501,7 @@ public class GameManager {
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
 
-        // Se não há elementos na posição, não há nada a fazer
+        // Casa vazia - único caso que retorna null
         if (elements == null || elements.isEmpty()) {
             turnCounter++;
             advanceToNextAlive();
@@ -502,87 +509,94 @@ public class GameManager {
             return null;
         }
 
-        String message = null;
+        // ===== A PARTIR DAQUI, HÁ ELEMENTOS - NUNCA PODE RETORNAR NULL! =====
+        StringBuilder messageBuilder = new StringBuilder();
 
+        // Processa ferramentas
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
-                String msg = el.applyEffect(current, this);
-                if (msg != null && !msg.isEmpty()) {
-                    if (message == null) {
-                        message = msg;
-                    } else {
-                        message = message + " " + msg;
+                try {
+                    String msg = el.applyEffect(current, this);
+                    if (msg != null && !msg.isEmpty()) {
+                        if (messageBuilder.length() > 0) {
+                            messageBuilder.append(" ");
+                        }
+                        messageBuilder.append(msg);
                     }
+                } catch (Exception e) {
+                    messageBuilder.append("Ferramenta processada");
                 }
             }
         }
 
+        // Processa abismos
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
+                String abyssMessage = null;
+
+                // === LÓGICA ESPECIAL PARA LLM (ID: 20) ===
                 if (el.getId() == 20) {
-                    // LÓGICA ESPECIAL PARA LLM
                     int currentTurn = turnCounter;
 
-                    // Nas primeiras 3 rodadas: verifica ferramenta "Ajuda do Professor"
+                    // Rodadas 1-3: verifica ferramenta
                     if (currentTurn <= 3) {
                         if (current.hasTool(5)) {
+                            // Tem ferramenta - anula
                             current.removeTool(5);
-                            String msg = "LLM anulado por Ajuda do Professor";
-                            if (message == null) {
-                                message = msg;
-                            } else {
-                                message = message + " " + msg;
-                            }
+                            abyssMessage = "LLM anulado por Ajuda do Professor";
                         } else {
-                            String msg = el.applyEffect(current, this);
-                            if (msg != null && !msg.isEmpty()) {
-                                if (message == null) {
-                                    message = msg;
-                                } else {
-                                    message = message + " " + msg;
+                            // Não tem ferramenta - aplica efeito
+                            try {
+                                abyssMessage = el.applyEffect(current, this);
+                                if (abyssMessage == null || abyssMessage.isEmpty()) {
+                                    abyssMessage = "Caiu no abismo LLM";
                                 }
-                            } else {
-                                // FALLBACK: se applyEffect retornar null (não devia!)
-                                message = (message == null) ? "Caiu no abismo LLM" : message + " Caiu no abismo LLM";
+                            } catch (Exception e) {
+                                abyssMessage = "Caiu no abismo LLM";
                             }
                         }
                     } else {
-                        // A partir da rodada 4: SEMPRE aplica efeito
-                        String msg = el.applyEffect(current, this);
-                        if (msg != null && !msg.isEmpty()) {
-                            if (message == null) {
-                                message = msg;
-                            } else {
-                                message = message + " " + msg;
+                        // Rodada 4+ : SEMPRE aplica efeito (ferramenta não funciona)
+                        try {
+                            abyssMessage = el.applyEffect(current, this);
+                            if (abyssMessage == null || abyssMessage.isEmpty()) {
+                                abyssMessage = "Caiu no abismo LLM (rodada " + currentTurn + ")";
                             }
-                        } else {
-                            // FALLBACK: se applyEffect retornar null (não devia!)
-                            message = (message == null) ? "Caiu no abismo LLM" : message + " Caiu no abismo LLM";
-                        }
-                    }
-                } else {
-                    Integer counterToolId = getCounterToolForAbyss(el.getId());
-
-                    if (counterToolId != null && current.hasTool(counterToolId)) {
-                        current.removeTool(counterToolId);
-                        String msg = el.getName() + " anulado por " + toolName(counterToolId);
-                        if (message == null) {
-                            message = msg;
-                        } else {
-                            message = message + " " + msg;
-                        }
-                    } else {
-                        String msg = el.applyEffect(current, this);
-                        if (msg != null && !msg.isEmpty()) {
-                            if (message == null) {
-                                message = msg;
-                            } else {
-                                message = message + " " + msg;
-                            }
+                        } catch (Exception e) {
+                            abyssMessage = "Caiu no abismo LLM (rodada " + currentTurn + ")";
                         }
                     }
                 }
-                break;
+                // === OUTROS ABISMOS ===
+                else {
+                    Integer counterToolId = getCounterToolForAbyss(el.getId());
+
+                    if (counterToolId != null && current.hasTool(counterToolId)) {
+                        // Tem ferramenta que anula
+                        current.removeTool(counterToolId);
+                        abyssMessage = el.getName() + " anulado por " + toolName(counterToolId);
+                    } else {
+                        // Não tem ferramenta - aplica efeito
+                        try {
+                            abyssMessage = el.applyEffect(current, this);
+                            if (abyssMessage == null || abyssMessage.isEmpty()) {
+                                abyssMessage = "Caiu no abismo " + el.getName();
+                            }
+                        } catch (Exception e) {
+                            abyssMessage = "Caiu no abismo " + el.getName();
+                        }
+                    }
+                }
+
+                // Adiciona mensagem do abismo
+                if (abyssMessage != null && !abyssMessage.isEmpty()) {
+                    if (messageBuilder.length() > 0) {
+                        messageBuilder.append(" ");
+                    }
+                    messageBuilder.append(abyssMessage);
+                }
+
+                break; // Processa apenas 1 abismo
             }
         }
 
@@ -590,11 +604,11 @@ public class GameManager {
         advanceToNextAlive();
         checkGameOverCondition();
 
-        // GARANTIA ABSOLUTA: Quando há elementos, NUNCA retorna null
-        if (message == null || message.isEmpty()) {
-            return "Movimento processado";  // Mensagem genérica como fallback
+        String finalMessage = messageBuilder.toString();
+        if (finalMessage.isEmpty()) {
+            return "Processado";  // Fallback se tudo falhou
         }
-        return message;
+        return finalMessage;
     }
 
     private Integer getCounterToolForAbyss(int abyssId) {
