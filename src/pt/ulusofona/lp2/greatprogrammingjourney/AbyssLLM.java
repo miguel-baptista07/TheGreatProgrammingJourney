@@ -20,19 +20,26 @@ public class AbyssLLM extends AbyssBase {
         int currentTurn = manager.getTurnCounter();
         int posicaoAtual = player.getPosicao();
 
-        // Rodadas 1-3: VOLTA para a posição anterior (onde estava antes do movimento)
+        // Rodadas 1-3: RECUA o número de casas que avançou
         if (currentTurn <= 3) {
-            int posicaoAnterior = player.getPosicaoAnteriorMovimento();
+            int ultimoMovimento = player.getLastMoveSpaces();
 
-            if (posicaoAnterior < 1) {
-                posicaoAnterior = 1;
+            if (ultimoMovimento <= 0) {
+                ultimoMovimento = 1;
             }
 
-            player.setPosicaoSemGuardarHistorico(posicaoAnterior);
+            // Recua o número de casas do movimento
+            int novaPosicao = posicaoAtual - ultimoMovimento;
+
+            if (novaPosicao < 1) {
+                novaPosicao = 1;
+            }
+
+            player.setPosicaoSemGuardarHistorico(novaPosicao);
             return "Caiu no LLM! Recua para a posição onde estava antes";
 
         } else {
-            // Rodada 4+: AVANÇA o número de casas do último movimento
+            // Rodada 4+: AVANÇA
             int ultimoMovimento = player.getLastMoveSpaces();
 
             if (ultimoMovimento <= 0) {
@@ -45,7 +52,7 @@ public class AbyssLLM extends AbyssBase {
             }
 
             player.setPosicaoSemGuardarHistorico(novaPosicao);
-            return "Caiu no LLM mas já tem experiência! Avança tantas casas quantas as do último movimento";
+            return "Caiu no LLM mas já tem experiência! Avança " + ultimoMovimento + " casas";
         }
     }
 }
