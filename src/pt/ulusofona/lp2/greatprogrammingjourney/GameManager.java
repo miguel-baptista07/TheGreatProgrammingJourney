@@ -125,10 +125,12 @@ public class GameManager {
                 }
 
                 if (type == 0) {
-                    if (subtype < 0 || subtype > 9) {
+                    // Abismos: 0-9 ou 20 (LLM)
+                    if (subtype < 0 || (subtype > 9 && subtype != 20)) {
                         return false;
                     }
                 } else if (type == 1) {
+                    // Ferramentas: 0-5
                     if (subtype < 0 || subtype > 5) {
                         return false;
                     }
