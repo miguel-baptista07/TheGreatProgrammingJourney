@@ -582,7 +582,7 @@ public class GameManager {
             if (novaPosicao < 1) {
                 novaPosicao = 1;
             }
-            current.setPosicao(novaPosicao);
+            current.setPosicaoSemGuardarHistorico(novaPosicao);
             return "Caiu no abismo LLM";
         } else {
             // Rodada 4+: AVANÇA com último movimento
@@ -595,7 +595,7 @@ public class GameManager {
             if (novaPosicao < 1) {
                 novaPosicao = 1;
             }
-            current.setPosicao(novaPosicao);
+            current.setPosicaoSemGuardarHistorico(novaPosicao);
             return "Caiu no abismo LLM (rodada " + currentTurn + ")";
         }
     }

@@ -34,7 +34,7 @@ public class AbyssLLM extends AbyssBase {
                     novaPosicao = 1;
                 }
 
-                player.setPosicao(novaPosicao);
+                player.setPosicaoSemGuardarHistorico(novaPosicao);
                 return "Caiu no LLM mas já tem experiência! Avança " + ultimoMovimento + " casas";
 
             } else {
@@ -44,7 +44,7 @@ public class AbyssLLM extends AbyssBase {
                     novaPosicao = 1;
                 }
 
-                player.setPosicao(novaPosicao);
+                player.setPosicaoSemGuardarHistorico(novaPosicao);
                 return "Caiu no abismo LLM: recua 2 casas (rodada " + currentTurn + ")";
             }
 
