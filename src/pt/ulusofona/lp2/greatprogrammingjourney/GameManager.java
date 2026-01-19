@@ -125,7 +125,7 @@ public class GameManager {
                 }
 
                 if (type == 0) {
-                    if (subtype < 0 || subtype > 9) {
+                    if ((subtype < 0 || subtype > 9)) {
                         return false;
                     }
                 } else if (type == 1) {
@@ -318,10 +318,8 @@ public class GameManager {
         normalizeCurrentIndex();
         Player cur = players.get(currentPlayerIndex);
 
-        // Se o jogador atual estiver eliminado ou preso, avançamos para o próximo que possa jogar.
-        // Se ninguém puder jogar, o jogo termina (empate).
-        if (cur.isEliminado() || cur.isPreso()) {
-            advanceToNextPlayable();
+        if (cur.isEliminado()) {
+            advanceToNextAlive();
             if (players.isEmpty() || gameOver) {
                 return -1;
             }
@@ -369,9 +367,6 @@ public class GameManager {
         }
 
         if (current.isPreso()) {
-            // Passa o turno; se todos estiverem presos, o jogo acaba (empate).
-            advanceToNextPlayable();
-            checkGameOverCondition();
             return false;
         }
 
@@ -478,18 +473,11 @@ public class GameManager {
         Player current = players.get(currentPlayerIndex);
 
         if (current.isEliminado()) {
-            advanceToNextPlayable();
-            checkGameOverCondition();
-            return "";
+            advanceToNextAlive();
+            return null;
         }
 
-        // Se o jogador estiver preso, não reage novamente ao mesmo quadrado; apenas passa o turno.
-        if (current.isPreso()) {
-            advanceToNextPlayable();
-            checkGameOverCondition();
-            return "";
-        }
-
+        // Libertar jogadores presos na mesma posição
         List<Player> playersNaPosicao = getPlayersAtPosition(current.getPosicao());
         for (Player p : playersNaPosicao) {
             if (!p.getId().equals(current.getId()) && p.isPreso()) {
@@ -498,8 +486,18 @@ public class GameManager {
         }
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
+
+        // Se não há elementos na posição
+        if (elements == null || elements.isEmpty()) {
+            turnCounter++;
+            advanceToNextAlive();
+            checkGameOverCondition();
+            return "";
+        }
+
         String message = null;
 
+        // Processar todas as ferramentas primeiro
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
@@ -511,41 +509,43 @@ public class GameManager {
             }
         }
 
+        // Processar apenas o primeiro abismo encontrado
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
-                if (el.getId() == 20) {
-                    String msg = el.applyEffect(current, this);
+                Integer counterToolId = getCounterToolForAbyss(el.getId());
+
+                // Verificar se tem ferramenta que anula o abismo
+                if (counterToolId != null && current.hasTool(counterToolId)) {
+                    current.removeTool(counterToolId);
+                    String msg = el.getName() + " anulado por " + toolName(counterToolId);
                     if (message == null) {
                         message = msg;
-                    } else if (msg != null) {
+                    } else {
                         message = message + " " + msg;
                     }
                 } else {
-                    Integer counterToolId = getCounterToolForAbyss(el.getId());
-
-                    if (counterToolId != null && current.hasTool(counterToolId)) {
-                        current.removeTool(counterToolId);
-                        String msg = el.getName() + " anulado por " + toolName(counterToolId);
+                    // Aplicar efeito do abismo
+                    String msg = el.applyEffect(current, this);
+                    if (msg != null) {
                         if (message == null) {
                             message = msg;
                         } else {
                             message = message + " " + msg;
                         }
-                    } else {
-                        String msg = el.applyEffect(current, this);
-                        if (message == null) {
-                            message = msg;
-                        } else if (msg != null) {
-                            message = message + " " + msg;
-                        }
                     }
+                    // Se msg for null e message ainda for null, será garantido após o loop
                 }
-                break;
+                break; // Só processa um abismo
             }
         }
 
+        // Garantir que nunca retorna null se há elementos
+        if (message == null) {
+            message = "";
+        }
+
         turnCounter++;
-        advanceToNextPlayable();
+        advanceToNextAlive();
         checkGameOverCondition();
 
         return message;
@@ -586,34 +586,6 @@ public class GameManager {
             }
 
             if (tentativas >= maxTentativas) {
-                gameOver = true;
-                return;
-            }
-        } while (true);
-    }
-
-    // Avança para o próximo jogador que esteja "em jogo" e possa efetivamente jogar (não eliminado e não preso).
-    // Se não existir nenhum, termina o jogo (empate).
-    private void advanceToNextPlayable() {
-        if (players.isEmpty()) {
-            currentPlayerIndex = 0;
-            return;
-        }
-
-        int tentativas = 0;
-        int maxTentativas = players.size();
-
-        do {
-            currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-            tentativas++;
-
-            Player p = players.get(currentPlayerIndex);
-            if (!p.isEliminado() && !p.isPreso()) {
-                return;
-            }
-
-            if (tentativas >= maxTentativas) {
-                // Ninguém pode jogar: ou todos eliminados ou todos presos -> jogo acaba empatado.
                 gameOver = true;
                 return;
             }
