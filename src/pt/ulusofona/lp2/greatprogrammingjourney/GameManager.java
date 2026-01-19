@@ -576,7 +576,8 @@ public class GameManager {
         advanceToNextAlive();
         checkGameOverCondition();
 
-        return message;
+        // Quando há elementos, nunca retorna null (teste espera sempre String)
+        return message != null ? message : "";
     }
 
     private Integer getCounterToolForAbyss(int abyssId) {
