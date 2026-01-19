@@ -346,6 +346,9 @@ public class GameManager {
         }
     }
 
+    // ============================================================================
+    // MÉTODO MODIFICADO: Agora liberta jogadores automaticamente após 3 turnos
+    // ============================================================================
     public boolean moveCurrentPlayer(int nrSpaces) {
         if (gameOver) {
             return false;
@@ -366,8 +369,16 @@ public class GameManager {
             return false;
         }
 
+        // MODIFICADO: Decrementa turnos preso e verifica se foi libertado
         if (current.isPreso()) {
-            return false;
+            current.decrementarTurnosPreso();
+
+            if (current.isPreso()) {
+                // Jogador ainda está preso, não pode mover
+                return false;
+            }
+            // Se chegou aqui, o jogador foi libertado automaticamente!
+            // Continua com o movimento normal
         }
 
         int maxMovement = 6;
@@ -421,7 +432,11 @@ public class GameManager {
         Player current = players.get(currentPlayerIndex);
 
         if (current.isPreso()) {
-            return "Player is imprisoned";
+            int turnosRestantes = current.getTurnosPreso();
+            if (turnosRestantes > 0) {
+                return "O jogador está preso (" + turnosRestantes + " turnos restantes)";
+            }
+            return "O jogador está preso";
         }
 
         String firstLang = current.getPrimeiraLinguagem();

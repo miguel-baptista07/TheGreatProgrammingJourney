@@ -16,6 +16,7 @@ public class Player {
     private Integer ferramentaAtiva;
     private boolean eliminado;
     private boolean preso;
+    private int turnosPreso;  // NOVO: contador de turnos preso
     private int lastMoveSpaces;
     private final List<Integer> posicaoHistorico;
     private String causaDerrota;
@@ -39,6 +40,7 @@ public class Player {
         this.ferramentaAtiva = null;
         this.eliminado = false;
         this.preso = false;
+        this.turnosPreso = 0;  // NOVO
         this.lastMoveSpaces = 0;
         this.posicaoHistorico = new ArrayList<>();
         this.posicaoHistorico.add(1);
@@ -152,10 +154,29 @@ public class Player {
 
     public void setPreso(boolean preso) {
         this.preso = preso;
+        if (preso) {
+            this.turnosPreso = 3;  // MODIFICADO: jogador fica preso por 3 turnos
+        } else {
+            this.turnosPreso = 0;
+        }
     }
 
     public void prender(int turnos) {
         this.preso = true;
+        this.turnosPreso = turnos;  // MODIFICADO: usa o parâmetro
+    }
+
+    public int getTurnosPreso() {
+        return turnosPreso;
+    }
+
+    public void decrementarTurnosPreso() {
+        if (turnosPreso > 0) {
+            turnosPreso--;
+            if (turnosPreso == 0) {
+                preso = false;
+            }
+        }
     }
 
     public void setLastMoveSpaces(int lastMoveSpaces) {
@@ -216,11 +237,12 @@ public class Player {
         this.causaDerrota = causaDerrota;
     }
 
-
     @Override
     public String toString() {
         String ferramentasStr = ferramentas.isEmpty() ? "No tools" : getFerramentasAsString();
-        String estadoStr = eliminado ? "Derrotado" : preso ? "Preso" : "Em Jogo";
+        String estadoStr = eliminado ? "Derrotado" :
+                preso ? "Preso (" + turnosPreso + " turnos)" :  // MODIFICADO: mostra turnos restantes
+                        "Em Jogo";
 
         return "ID: " + id + " | Nome: " + nome + " | Posição: " + posicao +
                 " | Ferramentas: " + ferramentasStr + " | Linguagens: " + linguagens +
