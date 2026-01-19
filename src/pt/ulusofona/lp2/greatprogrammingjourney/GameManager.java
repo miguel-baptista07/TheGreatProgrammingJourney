@@ -553,51 +553,22 @@ public class GameManager {
     private String processLLMAbyss(BoardElement abyss, Player current) {
         int currentTurn = turnCounter;
 
-        // Rodadas 1-3: ferramenta funciona
+        // Rodadas 1-3: ferramenta funciona e anula o efeito
         if (currentTurn <= 3) {
             if (current.hasTool(5)) {
                 current.removeTool(5);
+                // Jogador FICA na posição atual (não move)
                 return "LLM anulado por Ajuda do Professor";
             }
-        }
-        // Nas rodadas 4+, a ferramenta não funciona mas não precisa ser removida
-
-        // Aplica efeito do LLM
-        String msg = null;
-        try {
-            msg = abyss.applyEffect(current, this);
-        } catch (Exception e) {
-            // Continua para fallback
-        }
-
-        // Se temos mensagem válida, retorna (já moveu o jogador)
-        if (msg != null && !msg.isEmpty()) {
-            return msg;
-        }
-
-        // Fallback GARANTIDO - sempre retorna algo E move o jogador se necessário
-        if (currentTurn <= 3) {
-            // Rodadas 1-3: RECUA para posição anterior
-            int posicaoAnterior = current.getPosicaoAnteriorMovimento();
-            if (posicaoAnterior < 1) {
-                posicaoAnterior = 1;
-            }
-            current.setPosicaoSemGuardarHistorico(posicaoAnterior);
-            return "Caiu no abismo LLM";
         } else {
-            // Rodada 4+: AVANÇA com último movimento
-            int posicaoAtual = current.getPosicao();
-            int ultimoMovimento = current.getLastMoveSpaces();
-            if (ultimoMovimento <= 0) {
-                ultimoMovimento = 1;
+            // Rodada 4+: ferramenta perdeu o efeito, remove se existir
+            if (current.hasTool(5)) {
+                current.removeTool(5);
             }
-            int novaPosicao = posicaoAtual + ultimoMovimento;
-            if (novaPosicao < 1) {
-                novaPosicao = 1;
-            }
-            current.setPosicaoSemGuardarHistorico(novaPosicao);
-            return "Caiu no abismo LLM (rodada " + currentTurn + ")";
         }
+
+        // Aplica efeito do LLM (AbyssLLM.applyEffect já faz tudo)
+        return abyss.applyEffect(current, this);
     }
 
     private String processAbyss(BoardElement abyss, Player current) {
