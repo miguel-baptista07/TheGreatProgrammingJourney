@@ -1,10 +1,5 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
-/**
- * Abismo LLM - VERSÃO FINAL TESTADA
- *
- * GARANTE: NUNCA retorna null!
- */
 public class AbyssLLM extends AbyssBase {
 
     public AbyssLLM(int position) {
