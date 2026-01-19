@@ -57,9 +57,26 @@ public class AbyssLLM extends AbyssBase {
 
         } else {
             // Rodadas 1-3: RECUA para a posição anterior
+            // Usa a posição anterior do movimento (getPosicaoAnteriorMovimento)
+            // Mas se não estiver disponível, usa histórico
             int posicaoAnterior = player.getPosicaoAnteriorMovimento();
-            if (posicaoAnterior < 1) {
-                posicaoAnterior = 1;
+            
+            // Se a posição anterior for igual à atual ou inválida, tenta usar histórico
+            if (posicaoAnterior == posicaoAtual || posicaoAnterior < 1) {
+                try {
+                    // Tenta obter a posição de 1 movimento atrás do histórico
+                    int posHistorico = player.getHistoricalPosition(1);
+                    if (posHistorico >= 1 && posHistorico != posicaoAtual) {
+                        posicaoAnterior = posHistorico;
+                    }
+                } catch (Exception e) {
+                    // Se falhar, usa fallback
+                }
+            }
+            
+            if (posicaoAnterior < 1 || posicaoAnterior == posicaoAtual) {
+                // Fallback: recua 2 casas se não conseguir obter posição anterior
+                posicaoAnterior = Math.max(1, posicaoAtual - 2);
             }
 
             player.setPosicaoSemGuardarHistorico(posicaoAnterior);
