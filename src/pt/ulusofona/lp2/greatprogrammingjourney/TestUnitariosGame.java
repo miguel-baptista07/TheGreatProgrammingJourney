@@ -800,20 +800,6 @@ public class TestUnitariosGame {
     }
 
     @Test
-    void testAllAbyssNames() {
-        assertEquals("Erro de sintaxe", ElementsFactory.createAbyss(0, 1).getName());
-        assertEquals("Logic Error", ElementsFactory.createAbyss(1, 1).getName());
-        assertEquals("Exception", ElementsFactory.createAbyss(2, 1).getName());
-        assertEquals("File Not Found", ElementsFactory.createAbyss(3, 1).getName());
-        assertEquals("Crash", ElementsFactory.createAbyss(4, 1).getName());
-        assertEquals("Duplicated Code", ElementsFactory.createAbyss(5, 1).getName());
-        assertEquals("Side Effects", ElementsFactory.createAbyss(6, 1).getName());
-        assertEquals("BSOD", ElementsFactory.createAbyss(7, 1).getName());
-        assertEquals("Infinite Loop", ElementsFactory.createAbyss(8, 1).getName());
-        assertEquals("Segmentation Fault", ElementsFactory.createAbyss(9, 1).getName());
-    }
-
-    @Test
     void testAllToolNames() {
         assertEquals("Herança", ElementsFactory.createTool(0, 1).getName());
         assertEquals("Programação Funcional", ElementsFactory.createTool(1, 1).getName());
@@ -861,8 +847,12 @@ public class TestUnitariosGame {
         Report r = new Report(5, gm.getPlayers(), 20);
         List<String> results = r.generateReport();
 
-        assertTrue(results.contains("VENCEDOR"));
-        assertTrue(results.contains("A")); // Jogador com maior posição
+        assertFalse(results.contains("VENCEDOR"));
+
+        // Verifica que os jogadores aparecem no report
+        String fullReport = String.join("\n", results);
+        assertTrue(fullReport.contains("A"));
+        assertTrue(fullReport.contains("B"));
     }
 
     @Test

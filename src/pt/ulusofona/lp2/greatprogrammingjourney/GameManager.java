@@ -553,21 +553,17 @@ public class GameManager {
     private String processLLMAbyss(BoardElement abyss, Player current) {
         int currentTurn = turnCounter;
 
-        // Rodadas 1-3: ferramenta funciona e anula o efeito
         if (currentTurn <= 3) {
             if (current.hasTool(5)) {
                 current.removeTool(5);
-                // Jogador FICA na posição atual (não move)
                 return "LLM anulado por Ajuda do Professor";
             }
         } else {
-            // Rodada 4+: ferramenta perdeu o efeito, remove se existir
             if (current.hasTool(5)) {
                 current.removeTool(5);
             }
         }
 
-        // Aplica efeito do LLM (AbyssLLM.applyEffect já faz tudo)
         return abyss.applyEffect(current, this);
     }
 
