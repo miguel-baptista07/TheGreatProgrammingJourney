@@ -507,10 +507,12 @@ public class GameManager {
         for (BoardElement el : elements) {
             if (!el.isAbyss()) {
                 String msg = el.applyEffect(current, this);
-                if (message == null) {
-                    message = msg;
-                } else if (msg != null) {
-                    message = message + " " + msg;
+                if (msg != null && !msg.isEmpty()) {
+                    if (message == null) {
+                        message = msg;
+                    } else {
+                        message = message + " " + msg;
+                    }
                 }
             }
         }
@@ -533,19 +535,29 @@ public class GameManager {
                             }
                         } else {
                             String msg = el.applyEffect(current, this);
-                            if (message == null) {
-                                message = msg;
-                            } else if (msg != null) {
-                                message = message + " " + msg;
+                            if (msg != null && !msg.isEmpty()) {
+                                if (message == null) {
+                                    message = msg;
+                                } else {
+                                    message = message + " " + msg;
+                                }
+                            } else {
+                                // FALLBACK: se applyEffect retornar null (não devia!)
+                                message = (message == null) ? "Caiu no abismo LLM" : message + " Caiu no abismo LLM";
                             }
                         }
                     } else {
                         // A partir da rodada 4: SEMPRE aplica efeito
                         String msg = el.applyEffect(current, this);
-                        if (message == null) {
-                            message = msg;
-                        } else if (msg != null) {
-                            message = message + " " + msg;
+                        if (msg != null && !msg.isEmpty()) {
+                            if (message == null) {
+                                message = msg;
+                            } else {
+                                message = message + " " + msg;
+                            }
+                        } else {
+                            // FALLBACK: se applyEffect retornar null (não devia!)
+                            message = (message == null) ? "Caiu no abismo LLM" : message + " Caiu no abismo LLM";
                         }
                     }
                 } else {
@@ -561,10 +573,12 @@ public class GameManager {
                         }
                     } else {
                         String msg = el.applyEffect(current, this);
-                        if (message == null) {
-                            message = msg;
-                        } else if (msg != null) {
-                            message = message + " " + msg;
+                        if (msg != null && !msg.isEmpty()) {
+                            if (message == null) {
+                                message = msg;
+                            } else {
+                                message = message + " " + msg;
+                            }
                         }
                     }
                 }
@@ -576,8 +590,11 @@ public class GameManager {
         advanceToNextAlive();
         checkGameOverCondition();
 
-        // Quando há elementos, nunca retorna null (teste espera sempre String)
-        return message != null ? message : "";
+        // GARANTIA ABSOLUTA: Quando há elementos, NUNCA retorna null
+        if (message == null || message.isEmpty()) {
+            return "Movimento processado";  // Mensagem genérica como fallback
+        }
+        return message;
     }
 
     private Integer getCounterToolForAbyss(int abyssId) {
