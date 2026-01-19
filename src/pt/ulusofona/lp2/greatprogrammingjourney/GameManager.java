@@ -33,10 +33,10 @@ public class GameManager {
 
     public static String toolName(int id) {
         switch (id) {
-            case 0: return "HeranÃ§a";
-            case 1: return "ProgramaÃ§Ã£o Funcional";
-            case 2: return "Testes UnitÃ¡rios";
-            case 3: return "Tratamento de ExcepÃ§Ãµes";
+            case 0: return "Herança";
+            case 1: return "Programação Funcional";
+            case 2: return "Testes Unitários";
+            case 3: return "Tratamento de Excepções";
             case 4: return "IDE";
             case 5: return "Ajuda do Professor";
             default: return "Desconhecida";
@@ -485,6 +485,15 @@ public class GameManager {
         }
 
         List<BoardElement> elements = board.getAllElementsAt(current.getPosicao());
+
+        // Se não há elementos na posição, não há nada a fazer
+        if (elements == null || elements.isEmpty()) {
+            turnCounter++;
+            advanceToNextAlive();
+            checkGameOverCondition();
+            return null;
+        }
+
         String message = null;
 
         for (BoardElement el : elements) {
@@ -559,7 +568,7 @@ public class GameManager {
         advanceToNextAlive();
         checkGameOverCondition();
 
-        return message != null ? message : "";
+        return message;
     }
 
     private Integer getCounterToolForAbyss(int abyssId) {
