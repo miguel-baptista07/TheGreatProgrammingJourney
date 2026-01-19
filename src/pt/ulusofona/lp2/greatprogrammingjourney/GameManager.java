@@ -33,10 +33,10 @@ public class GameManager {
 
     public static String toolName(int id) {
         switch (id) {
-            case 0: return "Herança";
-            case 1: return "Programação Funcional";
-            case 2: return "Testes Unitários";
-            case 3: return "Tratamento de Excepções";
+            case 0: return "HeranÃ§a";
+            case 1: return "ProgramaÃ§Ã£o Funcional";
+            case 2: return "Testes UnitÃ¡rios";
+            case 3: return "Tratamento de ExcepÃ§Ãµes";
             case 4: return "IDE";
             case 5: return "Ajuda do Professor";
             default: return "Desconhecida";
@@ -346,9 +346,6 @@ public class GameManager {
         }
     }
 
-    // ============================================================================
-    // MÉTODO MODIFICADO: Agora liberta jogadores automaticamente após 3 turnos
-    // ============================================================================
     public boolean moveCurrentPlayer(int nrSpaces) {
         if (gameOver) {
             return false;
@@ -369,16 +366,8 @@ public class GameManager {
             return false;
         }
 
-        // MODIFICADO: Decrementa turnos preso e verifica se foi libertado
         if (current.isPreso()) {
-            current.decrementarTurnosPreso();
-
-            if (current.isPreso()) {
-                // Jogador ainda está preso, não pode mover
-                return false;
-            }
-            // Se chegou aqui, o jogador foi libertado automaticamente!
-            // Continua com o movimento normal
+            return false;
         }
 
         int maxMovement = 6;
@@ -423,7 +412,7 @@ public class GameManager {
             return "Game over";
         }
         if (nrSpaces < 1 || nrSpaces > 6) {
-            return "Número inválido de espaços";
+            return "NÃºmero invÃ¡lido de espaÃ§os";
         }
         if (players.isEmpty()) {
             return "Sem Jogadores";
@@ -432,11 +421,7 @@ public class GameManager {
         Player current = players.get(currentPlayerIndex);
 
         if (current.isPreso()) {
-            int turnosRestantes = current.getTurnosPreso();
-            if (turnosRestantes > 0) {
-                return "O jogador está preso (" + turnosRestantes + " turnos restantes)";
-            }
-            return "O jogador está preso";
+            return "Player is imprisoned";
         }
 
         String firstLang = current.getPrimeiraLinguagem();
@@ -481,7 +466,7 @@ public class GameManager {
 
     public String reactToAbyssOrTool() {
         if (gameOver || players.isEmpty()) {
-            return null;
+            return "";
         }
 
         normalizeCurrentIndex();
@@ -489,7 +474,7 @@ public class GameManager {
 
         if (current.isEliminado()) {
             advanceToNextAlive();
-            return null;
+            return "";
         }
 
         List<Player> playersNaPosicao = getPlayersAtPosition(current.getPosicao());
@@ -516,11 +501,35 @@ public class GameManager {
         for (BoardElement el : elements) {
             if (el.isAbyss()) {
                 if (el.getId() == 20) {
-                    String msg = el.applyEffect(current, this);
-                    if (message == null) {
-                        message = msg;
-                    } else if (msg != null) {
-                        message = message + " " + msg;
+                    // LÓGICA ESPECIAL PARA LLM
+                    int currentTurn = turnCounter;
+
+                    // Nas primeiras 3 rodadas: verifica ferramenta "Ajuda do Professor"
+                    if (currentTurn <= 3) {
+                        if (current.hasTool(5)) {
+                            current.removeTool(5);
+                            String msg = "LLM anulado por Ajuda do Professor";
+                            if (message == null) {
+                                message = msg;
+                            } else {
+                                message = message + " " + msg;
+                            }
+                        } else {
+                            String msg = el.applyEffect(current, this);
+                            if (message == null) {
+                                message = msg;
+                            } else if (msg != null) {
+                                message = message + " " + msg;
+                            }
+                        }
+                    } else {
+                        // A partir da rodada 4: SEMPRE aplica efeito
+                        String msg = el.applyEffect(current, this);
+                        if (message == null) {
+                            message = msg;
+                        } else if (msg != null) {
+                            message = message + " " + msg;
+                        }
                     }
                 } else {
                     Integer counterToolId = getCounterToolForAbyss(el.getId());
@@ -550,7 +559,7 @@ public class GameManager {
         advanceToNextAlive();
         checkGameOverCondition();
 
-        return message;
+        return message != null ? message : "";
     }
 
     private Integer getCounterToolForAbyss(int abyssId) {

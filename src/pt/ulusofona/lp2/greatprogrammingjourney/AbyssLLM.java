@@ -1,9 +1,6 @@
 package pt.ulusofona.lp2.greatprogrammingjourney;
 
 public class AbyssLLM extends AbyssBase {
-
-    private static final int AJUDA_DO_PROFESSOR = 5;
-
     public AbyssLLM(int position) {
         super(20, position);
     }
@@ -15,29 +12,27 @@ public class AbyssLLM extends AbyssBase {
 
     @Override
     public String applyEffect(Player player, GameManager manager) {
-        boolean temAjuda = player.hasTool(AJUDA_DO_PROFESSOR);
+        int currentTurn = manager.getTurnCounter();
 
-        // Antes da 4ª ronda (turnCounter < 4, ou seja, rondas 1, 2, 3)
-        if (manager.getTurnCounter() < 4) {
-            if (temAjuda) {
-                player.removeTool(AJUDA_DO_PROFESSOR);
-                return "Caiu no LLM mas a Ajuda do Professor anulou o efeito.";
+        // A partir da rodada 4: jogador tem experiência e AVANÇA
+        if (currentTurn >= 4) {
+            int ultimoMovimento = player.getLastMoveSpaces();
+            int novaPosicao = player.getPosicao() + ultimoMovimento;
+
+            if (novaPosicao < 1) {
+                novaPosicao = 1;
             }
 
-            int posicaoAnterior = player.getPosicaoAnteriorMovimento();
-            player.setPosicaoSemGuardarHistorico(posicaoAnterior);
-            return "Caiu no LLM! Recuas para a posição onde estavas antes";
+            player.setPosicao(novaPosicao);
+            return "Caiu no LLM mas já tem experiência! Avança " + ultimoMovimento + " casas";
+        } else {
+            // Rodadas 1-3: sem experiência, recua 2 casas
+            int novaPosicao = player.getPosicao() - 2;
+            if (novaPosicao < 1) {
+                novaPosicao = 1;
+            }
+            player.setPosicao(novaPosicao);
+            return "Caiu no abismo LLM: recua 2 casas (rodada " + currentTurn + ")";
         }
-
-        // A partir da 4ª ronda (turnCounter >= 4)
-        if (temAjuda) {
-            player.removeTool(AJUDA_DO_PROFESSOR);
-        }
-
-        int movimentoAnterior = player.getPosicao() - player.getPosicaoAnteriorMovimento();
-        int novaPosicao = player.getPosicao() + movimentoAnterior;
-        player.setPosicaoSemGuardarHistorico(novaPosicao);
-
-        return "Caiu no LLM mas já tem experiência! Avança tantas casas quantas as do último movimento";
     }
 }
