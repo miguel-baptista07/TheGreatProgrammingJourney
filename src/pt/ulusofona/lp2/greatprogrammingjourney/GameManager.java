@@ -318,8 +318,10 @@ public class GameManager {
         normalizeCurrentIndex();
         Player cur = players.get(currentPlayerIndex);
 
-        if (cur.isEliminado()) {
-            advanceToNextAlive();
+        // Se o jogador atual estiver eliminado ou preso, avançamos para o próximo que possa jogar.
+        // Se ninguém puder jogar, o jogo termina (empate).
+        if (cur.isEliminado() || cur.isPreso()) {
+            advanceToNextPlayable();
             if (players.isEmpty() || gameOver) {
                 return -1;
             }
@@ -367,6 +369,9 @@ public class GameManager {
         }
 
         if (current.isPreso()) {
+            // Passa o turno; se todos estiverem presos, o jogo acaba (empate).
+            advanceToNextPlayable();
+            checkGameOverCondition();
             return false;
         }
 
@@ -473,8 +478,16 @@ public class GameManager {
         Player current = players.get(currentPlayerIndex);
 
         if (current.isEliminado()) {
-            advanceToNextAlive();
-            return null;
+            advanceToNextPlayable();
+            checkGameOverCondition();
+            return "";
+        }
+
+        // Se o jogador estiver preso, não reage novamente ao mesmo quadrado; apenas passa o turno.
+        if (current.isPreso()) {
+            advanceToNextPlayable();
+            checkGameOverCondition();
+            return "";
         }
 
         List<Player> playersNaPosicao = getPlayersAtPosition(current.getPosicao());
@@ -532,7 +545,7 @@ public class GameManager {
         }
 
         turnCounter++;
-        advanceToNextAlive();
+        advanceToNextPlayable();
         checkGameOverCondition();
 
         return message;
@@ -573,6 +586,34 @@ public class GameManager {
             }
 
             if (tentativas >= maxTentativas) {
+                gameOver = true;
+                return;
+            }
+        } while (true);
+    }
+
+    // Avança para o próximo jogador que esteja "em jogo" e possa efetivamente jogar (não eliminado e não preso).
+    // Se não existir nenhum, termina o jogo (empate).
+    private void advanceToNextPlayable() {
+        if (players.isEmpty()) {
+            currentPlayerIndex = 0;
+            return;
+        }
+
+        int tentativas = 0;
+        int maxTentativas = players.size();
+
+        do {
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+            tentativas++;
+
+            Player p = players.get(currentPlayerIndex);
+            if (!p.isEliminado() && !p.isPreso()) {
+                return;
+            }
+
+            if (tentativas >= maxTentativas) {
+                // Ninguém pode jogar: ou todos eliminados ou todos presos -> jogo acaba empatado.
                 gameOver = true;
                 return;
             }
