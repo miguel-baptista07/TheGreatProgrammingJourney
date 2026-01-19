@@ -569,15 +569,33 @@ public class GameManager {
             // Continua para fallback
         }
 
-        // Se temos mensagem válida, retorna
+        // Se temos mensagem válida, retorna (já moveu o jogador)
         if (msg != null && !msg.isEmpty()) {
             return msg;
         }
 
-        // Fallback GARANTIDO - sempre retorna algo
+        // Fallback GARANTIDO - sempre retorna algo E move o jogador se necessário
         if (currentTurn <= 3) {
+            // Rodadas 1-3: RECUA 2 casas
+            int posicaoAtual = current.getPosicao();
+            int novaPosicao = posicaoAtual - 2;
+            if (novaPosicao < 1) {
+                novaPosicao = 1;
+            }
+            current.setPosicao(novaPosicao);
             return "Caiu no abismo LLM";
         } else {
+            // Rodada 4+: AVANÇA com último movimento
+            int posicaoAtual = current.getPosicao();
+            int ultimoMovimento = current.getLastMoveSpaces();
+            if (ultimoMovimento <= 0) {
+                ultimoMovimento = 1;
+            }
+            int novaPosicao = posicaoAtual + ultimoMovimento;
+            if (novaPosicao < 1) {
+                novaPosicao = 1;
+            }
+            current.setPosicao(novaPosicao);
             return "Caiu no abismo LLM (rodada " + currentTurn + ")";
         }
     }
