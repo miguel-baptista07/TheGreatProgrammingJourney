@@ -52,7 +52,7 @@ public class AbyssLLM extends AbyssBase {
             }
 
             player.setPosicaoSemGuardarHistorico(novaPosicao);
-            return "Caiu no LLM mas já tem experiência! Avança " + ultimoMovimento + " casas";
+            return "Caiu no LLM mas já tem experiência! Avança tantas casas quantas as do último movimento";
         }
     }
 }
