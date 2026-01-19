@@ -366,8 +366,16 @@ public class GameManager {
             return false;
         }
 
+        // MODIFICADO: Decrementa turnos preso e verifica se foi libertado
         if (current.isPreso()) {
-            return false;
+            current.decrementarTurnosPreso();
+
+            if (current.isPreso()) {
+                // Jogador ainda está preso, não pode mover
+                return false;
+            }
+            // Se chegou aqui, o jogador foi libertado automaticamente!
+            // Continua com o movimento normal
         }
 
         int maxMovement = 6;

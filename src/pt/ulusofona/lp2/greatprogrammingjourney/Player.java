@@ -152,10 +152,11 @@ public class Player {
         return preso;
     }
 
+    // MODIFICADO: setPreso agora define turnosPreso
     public void setPreso(boolean preso) {
         this.preso = preso;
         if (preso) {
-            this.turnosPreso = 3;  // MODIFICADO: jogador fica preso por 3 turnos
+            this.turnosPreso = 3;  // Preso por 3 turnos
         } else {
             this.turnosPreso = 0;
         }
@@ -163,13 +164,15 @@ public class Player {
 
     public void prender(int turnos) {
         this.preso = true;
-        this.turnosPreso = turnos;  // MODIFICADO: usa o parâmetro
+        this.turnosPreso = turnos;
     }
 
+    // NOVO: getter para turnos preso
     public int getTurnosPreso() {
         return turnosPreso;
     }
 
+    // NOVO: método para decrementar turnos preso
     public void decrementarTurnosPreso() {
         if (turnosPreso > 0) {
             turnosPreso--;
@@ -241,7 +244,7 @@ public class Player {
     public String toString() {
         String ferramentasStr = ferramentas.isEmpty() ? "No tools" : getFerramentasAsString();
         String estadoStr = eliminado ? "Derrotado" :
-                preso ? "Preso (" + turnosPreso + " turnos)" :  // MODIFICADO: mostra turnos restantes
+                preso ? "Preso (" + turnosPreso + " turnos)" :
                         "Em Jogo";
 
         return "ID: " + id + " | Nome: " + nome + " | Posição: " + posicao +
