@@ -18,39 +18,52 @@ public class AbyssLLM extends AbyssBase {
             return "Erro: abismo LLM";
         }
 
+        int currentTurn;
+        int posicaoAtual;
+        
         try {
-            int currentTurn = manager.getTurnCounter();
-            int posicaoAtual = player.getPosicao();
+            currentTurn = manager.getTurnCounter();
+            posicaoAtual = player.getPosicao();
+        } catch (Exception e) {
+            // Se não conseguir obter turn ou posição, tenta voltar para posição anterior
+            int posicaoAnterior = player.getPosicaoAnteriorMovimento();
+            if (posicaoAnterior < 1) {
+                posicaoAnterior = 1;
+            }
+            player.setPosicaoSemGuardarHistorico(posicaoAnterior);
+            return "Caiu no abismo LLM";
+        }
 
-            // Rodada 4+: AVANÇA
-            if (currentTurn >= 4) {
-                int ultimoMovimento = player.getLastMoveSpaces();
-                if (ultimoMovimento <= 0) {
-                    ultimoMovimento = 1; // Fallback
-                }
-
-                int novaPosicao = posicaoAtual + ultimoMovimento;
-                if (novaPosicao < 1) {
-                    novaPosicao = 1;
-                }
-
-                player.setPosicaoSemGuardarHistorico(novaPosicao);
-                return "Caiu no LLM mas já tem experiência! Avança " + ultimoMovimento + " casas";
-
-            } else {
-                // Rodadas 1-3: RECUA
-                int novaPosicao = posicaoAtual - 2;
-                if (novaPosicao < 1) {
-                    novaPosicao = 1;
-                }
-
-                player.setPosicaoSemGuardarHistorico(novaPosicao);
-                return "Caiu no abismo LLM: recua 2 casas (rodada " + currentTurn + ")";
+        // Rodada 4+: AVANÇA
+        if (currentTurn >= 4) {
+            int ultimoMovimento = 0;
+            try {
+                ultimoMovimento = player.getLastMoveSpaces();
+            } catch (Exception e) {
+                // Continua com fallback
+            }
+            
+            if (ultimoMovimento <= 0) {
+                ultimoMovimento = 1; // Fallback
             }
 
-        } catch (Exception e) {
-            // Fallback final - NUNCA retorna null!
-            return "Caiu no abismo LLM";
+            int novaPosicao = posicaoAtual + ultimoMovimento;
+            if (novaPosicao < 1) {
+                novaPosicao = 1;
+            }
+
+            player.setPosicaoSemGuardarHistorico(novaPosicao);
+            return "Caiu no LLM mas já tem experiência! Avança " + ultimoMovimento + " casas";
+
+        } else {
+            // Rodadas 1-3: RECUA para a posição anterior
+            int posicaoAnterior = player.getPosicaoAnteriorMovimento();
+            if (posicaoAnterior < 1) {
+                posicaoAnterior = 1;
+            }
+
+            player.setPosicaoSemGuardarHistorico(posicaoAnterior);
+            return "Caiu no abismo LLM: recua 2 casas (rodada " + currentTurn + ")";
         }
     }
 }

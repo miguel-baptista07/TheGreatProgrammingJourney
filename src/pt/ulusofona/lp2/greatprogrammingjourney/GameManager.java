@@ -576,13 +576,12 @@ public class GameManager {
 
         // Fallback GARANTIDO - sempre retorna algo E move o jogador se necessário
         if (currentTurn <= 3) {
-            // Rodadas 1-3: RECUA 2 casas
-            int posicaoAtual = current.getPosicao();
-            int novaPosicao = posicaoAtual - 2;
-            if (novaPosicao < 1) {
-                novaPosicao = 1;
+            // Rodadas 1-3: RECUA para posição anterior
+            int posicaoAnterior = current.getPosicaoAnteriorMovimento();
+            if (posicaoAnterior < 1) {
+                posicaoAnterior = 1;
             }
-            current.setPosicaoSemGuardarHistorico(novaPosicao);
+            current.setPosicaoSemGuardarHistorico(posicaoAnterior);
             return "Caiu no abismo LLM";
         } else {
             // Rodada 4+: AVANÇA com último movimento
