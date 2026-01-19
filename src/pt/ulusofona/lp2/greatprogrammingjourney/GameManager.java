@@ -560,8 +560,9 @@ public class GameManager {
                 return "LLM anulado por Ajuda do Professor";
             }
         }
+        // Nas rodadas 4+, a ferramenta não funciona mas não precisa ser removida
 
-        // Rodada 4+ ou não tem ferramenta: aplica efeito
+        // Aplica efeito do LLM
         String msg = null;
         try {
             msg = abyss.applyEffect(current, this);
