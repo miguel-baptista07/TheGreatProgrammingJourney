@@ -529,13 +529,11 @@ public class GameManager {
             if (el.isAbyss()) {
                 String abyssMsg = processAbyss(el, current);
 
-                // Garantir que sempre temos uma mensagem do abismo
-                if (abyssMsg != null && !abyssMsg.isEmpty()) {
-                    if (messages.length() > 0) {
-                        messages.append(" ");
-                    }
-                    messages.append(abyssMsg);
+                // SEMPRE adiciona mensagem do abismo (processAbyss sempre retorna string válida)
+                if (messages.length() > 0) {
+                    messages.append(" ");
                 }
+                messages.append(abyssMsg);
 
                 break; // Processa apenas 1 abismo
             }
@@ -548,6 +546,38 @@ public class GameManager {
         // GARANTIR: nunca retorna null quando há elementos
         String result = messages.toString();
         return result.isEmpty() ? "Processado" : result;
+    }
+
+    private String processLLMAbyss(BoardElement abyss, Player current) {
+        int currentTurn = turnCounter;
+
+        // Rodadas 1-3: ferramenta funciona
+        if (currentTurn <= 3) {
+            if (current.hasTool(5)) {
+                current.removeTool(5);
+                return "LLM anulado por Ajuda do Professor";
+            }
+        }
+
+        // Rodada 4+ ou não tem ferramenta: aplica efeito
+        String msg = null;
+        try {
+            msg = abyss.applyEffect(current, this);
+        } catch (Exception e) {
+            // Continua para fallback
+        }
+
+        // Se temos mensagem válida, retorna
+        if (msg != null && !msg.isEmpty()) {
+            return msg;
+        }
+
+        // Fallback GARANTIDO - sempre retorna algo
+        if (currentTurn <= 3) {
+            return "Caiu no abismo LLM";
+        } else {
+            return "Caiu no abismo LLM (rodada " + currentTurn + ")";
+        }
     }
 
     private String processAbyss(BoardElement abyss, Player current) {
@@ -579,35 +609,6 @@ public class GameManager {
 
         // Fallback garantido
         return "Caiu no abismo " + abyss.getName();
-    }
-
-    private String processLLMAbyss(BoardElement abyss, Player current) {
-        int currentTurn = turnCounter;
-
-        // Rodadas 1-3: ferramenta funciona
-        if (currentTurn <= 3) {
-            if (current.hasTool(5)) {
-                current.removeTool(5);
-                return "LLM anulado por Ajuda do Professor";
-            }
-        }
-
-        // Rodada 4+ ou não tem ferramenta: aplica efeito
-        try {
-            String msg = abyss.applyEffect(current, this);
-            if (msg != null && !msg.isEmpty()) {
-                return msg;
-            }
-        } catch (Exception e) {
-            // Continua para fallback
-        }
-
-        // Fallback garantido
-        if (currentTurn <= 3) {
-            return "Caiu no abismo LLM";
-        } else {
-            return "Caiu no abismo LLM (rodada " + currentTurn + ")";
-        }
     }
 
     private Integer getCounterToolForAbyss(int abyssId) {
